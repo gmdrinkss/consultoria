@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- MUDANÇA RESPONSIVIDADE: maximum-scale=1.0 e user-scalable=no previnem o iPhone de dar zoom involuntário -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GMDrinks - Orçamentos & Pagamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased; /* Suaviza fontes no iOS */
+        }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .gold-text { color: #d4af37; }
+        .gold-bg { background-color: #d4af37; }
+        .gold-border { border-color: #d4af37; }
+        
+        /* Barreira de Acesso */
+        #access-barrier {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(25px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .barrier-card {
+            background: #151515;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 40px 30px;
+            border-radius: 32px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .barrier-input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            outline: none;
+            /* MUDANÇA RESPONSIVIDADE: No mínimo 16px para iOS não dar zoom automático ao digitar */
+            font-size: 16px; 
+            transition: border-color 0.3s;
+        }
+        .barrier-input:focus { border-color: #d4af37; }
+
+        /* Estado Bloqueado */
+        .content-locked {
+            filter: blur(20px);
+            pointer-events: none;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .card-premium-row {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            min-height: 360px;
+        }
+        .card-highlight {
+            border: 1px solid #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+        
+        .side-image-container {
+            width: 35%; 
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .plan-image {
+            width: 150%; 
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7) contrast(1.1);
+            transform-origin: left center;
+            animation: panLeftToRight 15s infinite alternate ease-in-out;
+        }
+
+        @keyframes panLeftToRight {
+            0% { transform: scale(1.1) translateX(0); }
+            100% { transform: scale(1.1) translateX(-25%); }
+        }
+
+        .input-gold {
+            background: #262626;
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #444;
+            color: #d4af37;
+            text-align: center;
+            outline: none;
+        }
+        
+        .btn-step {
+            background: #333;
+            color: #d4af37;
+            /* MUDANÇA RESPONSIVIDADE: Touch target maior para cliques mais fáceis no mobile */
+            min-width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            font-size: 20px;
+        }
+
+        .list-bullet { color: #d4af37; margin-right: 6px; font-weight: bold; }
+        .custom-grid-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 4px;
+            text-align: left;
+        }
+
+        .price-badge {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        .btn-aux {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            /* MUDANÇA RESPONSIVIDADE: Fonte aumentada para leitura mobile */
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 12px 10px;
+            border-radius: 999px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-aux:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: #d4af37;
+        }
+
+        /* CORREÇÃO PARA O MODAL (SIMULADOR DE PAGAMENTO) NÃO CORTAR NO iPHONE */
+        .step-overlay {
+            position: fixed;
+            inset: 0; /* Substitui top, left, width e height 100% */
+            height: 100dvh; /* dvh resolve o problema da barra de navegação no Safari iOS */
+            background: rgba(0,0,0,0.98);
+            z-index: 100;
+            display: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Garante scroll suave no iPhone */
+            padding: 20px;
+            /* Dá espaço adicional pra barra segura (linha preta) nos iPhones recentes */
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+
+        .drink-selection-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .drink-selection-card:hover:not(.locked) {
+            border-color: #555;
+            transform: translateY(-4px);
+        }
+        .drink-selection-card.selected {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .lock-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            text-align: center;
+            padding: 10px;
+        }
+        .lock-icon-circle {
+            background: #d4af37;
+            color: black;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .check-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #d4af37;
+            color: black;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+            z-index: 30;
+        }
+        .drink-selection-card.selected .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .drink-img-thumb {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: 0.5s ease;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            color: #888;
+            font-size: 11px; /* Aumentado um pouco para celular */
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 10px 0; /* Maior área de clique */
+        }
+        .btn-back:hover { color: #d4af37; }
+
+        .payment-option-card {
+            background: #151515;
+            border: 1px solid #222;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .payment-option-card:hover {
+            border-color: #d4af3755;
+            background: #1a1a1a;
+        }
+
+        .example-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 2px solid #d4af37;
+            padding: 12px;
+            margin-top: 12px;
+            /* MUDANÇA RESPONSIVIDADE: Fonte um pouco maior no celular */
+            font-size: 12px; 
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .menu-visual-card {
+            background: #151515;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+        .menu-visual-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 1px solid #d4af3733;
+        }
+
+        .schedule-box {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .input-date {
+            background: #000;
+            border: 1px solid #444;
+            color: #d4af37;
+            padding: 12px 10px; /* Mais padding para dedo */
+            border-radius: 8px;
+            font-size: 16px; /* Evita zoom no iOS */
+            width: 100%;
+            outline: none;
+        }
+        .input-date:focus { border-color: #d4af37; }
+
+        /* MUDANÇAS RESPONSIVAS ESPECÍFICAS (Media Queries) */
+        @media (min-width: 768px) {
+            .btn-aux { font-size: 9px; padding: 10px; }
+            .example-box { font-size: 11px; }
+            .btn-back { font-size: 10px; padding: 0; margin-bottom: 20px; }
+        }
+
+        @media (max-width: 768px) {
+            /* Garante que o card tem permissão para crescer sem cortar nada */
+            .card-premium-row { flex-direction: column; height: auto; min-height: max-content; }
+            /* Imagem com altura melhor no celular para não ficar esmagada */
+            .side-image-container { width: 100%; height: 220px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+            /* Lista em apenas 1 coluna no celular para o texto caber direitinho */
+            .custom-grid-list { grid-template-columns: 1fr; gap: 8px; }
+            .barrier-card { padding: 30px 20px; }
+        }
+
+        @media screen and (max-width: 440px) and (min-height: 850px) {
+            main, .step-overlay > div {
+                min-height: 100vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                padding-top: 0px !important;
+                padding-bottom: 100px !important;
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 pb-10">
+
+    <!-- BARREIRA DE ACESSO -->
+    <div id="access-barrier">
+        <div class="barrier-card">
+            <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter">GMDrinks</h1>
+            <!-- MUDANÇA: text-[10px] -> text-xs md:text-[10px] para ser legível no mobile -->
+            <p class="text-xs md:text-[10px] text-gray-500 uppercase tracking-[0.4em] mb-8">Consultoria de Drinks</p>
+            
+            <input type="text" id="lead-name-barrier" placeholder="Seu Nome Completo" class="barrier-input">
+            <input type="tel" id="lead-whatsapp-barrier" placeholder="WhatsApp (DDD)" class="barrier-input">
+            
+            <!-- LINHA DUPLA: DATA E CONVIDADOS -->
+            <div class="flex gap-3 mb-2">
+                <div class="flex-1 text-left">
+                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Data do Evento</label>
+                    <input type="date" id="lead-date-barrier" class="barrier-input mb-0">
+                </div>
+                <div class="w-1/3 text-left">
+                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Convidados</label>
+                    <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input mb-0">
+                </div>
+            </div>
+            
+            <button type="button" onclick="unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-6 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+                Acessar Orçamentos
+            </button>
+            <p class="text-[11px] md:text-[9px] text-gray-600 mt-8 uppercase tracking-widest">Experiência Premium Garantida</p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div id="app-container" class="content-locked w-full flex flex-col items-center">
+        <header class="mt-4 mb-8 text-center">
+            <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1">GMDrinks</h1>
+            <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto">A sofisticação que o seu evento merece em cada detalhe.</p>
+        </header>
+
+        <main id="main-content" class="w-full max-w-5xl space-y-8">
+            
+            <!-- Plano Essencial -->
+            <section class="card-premium-row rounded-3xl">
+                <div class="side-image-container">
+                    <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200" alt="[Imagem de Coquetéis Clássicos]" class="plan-image">
+                </div>
+                
+                <div class="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold tracking-widest uppercase">Plano Essencial</h2>
+                            <span class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest" >Frete Gratis"BH"Região</span>
+                        </div>
+                        
+                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-4">
+                            <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> 8 drinks à escolha</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> 4 horas de Open Bar</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Taças e Copos</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Frutas e Xaropes</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Estrutura Completa</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Iluminação&Decoração</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Estrutura completa</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span>Gelo</li>
+                            <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffEssencial">2 Bartenders + 1 Barback</span></li>
+                        </div>
+
+                        <!-- NOVA SEÇÃO: TAGS DE BEBIDAS INCLUSAS (ESSENCIAL) -->
+                        <div class="mt-2 p-3 rounded-xl bg-black/40 border border-white/5">
+                            <span class="block text-[8px] uppercase text-gray-500 font-bold tracking-[0.2em] mb-2">Marcas Inclusas</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">VODKA ORLOF</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">RUM MONTILLA</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">GIN ROCKS</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">XAROPES/LICORES ARTESANAIS</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="space-y-4 pt-4 border-t border-white/5 mt-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                                <div class="flex flex-col items-start space-y-1">
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
+                                        <button type="button" onclick="stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
+                                        <input type="number" id="guestInputEssencial" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <button type="button" onclick="stepValue('Essencial', 1)" class="btn-step rounded-r-lg">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end sm:items-start">
+                                    <span class="text-xs md:text-[0.7rem] text-[#888] uppercase font-bold">Por Pessoa</span>
+                                    <div class="text-lg font-bold text-white" id="perPersonEssencial">R$ 0,00</div>
+                                </div>
+                            </div>
+
+                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[140px] w-full sm:w-auto">
+                                <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
+                                <div class="text-xl font-bold gold-text" id="priceEssencial">R$ 0,00</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 mt-4">
+                            <button type="button" onclick="openForm('Essencial')" class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                                Escolho este Plano !
+                            </button>
+                            
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button type="button" onclick="showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button type="button" onclick="directSimulate('Essencial')" class="btn-aux">Simular Pagamento</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Plano Premium -->
+            <section class="card-premium-row card-highlight rounded-3xl relative">
+                <div class="side-image-container">
+                    <img src="https://wallpapercave.com/wp/wp12235428.jpg" alt="[Imagem de Coquetéis Premium]" class="plan-image" style="animation-delay: -5s;">
+                </div>
+                
+                <div class="absolute top-4 right-6 gold-bg text-black text-xs md:text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg z-10">
+                    Mais Vendido
+                </div>
+                
+                <div class="p-6 pb-8 flex-grow flex flex-col justify-between"> <!-- Adicionado pb-8 p/ garantir respiro extra no final -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-6 md:mt-0">
+                            <h2 class="text-xl font-bold tracking-widest uppercase">Plano Premium</h2>
+                            <span class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Frete Grátis BH"Região"</span>
+                        </div>
+                        
+                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-3">            
+                            <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
+                            <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span>BEBIDAS PREMIUN!</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> 10 drinks à escolha</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> 5 horas de serviço</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças e copos</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura completa</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Iluminação&Decoração</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags divertidas</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> 50 Shots Exclusivos</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Insumos Premium</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span>Gelo</li>
+                            <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffPremium">4 Bartenders + 1 Barback</span></li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio personalizado</li>
+                        </div>
+
+                        <!-- NOVA SEÇÃO: TAGS DE BEBIDAS INCLUSAS (PREMIUM) -->
+                        <div class="mt-2 p-3 rounded-xl bg-gradient-to-r from-[#d4af37]/10 to-transparent border border-[#d4af37]/30">
+                            <span class="block text-[8px] uppercase gold-text font-bold tracking-[0.2em] mb-2">Carta Premium Inclusa</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">VODKA ABSOLUT</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">RUM BACARDI</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">GIN TANQUERAY</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">XAROPES MONIN</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">LICOR STOCKS</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">WHISKY JACK DANIELS</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">CAMPARI</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="space-y-4 pt-4 border-t border-white/5 mt-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                                <div class="flex flex-col items-start space-y-1">
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
+                                        <button onclick="stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
+                                        <input type="number" id="guestInputPremium" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <button onclick="stepValue('Premium', 1)" class="btn-step rounded-r-lg">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end sm:items-start">
+                                    <span class="text-xs md:text-[0.7rem] text-[#888] uppercase font-bold">Por Pessoa</span>
+                                    <div class="text-lg font-bold text-white" id="perPersonPremium">R$ 0,00</div>
+                                </div>
+                            </div>
+
+                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[140px] w-full sm:w-auto">
+                                <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
+                                <div class="text-xl font-bold gold-text" id="pricePremium">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mt-4">
+                            <button onclick="openForm('Premium')"class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                                Escolho este Plano !
+                            </button>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button onclick="showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button onclick="directSimulate('Premium')" class="btn-aux">Simular Pagamento</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: CARDÁPIO VISUAL -->
+    <div id="modal-menu-visual" class="step-overlay">
+        <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
+            <div onclick="closeMenuVisual()" class="btn-back">← Voltar</div>
+            <div class="text-center mb-10">
+                <h3 class="brand-font text-4xl gold-text uppercase">O Cardápio</h3>
+                <p class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-[0.3em]">Artesanal & Sofisticado</p>
+            </div>
+            <div id="menu-grid-display" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: SELEÇÃO VISUAL DE DRINKS -->
+    <div id="step-drinks" class="step-overlay">
+        <div class="max-w-5xl mx-auto mt-10 px-4 pb-32">
+            <div id="drink-back-container">
+                <div onclick="closeAll()" class="btn-back">← Voltar para Planos</div>
+            </div>
+            
+            <div class="text-center mb-8">
+                <h3 class="brand-font text-3xl gold-text uppercase">A Sua Seleção</h3>
+                <p id="drink-limit-msg" class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-widest"></p>
+            </div>
+
+            <div id="drink-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black to-transparent z-50">
+                <div class="max-w-md mx-auto">
+                    <button type="button" id="btn-confirm-drinks" onclick="goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_0_30px_rgba(212,175,55,0.3)] opacity-50">
+                        Confirmar Seleção (0)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO FINAL -->
+    <div id="step-pay" class="step-overlay">
+        <!-- Alterado para pb-32 para espaço extra p/ o final da tela -->
+        <div class="max-w-4xl mx-auto mt-10 pb-32 px-4">
+            <div id="back-button-container">
+                <div id="btn-back-to-drinks" onclick="backToDrinks()" class="btn-back">← Voltar para Drinks</div>
+                <div id="btn-close-sim" onclick="closeAll()" class="btn-back" style="display:none;">← Voltar para Planos</div>
+            </div>
+            
+            <div class="text-center mb-6">
+                <h3 class="brand-font text-3xl gold-text uppercase">Opções de Pagamento</h3>
+                <p class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-widest">Orçamento Base: <span id="payment-ref-total" class="text-white font-bold"></span></p>
+                <div id="simulation-notice" class="mt-2 text-xs md:text-[9px] gold-text uppercase tracking-widest font-black hidden">
+                    ⚠ Visualização Prévia - Personalize seu cardápio abaixo
+                </div>
+            </div>
+
+            <div class="schedule-box">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div>
+                        <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Data prevista do evento</label>
+                        <input type="date" id="eventDate" onchange="calcTimeline()" class="input-date">
+                    </div>
+                    <div>
+                        <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Previsão de fechamento</label>
+                        <input type="date" id="closingDate" onchange="calcTimeline()" class="input-date">
+                    </div>
+                </div>
+                <div id="timeline-result" class="mt-4 p-4 bg-black/40 rounded-xl border border-white/5 text-center hidden">
+                    <p class="text-xs md:text-[10px] text-gray-400 uppercase tracking-widest">
+                        Tempo de parcelamento: <span id="months-count" class="gold-text font-bold">0 meses</span> 
+                        <span class="mx-2 opacity-30">|</span> 
+                        Quitação até: <span id="limit-date-str" class="text-white font-bold">--/--/--</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="payment-options-grid">
+                <div class="payment-option-card flex flex-col justify-between">
+                    <div>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">1. Reserva Padrão (50/50)</h4>
+                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal reduzido.</p>
+                        <div id="ex-model-1" class="example-box"></div>
+                    </div>
+                    <button type="button" onclick="handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                </div>
+                <div class="payment-option-card flex flex-col justify-between">
+                    <div>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">2. Entrada + Parcelas Pix</h4>
+                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Sem juros, parcelando livremente até o dia do evento.</p>
+                        <div id="ex-model-2" class="example-box"></div>
+                    </div>
+                    <button type="button" onclick="handlePaymentAction('Entrada + Parcelas Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                </div>
+                <div class="payment-option-card flex flex-col justify-between">
+                    <div>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">3. Parcelamento Total Pix</h4>
+                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Divida o valor total sem precisar de entrada imediata.</p>
+                        <div id="ex-model-3" class="example-box"></div>
+                    </div>
+                    <button type="button" onclick="handlePaymentAction('Parcelamento Total Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                </div>
+                <div class="payment-option-card flex flex-col justify-between">
+                    <div>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">4. Cartão de Crédito</h4>
+                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Via Mercado Pago (Com taxas de parcelamento do banco).</p>
+                        <div id="ex-model-4" class="example-box"></div>
+                    </div>
+                    <button type="button" onclick="handlePaymentAction('Cartão de Crédito')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = "5531983684231";
+        const DRINKS_DB = [
+            { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e Gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false },
+            { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e Gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false },
+            { id: 3, name: "Caip Frutas", desc: "Abacaxi, morango, maracujá, abacaxi com hortelã, e Gelo.", img: "https://i.ibb.co/1fywzrkF/Chat-GPT-Image-20-de-mar-de-2026-09-24-24.png", premium: false },
+            { id: 4, name: "Negroni", desc: "Campari, gim, vermute rosso, Guarnição laranja e Gelo.", img: "https://conteudo.imguol.com.br/c/entretenimento/73/2020/09/10/negroni-1599771396384_v2_3x4.jpg", premium: true },
+            { id: 5, name: "Aperol Spritz", desc: "Espumante, aperol, agua com gás ou sprite, e Gelo.", img: "https://static.wixstatic.com/media/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg/v1/fill/w_480,h_638,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg", premium: true },
+            { id: 6, name: "Mojito", desc: "Rum, hortelã, xarope de menta, suco de limão, sprite e Gelo.", img: "https://www.deliciousmagazine.co.uk/wp-content/uploads/2014/01/Mojito-768x960.jpg", premium: false },
+            { id: 7, name: "Sex on the Beach", desc: "Vodka, licor de pessêgo, suco de laranja, grenadine, laranja, e Gelo.", img: "https://www.receiteria.com.br/wp-content/uploads/sex-on-the-beach-01.jpg", premium: false },
+            { id: 8, name: "Pina Colada", desc: "Rum, abacaxi, leite de cocô, leite condensado, e Gelo.", img: "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2022/09/23/1631063638-receita-pina-colada.jpg", premium: false },
+            { id: 9, name: "Soda Italiana", desc: "Xaropes monin diversos, com agua com gás e gelo.", img: "https://resize.casapino.com.br/?u=https://cms-bomgourmet.s3.amazonaws.com/bomgourmet/2018/03/201803/liquori-soda-italiana-e2a4f9e0.jpg&w=661", premium: true },
+            { id: 10, name: "Cogumelo Azul", desc: "Gin, curaçau blue, limão, sprite e gelo.", img: "https://bartenderstore.com.br/wp-content/uploads/2023/08/Gin-Tonica-Azul-edit.jpg", premium: false },
+            { id: 11, name: "Nectar", desc: "Vodka, licor de morango, leite condensado, suco de morango, e Gelo.", img: "https://cdn.deliway.com.br/blog/base/31c/0c1/78a/batidinha-morango.jpg", premium: false },
+            { id: 12, name: "Whisky Sour", desc: "Whisky, suco de limão siciliano, xarope trad. e Gelo.", img: "https://blog-distiller.imgix.net/wp-content/uploads/2018/08/24143617/whiskeysourADOBE.jpg?", premium: true },
+            { id: 13, name: "Whisky com Gelo", desc: "Whisky selecionado e gelo.", img: "https://i.pinimg.com/474x/01/00/6d/01006d7987b4a31366abffc646d2302c.jpg", premium: true },
+            { id: 14, name: "Red Collins", desc: "Gin, xarope de hibisco, limão, agua com gás e Gelo.", img: "https://1769distillery.com/wp-content/uploads/2021/01/Pink-hibiscus-collins.jpg", premium: false },
+            { id: 15, name: "Maracugim", desc: "Gin, maracujá, suco de limão, sprite e gelo.", img: "https://simplifica.efacil.com.br/wp-content/uploads/2025/05/hortela-de-molho-de-maracuja.jpg", premium: false },
+            { id: 16, name: "Tropicall", desc: "Rum ou Gin, abacaxi, hortelã, limão thaitti, suco de laranja e gelo.", img: "https://content.paodeacucar.com/wp-content/uploads/2025/09/caipirinha-abacaxi-hortela.jpg", premium: false },
+            { id: 17, name: "Caip Raisin", desc: "Vodka ou cachaça, Uvas, manjerição, açucar, suco de raisin", img: "https://www.receiteria.com.br/wp-content/uploads/gin-com-uva-e-hortela-01.jpg", premium: false },
+            { id: 18, name: "Harumê", desc: "Vodka ou Gin, Creme de abacaxi, Calda de Hibisco, Xarope Trad., Suco de Limão, Hortelã e Gelo", img: "https://mapadacachaca.com.br/wp-content/uploads/2026/03/serenia-coquetel-cachaca-vibra-brasil-optimized.jpg", premium: false },
+            { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false },
+            { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false },
+            { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false },
+            { id: 22, name: "Fakerulá", desc: "Amarulá Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false }
+            
+        ];
+
+        let orderState = {
+            plan: '',
+            guests: 0,
+            name: '',
+            whatsapp: '',
+            drinks: [],
+            totalValue: 0,
+            priceStr: '',
+            maxDrinks: 0,
+            isQuickSimulation: false,
+            availableMonths: 0,
+            eventDate: ''
+        };
+
+        const fmt = (v) => {
+            const val = parseFloat(v);
+            if (isNaN(val)) return "R$ 0,00";
+            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        };
+
+        window.unlockApp = function() {
+            const name = document.getElementById('lead-name-barrier').value;
+            const wa = document.getElementById('lead-whatsapp-barrier').value;
+            const date = document.getElementById('lead-date-barrier').value;
+            const guests = document.getElementById('lead-guests-barrier').value;
+            
+            if(!name || !wa || !date || !guests) {
+                alert("Por favor, preencha todos os campos para continuar sua experiência.");
+                return;
+            }
+
+            orderState.name = name;
+            orderState.whatsapp = wa;
+            orderState.eventDate = date;
+            orderState.guests = parseInt(guests);
+            
+            document.getElementById('guestInputEssencial').value = guests;
+            document.getElementById('guestInputPremium').value = guests;
+            document.getElementById('eventDate').value = date;
+
+            const barrier = document.getElementById('access-barrier');
+            barrier.style.transition = 'opacity 0.6s ease';
+            barrier.style.opacity = '0';
+            
+            setTimeout(() => {
+                barrier.style.display = 'none';
+                document.getElementById('app-container').classList.remove('content-locked');
+                document.getElementById('app-container').style.height = 'auto';
+                window.updateDisplay();
+                calcTimeline(); 
+            }, 600);
+        };
+        //ESSENCIAL valores de acordo com a quantidade de convidados e bartenders+barback  //
+        const getEssencialData = (guests) => {
+            let perPerson = 21.30;
+            let staff = "2 Bartenders + 1 Barback";
+            let extraCost = 0;
+
+            if (guests < 50) perPerson = 53.20;
+            else if (guests <= 70) perPerson = 38.00;
+            else if (guests <= 100) perPerson = 28.87;
+            else if (guests >= 130) perPerson = 25.32;
+            else if (guests >= 180) perPerson = 25.32;
+            else if (guests <= 200) perPerson = 22.50;
+
+            if (guests > 110) { staff = "3 Bartenders + 1 Barback"; extraCost = 100.00; }
+            if (guests > 159) { staff = "4 Bartenders + 1 Barback"; extraCost = 300.00; }
+            if (guests >= 230) { staff = "5 Bartenders + 1 Barback"; extraCost = 600.00; }
+            
+            return { perPerson, staff, extraCost };
+        };
+        // PREMIUN VALORES DE ACORDO COM A QUANTIDADE DE CONVIDADOS E BARTENDERS+BARBACKS //
+        const getPremiumData = (guests) => {
+            let perPerson = 32.50;
+            let staff = "3 Bartenders + 1 Barback";
+            let extraCost = 0;
+
+            if (guests <= 49) perPerson = 89.90;
+            else if (guests <= 70) perPerson = 56.00;
+            else if (guests <= 100) perPerson = 39.56;
+            else if (guests <= 130) perPerson = 38.39;
+            else if (guests <= 150) perPerson = 36.27;
+            else if (guests <= 170) perPerson = 35.27;
+            else if (guests <= 200) perPerson = 33.50;
+            else if (guests <= 230) perPerson = 32.50;
+
+            if (guests > 130) { staff = "4 Bartenders + 1 Barback"; extraCost = 250.00; }
+            if (guests > 170) { staff = "5 Bartenders + 1 Barback"; extraCost = 500.00; }
+            if (guests > 230) { staff = "6 Bartenders + 1 Barback"; extraCost = 750.00; }
+            
+            return { perPerson, staff, extraCost };
+        };
+
+        window.updateDisplay = function() {
+            const guestsE = parseInt(document.getElementById('guestInputEssencial').value) || 0;
+            const dataE = getEssencialData(guestsE);
+            document.getElementById('perPersonEssencial').innerText = fmt(dataE.perPerson);
+            document.getElementById('priceEssencial').innerText = fmt((guestsE * dataE.perPerson) + dataE.extraCost);
+            document.getElementById('staffEssencial').innerText = dataE.staff;
+
+            const guestsP = parseInt(document.getElementById('guestInputPremium').value) || 0;
+            const dataP = getPremiumData(guestsP);
+            document.getElementById('perPersonPremium').innerText = fmt(dataP.perPerson);
+            document.getElementById('pricePremium').innerText = fmt((guestsP * dataP.perPerson) + dataP.extraCost);
+            document.getElementById('staffPremium').innerText = dataP.staff;
+        };
+
+        window.stepValue = function(plan, amount) {
+            const input = document.getElementById(`guestInput${plan}`);
+            let val = (parseInt(input.value) || 0) + amount;
+            if (val < 30) val = 30;
+            input.value = val;
+            window.updateDisplay();
+        };
+
+        window.calcTimeline = function() {
+            const evDateVal = document.getElementById('eventDate').value;
+            const clDateVal = document.getElementById('closingDate').value || new Date().toISOString().split("T")[0];
+            
+            if(!evDateVal) return;
+            const evDate = new Date(evDateVal);
+            const clDate = new Date(clDateVal);
+            
+            let months = (evDate.getFullYear() - clDate.getFullYear()) * 12;
+            months -= clDate.getMonth();
+            months += evDate.getMonth();
+            orderState.availableMonths = months <= 0 ? 1 : months;
+            
+            document.getElementById('months-count').innerText = `${orderState.availableMonths} ${orderState.availableMonths === 1 ? 'mês' : 'meses'}`;
+            document.getElementById('limit-date-str').innerText = evDate.toLocaleDateString('pt-BR');
+            document.getElementById('timeline-result').classList.remove('hidden');
+            renderPaymentExamples();
+        };
+
+        window.showMenu = function() {
+            const grid = document.getElementById('menu-grid-display');
+            grid.innerHTML = DRINKS_DB.map(drink => `
+                <div class="menu-visual-card relative">
+                    ${drink.premium ? '<span class="absolute top-2 right-2 bg-black/80 text-[#d4af37] text-[8px] px-2 py-1 rounded-full font-bold uppercase z-10">Premium</span>' : ''}
+                    <img src="${drink.img}" class="menu-visual-img" alt="[Imagem de ${drink.name}]">
+                    <div class="p-6">
+                        <h4 class="gold-text brand-font text-2xl mb-2">${drink.name}</h4>
+                        <p class="text-gray-400 text-xs md:text-[10px] leading-relaxed uppercase tracking-widest">${drink.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('modal-menu-visual').style.display = 'block';
+        };
+
+        window.closeMenuVisual = function() { document.getElementById('modal-menu-visual').style.display = 'none'; };
+
+        window.directSimulate = function(plan) {
+            orderState.plan = plan;
+            orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
+            const data = plan === 'Essencial' ? getEssencialData(orderState.guests) : getPremiumData(orderState.guests);
+            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
+            orderState.priceStr = fmt(orderState.totalValue);
+            orderState.isQuickSimulation = true; 
+            orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
+            
+            document.getElementById('btn-back-to-drinks').style.display = 'none';
+            document.getElementById('btn-close-sim').style.display = 'inline-flex';
+            document.getElementById('simulation-notice').classList.remove('hidden');
+            
+            const buttons = document.querySelectorAll('.btn-pay-action');
+            buttons.forEach(btn => btn.innerText = "Quero essa (Escolher Drinks)");
+            
+            window.goToPayment();
+        };
+
+        window.openForm = function(plan) {
+            orderState.plan = plan;
+            orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
+            const data = plan === 'Essencial' ? getEssencialData(orderState.guests) : getPremiumData(orderState.guests);
+            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
+            orderState.priceStr = fmt(orderState.totalValue);
+            orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
+            orderState.isQuickSimulation = false;
+            
+            const buttons = document.querySelectorAll('.btn-pay-action');
+            buttons.forEach(btn => btn.innerText = "Confirmar Reserva");
+            
+            document.getElementById('btn-back-to-drinks').style.display = 'inline-flex';
+            document.getElementById('btn-close-sim').style.display = 'none';
+            document.getElementById('simulation-notice').classList.add('hidden');
+            document.getElementById('step-drinks').style.display = 'block';
+            renderDrinkSelectionGrid();
+        };
+
+        function renderDrinkSelectionGrid() {
+            const grid = document.getElementById('drink-selection-grid');
+            document.getElementById('drink-limit-msg').innerText = `Selecione até ${orderState.maxDrinks} coquetéis para seu evento`;
+            grid.innerHTML = DRINKS_DB.map(drink => {
+                const isSelected = orderState.drinks.includes(drink.name);
+                const isLocked = orderState.plan === 'Essencial' && drink.premium;
+                return `
+                    <div class="drink-selection-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
+                         onclick="${isLocked ? '' : `toggleDrink('${drink.name}')`}">
+                        ${isLocked ? `
+                            <div class="lock-overlay">
+                                <div class="lock-icon-circle">🔒</div>
+                                <span class="text-[11px] md:text-[9px] gold-text font-black uppercase tracking-widest">Plano Premium</span>
+                                <button type="button" onclick="upgradeToPremium(event)" class="mt-2 text-xs md:text-[8px] bg-[#d4af37] text-black px-4 py-2 rounded-full font-black uppercase tracking-wider">Fazer Upgrade</button>
+                            </div>
+                        ` : ''}
+                        <div class="check-icon">✓</div>
+                        <img src="${drink.img}" class="drink-img-thumb" alt="[Imagem de ${drink.name}]">
+                        <div class="p-4">
+                            <h4 class="text-sm md:text-xs font-black gold-text uppercase">${drink.name}</h4>
+                            <p class="text-xs md:text-[9px] text-gray-500 mt-1 uppercase tracking-tighter line-clamp-2">${drink.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            updateConfirmBtn();
+        }
+
+        window.toggleDrink = function(name) {
+            const idx = orderState.drinks.indexOf(name);
+            if(idx > -1) orderState.drinks.splice(idx, 1);
+            else if(orderState.drinks.length < orderState.maxDrinks) orderState.drinks.push(name);
+            renderDrinkSelectionGrid();
+        };
+
+        window.upgradeToPremium = function(e) {
+            e.stopPropagation();
+            orderState.plan = 'Premium';
+            orderState.maxDrinks = 10;
+            const data = getPremiumData(orderState.guests);
+            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
+            orderState.priceStr = fmt(orderState.totalValue);
+            renderDrinkSelectionGrid();
+        };
+
+        function updateConfirmBtn() {
+            const btn = document.getElementById('btn-confirm-drinks');
+            btn.innerText = `Confirmar Seleção (${orderState.drinks.length} de ${orderState.maxDrinks})`;
+            btn.disabled = orderState.drinks.length === 0;
+            btn.style.opacity = orderState.drinks.length > 0 ? '1' : '0.5';
+        }
+
+        window.goToPayment = function() {
+            document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none');
+            document.getElementById('step-pay').style.display = 'block';
+            document.getElementById('payment-ref-total').innerText = orderState.priceStr;
+            renderPaymentExamples();
+            window.scrollTo(0,0);
+        };
+
+        function renderPaymentExamples() {
+            const v = orderState.totalValue;
+            const m = orderState.availableMonths || 1;
+            document.getElementById('ex-model-1').innerHTML = `Sinal p/ Reserva: <b>${fmt(v * 0.5)}</b><br>Restante no dia: <b>${fmt(v * 0.5)}</b>`;
+            let model2Txt = `Entrada (30%): <b>${fmt(v * 0.3)}</b><br>`;
+            if(m > 1) model2Txt += `Saldo em <b>${m}x Pix de ${fmt((v*0.7)/m)}</b> s/ juros`;
+            else model2Txt += `Saldo de <b>${fmt(v*0.7)}</b> p/ o dia do evento.`;
+            document.getElementById('ex-model-2').innerHTML = model2Txt;
+            let model3Txt = `Valor Total: <b>${fmt(v)}</b><br>`;
+            if(m > 1) model3Txt += `Simulação: <b>${m}x Pix de ${fmt(v/m)}</b> s/ juros`;
+            else model3Txt += `Pagamento integral até a data do evento.`;
+            document.getElementById('ex-model-3').innerHTML = model3Txt;
+            document.getElementById('ex-model-4').innerHTML = `À vista Pix: <b>${fmt(v)}</b><br>No cartão 12x: <b>12x de ${fmt((v * 1.28)/12)}</b> (c/ taxas)`;
+        }
+
+        window.handlePaymentAction = function(method) {
+            if (orderState.isQuickSimulation && orderState.drinks.length === 0) {
+                document.getElementById('step-pay').style.display = 'none';
+                document.getElementById('step-drinks').style.display = 'block';
+                orderState.isQuickSimulation = false; 
+                document.getElementById('simulation-notice').classList.add('hidden');
+                document.getElementById('btn-back-to-drinks').style.display = 'inline-flex';
+                document.getElementById('btn-close-sim').style.display = 'none';
+                
+                const buttons = document.querySelectorAll('.btn-pay-action');
+                buttons.forEach(btn => btn.innerText = "Confirmar Reserva");
+                
+                renderDrinkSelectionGrid();
+            } else {
+                finishOrder(method);
+            }
+        };
+
+        window.finishOrder = function(method) {
+            const evDate = document.getElementById('eventDate').value;
+            let msg = `🍸 NOVO ORÇAMENTO GMDRINKS 🍸\n\n`;
+            msg += `*CLIENTE:* ${orderState.name}\n`;
+            msg += `*WHATSAPP:* ${orderState.whatsapp}\n`;
+            msg += `*PLANO:* ${orderState.plan}\n`;
+            msg += `*CONVIDADOS:* ${orderState.guests}\n`;
+            msg += `*DRINKS ESCOLHIDOS:* ${orderState.drinks.length > 0 ? orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
+            msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n`;
+            msg += `*VALOR TOTAL:* ${orderState.priceStr}\n\n`;
+            msg += `*PAGAMENTO SELECIONADO:* ${method}\n`;
+            if(orderState.availableMonths > 1) msg += `*PARCELAMENTO ESTIMADO:* ${orderState.availableMonths} meses\n`;
+            msg += `\nOlá! Gostaria de validar minha data com as condições simuladas no app.`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        window.closeAll = function() { document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none'); document.getElementById('modal-menu-visual').style.display = 'none'; };
+        window.backToDrinks = function() { window.closeAll(); document.getElementById('step-drinks').style.display = 'block'; };
+
+        window.onload = function() { 
+            window.updateDisplay(); 
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateBarrier = document.getElementById('lead-date-barrier');
+            const dateEvent = document.getElementById('eventDate');
+            if(dateBarrier) dateBarrier.min = tomorrow.toISOString().split("T")[0];
+            if(dateEvent) dateEvent.min = tomorrow.toISOString().split("T")[0];
+            document.getElementById('closingDate').min = new Date().toISOString().split("T")[0];
+        };
+    </script>
+</body>
+</html>
