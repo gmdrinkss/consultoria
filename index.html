@@ -2,7 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <!-- MUDANÇA RESPONSIVIDADE: maximum-scale=1.0 e user-scalable=no previnem o iPhone de dar zoom involuntário -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GMDrinks - Orçamentos & Pagamentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +12,7 @@
             background-color: #0f0f0f;
             color: #ffffff;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased; /* Suaviza fontes no iOS */
+            -webkit-font-smoothing: antialiased;
         }
         .brand-font { font-family: 'Playfair Display', serif; }
         .gold-text { color: #d4af37; }
@@ -51,7 +50,6 @@
             border-radius: 14px;
             margin-bottom: 12px;
             outline: none;
-            /* MUDANÇA RESPONSIVIDADE: No mínimo 16px para iOS não dar zoom automático ao digitar */
             font-size: 16px; 
             transition: border-color 0.3s;
         }
@@ -114,7 +112,6 @@
         .btn-step {
             background: #333;
             color: #d4af37;
-            /* MUDANÇA RESPONSIVIDADE: Touch target maior para cliques mais fáceis no mobile */
             min-width: 44px;
             height: 44px;
             display: flex;
@@ -142,7 +139,6 @@
         .btn-aux {
             border: 1px solid rgba(212, 175, 55, 0.4);
             color: #d4af37;
-            /* MUDANÇA RESPONSIVIDADE: Fonte aumentada para leitura mobile */
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
@@ -159,18 +155,16 @@
             border-color: #d4af37;
         }
 
-        /* CORREÇÃO PARA O MODAL (SIMULADOR DE PAGAMENTO) NÃO CORTAR NO iPHONE */
         .step-overlay {
             position: fixed;
-            inset: 0; /* Substitui top, left, width e height 100% */
-            height: 100dvh; /* dvh resolve o problema da barra de navegação no Safari iOS */
+            inset: 0; 
+            height: 100dvh; 
             background: rgba(0,0,0,0.98);
             z-index: 100;
             display: none;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Garante scroll suave no iPhone */
+            -webkit-overflow-scrolling: touch; 
             padding: 20px;
-            /* Dá espaço adicional pra barra segura (linha preta) nos iPhones recentes */
             padding-bottom: calc(20px + env(safe-area-inset-bottom));
         }
 
@@ -255,14 +249,14 @@
             display: inline-flex;
             align-items: center;
             color: #888;
-            font-size: 11px; /* Aumentado um pouco para celular */
+            font-size: 11px; 
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 20px;
             cursor: pointer;
             transition: color 0.3s;
-            padding: 10px 0; /* Maior área de clique */
+            padding: 10px 0; 
         }
         .btn-back:hover { color: #d4af37; }
 
@@ -283,7 +277,6 @@
             border-left: 2px solid #d4af37;
             padding: 12px;
             margin-top: 12px;
-            /* MUDANÇA RESPONSIVIDADE: Fonte um pouco maior no celular */
             font-size: 12px; 
             color: #aaa;
             line-height: 1.5;
@@ -313,15 +306,14 @@
             background: #000;
             border: 1px solid #444;
             color: #d4af37;
-            padding: 12px 10px; /* Mais padding para dedo */
+            padding: 12px 10px; 
             border-radius: 8px;
-            font-size: 16px; /* Evita zoom no iOS */
+            font-size: 16px; 
             width: 100%;
             outline: none;
         }
         .input-date:focus { border-color: #d4af37; }
 
-        /* MUDANÇAS RESPONSIVAS ESPECÍFICAS (Media Queries) */
         @media (min-width: 768px) {
             .btn-aux { font-size: 9px; padding: 10px; }
             .example-box { font-size: 11px; }
@@ -329,11 +321,8 @@
         }
 
         @media (max-width: 768px) {
-            /* Garante que o card tem permissão para crescer sem cortar nada */
             .card-premium-row { flex-direction: column; height: auto; min-height: max-content; }
-            /* Imagem com altura melhor no celular para não ficar esmagada */
             .side-image-container { width: 100%; height: 220px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-            /* Lista em apenas 1 coluna no celular para o texto caber direitinho */
             .custom-grid-list { grid-template-columns: 1fr; gap: 8px; }
             .barrier-card { padding: 30px 20px; }
         }
@@ -350,6 +339,8 @@
                 padding-right: 0px !important;
             }
         }
+        
+        .clickable-title { cursor: pointer; user-select: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
@@ -357,36 +348,40 @@
     <!-- BARREIRA DE ACESSO -->
     <div id="access-barrier">
         <div class="barrier-card">
-            <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter">GMDrinks</h1>
-            <!-- MUDANÇA: text-[10px] -> text-xs md:text-[10px] para ser legível no mobile -->
-            <p class="text-xs md:text-[10px] text-gray-500 uppercase tracking-[0.4em] mb-8">Consultoria de Drinks</p>
+            <!-- Clique secreto aqui 5x para abrir painel admin -->
+            <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter clickable-title" onclick="window.triggerAdmin()">GMDrinks</h1>
+            <p class="text-xs md:text-[10px] text-gray-500 uppercase tracking-[0.4em] mb-6">Consultoria de Drinks</p>
             
-            <input type="text" id="lead-name-barrier" placeholder="Seu Nome Completo" class="barrier-input">
-            <input type="tel" id="lead-whatsapp-barrier" placeholder="WhatsApp (DDD)" class="barrier-input">
-            
-            <!-- LINHA DUPLA: DATA E CONVIDADOS -->
-            <div class="flex gap-3 mb-2">
-                <div class="flex-1 text-left">
-                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Data do Evento</label>
-                    <input type="date" id="lead-date-barrier" class="barrier-input mb-0">
-                </div>
-                <div class="w-1/3 text-left">
-                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Qtd.Convidados</label>
-                    <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input mb-0">
+            <p id="validation-msg" class="text-red-500 text-[10px] hidden mb-4 font-bold uppercase tracking-widest bg-red-900/20 p-2 rounded-lg border border-red-500/20">Por favor, preencha todos os campos.</p>
+
+            <div class="space-y-1">
+                <input type="text" id="lead-name-barrier" placeholder="Seu Nome Completo" class="barrier-input">
+                <input type="tel" id="lead-whatsapp-barrier" placeholder="WhatsApp (DDD)" class="barrier-input">
+                
+                <div class="flex gap-3 text-left">
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-500 uppercase font-bold ml-1 mb-1 block">Data do Evento</label>
+                        <input type="date" id="lead-date-barrier" class="barrier-input">
+                    </div>
+                    <div class="w-1/3">
+                        <label class="text-[10px] text-gray-500 uppercase font-bold ml-1 mb-1 block">Convidados</label>
+                        <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input">
+                    </div>
                 </div>
             </div>
             
-            <button type="button" onclick="unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-6 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+            <button type="button" onclick="unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-4 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
                 Acessar Orçamentos
             </button>
-            <p class="text-[11px] md:text-[9px] text-gray-600 mt-8 uppercase tracking-widest">Experiência Premium Garantida</p>
+            <p class="text-[11px] md:text-[9px] text-gray-600 mt-6 uppercase tracking-widest">Experiência Premium Garantida</p>
         </div>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div id="app-container" class="content-locked w-full flex flex-col items-center">
         <header class="mt-4 mb-8 text-center">
-            <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1">GMDrinks</h1>
+            <!-- Clique secreto aqui também 5x -->
+            <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1 clickable-title" onclick="window.triggerAdmin()">GMDrinks</h1>
             <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto">A sofisticação que o seu evento merece em cada detalhe.</p>
         </header>
 
@@ -414,8 +409,7 @@
                             <li class="flex items-start"><span class="list-bullet">•</span> Frutas e Xaropes</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Estrutura Completa</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Iluminação&Decoração</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span>Insumos Basicos</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span>Gelo</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Estrutura completa</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffEssencial">2 Bartenders + 1 Barback</span></li>
                         </div>
 
@@ -438,9 +432,9 @@
                                 <div class="flex flex-col items-start space-y-1">
                                     <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">QTD.Convidados</span>
                                     <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
-                                        <button type="button" onclick="stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputEssencial" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
-                                        <button type="button" onclick="stepValue('Essencial', 1)" class="btn-step rounded-r-lg">+</button>
+                                        <button type="button" onclick="window.stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
+                                        <input type="number" id="guestInputEssencial" value="50" oninput="window.updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <button type="button" onclick="window.stepValue('Essencial', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end sm:items-start">
@@ -456,13 +450,13 @@
                         </div>
                         
                         <div class="space-y-3 mt-4">
-                            <button type="button" onclick="openForm('Essencial')" class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                            <button type="button" onclick="window.openForm('Essencial')" class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
                                 Escolho este Plano !
                             </button>
                             
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="button" onclick="showMenu()" class="btn-aux">Nosso Cardápio</button>
-                                <button type="button" onclick="directSimulate('Essencial')" class="btn-aux">Simular Pagamento</button>
+                                <button type="button" onclick="window.showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button type="button" onclick="window.directSimulate('Essencial')" class="btn-aux">Simular Pagamento</button>
                             </div>
                         </div>
                     </div>
@@ -499,7 +493,7 @@
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags divertidas</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 50 Shots Exclusivos</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Insumos Premium</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span>Gelo</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Até 10 drinks à escolha</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffPremium">4 Bartenders + 1 Barback</span></li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio personalizado</li>
                         </div>
@@ -524,11 +518,11 @@
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Qtd.Convidados</span>
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
                                     <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
-                                        <button onclick="stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputPremium" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
-                                        <button onclick="stepValue('Premium', 1)" class="btn-step rounded-r-lg">+</button>
+                                        <button onclick="window.stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
+                                        <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <button onclick="window.stepValue('Premium', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end sm:items-start">
@@ -544,12 +538,12 @@
                         </div>
 
                         <div class="space-y-3 mt-4">
-                            <button onclick="openForm('Premium')"class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                            <button onclick="window.openForm('Premium')" class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
                                 Escolho este Plano !
                             </button>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button onclick="showMenu()" class="btn-aux">Nosso Cardápio</button>
-                                <button onclick="directSimulate('Premium')" class="btn-aux">Simular Pagamento</button>
+                                <button onclick="window.showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button onclick="window.directSimulate('Premium')" class="btn-aux">Simular Pagamento</button>
                             </div>
                         </div>
                     </div>
@@ -561,7 +555,7 @@
     <!-- MODAL: CARDÁPIO VISUAL -->
     <div id="modal-menu-visual" class="step-overlay">
         <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
-            <div onclick="closeMenuVisual()" class="btn-back">← Voltar</div>
+            <div onclick="window.closeMenuVisual()" class="btn-back">← Voltar</div>
             <div class="text-center mb-10">
                 <h3 class="brand-font text-4xl gold-text uppercase">O Cardápio</h3>
                 <p class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-[0.3em]">Artesanal & Sofisticado</p>
@@ -574,7 +568,7 @@
     <div id="step-drinks" class="step-overlay">
         <div class="max-w-5xl mx-auto mt-10 px-4 pb-32">
             <div id="drink-back-container">
-                <div onclick="closeAll()" class="btn-back">← Voltar para Planos</div>
+                <div onclick="window.closeAll()" class="btn-back">← Voltar para Planos</div>
             </div>
             
             <div class="text-center mb-8">
@@ -586,7 +580,7 @@
 
             <div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black to-transparent z-50">
                 <div class="max-w-md mx-auto">
-                    <button type="button" id="btn-confirm-drinks" onclick="goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_0_30px_rgba(212,175,55,0.3)] opacity-50">
+                    <button type="button" id="btn-confirm-drinks" onclick="window.goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_0_30px_rgba(212,175,55,0.3)] opacity-50">
                         Confirmar Seleção (0)
                     </button>
                 </div>
@@ -599,8 +593,8 @@
         <!-- Alterado para pb-32 para espaço extra p/ o final da tela -->
         <div class="max-w-4xl mx-auto mt-10 pb-32 px-4">
             <div id="back-button-container">
-                <div id="btn-back-to-drinks" onclick="backToDrinks()" class="btn-back">← Voltar para Drinks</div>
-                <div id="btn-close-sim" onclick="closeAll()" class="btn-back" style="display:none;">← Voltar para Planos</div>
+                <div id="btn-back-to-drinks" onclick="window.backToDrinks()" class="btn-back">← Voltar para Drinks</div>
+                <div id="btn-close-sim" onclick="window.closeAll()" class="btn-back" style="display:none;">← Voltar para Planos</div>
             </div>
             
             <div class="text-center mb-6">
@@ -615,11 +609,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                     <div>
                         <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Data prevista do evento</label>
-                        <input type="date" id="eventDate" onchange="calcTimeline()" class="input-date">
+                        <input type="date" id="eventDate" onchange="window.calcTimeline()" class="input-date">
                     </div>
                     <div>
                         <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Previsão de fechamento</label>
-                        <input type="date" id="closingDate" onchange="calcTimeline()" class="input-date">
+                        <input type="date" id="closingDate" onchange="window.calcTimeline()" class="input-date">
                     </div>
                 </div>
                 <div id="timeline-result" class="mt-4 p-4 bg-black/40 rounded-xl border border-white/5 text-center hidden">
@@ -638,7 +632,7 @@
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal 50%.</p>
                         <div id="ex-model-1" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
@@ -646,7 +640,7 @@
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Sem juros, parcelando livremente até o dia do evento.</p>
                         <div id="ex-model-2" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="handlePaymentAction('Entrada + Parcelas Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Entrada + Parcelas Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
@@ -654,7 +648,7 @@
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Divida o valor total sem precisar de entrada imediata.</p>
                         <div id="ex-model-3" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="handlePaymentAction('Parcelamento Total Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Parcelamento Total Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
@@ -662,29 +656,45 @@
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Via Mercado Pago (Com taxas de parcelamento do banco).</p>
                         <div id="ex-model-4" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="handlePaymentAction('Cartão de Crédito')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Cartão de Crédito')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL DE ADMINISTRAÇÃO (OCULTO - BANCO DE DADOS) -->
+    <div id="admin-panel" class="step-overlay" style="z-index: 10000;">
+        <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
+            <div onclick="document.getElementById('admin-panel').style.display='none'" class="btn-back">← Voltar</div>
+            <div class="text-center mb-6">
+                <h3 class="brand-font text-3xl gold-text uppercase">Painel de Clientes</h3>
+                <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Leads Guardados</p>
+            </div>
+            <!-- Aqui a lista de leads será injetada -->
+            <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <p class="text-center text-gray-500 text-xs uppercase tracking-widest mt-10">Carregando Banco de Dados...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA DO ORÇAMENTO -->
     <script>
         const WHATSAPP_NUMBER = "5531983684231";
         const DRINKS_DB = [
-            { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e Gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false },
-            { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e Gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false },
-            { id: 3, name: "Caip Frutas", desc: "Abacaxi, morango, maracujá, abacaxi com hortelã, e Gelo.", img: "https://i.ibb.co/1fywzrkF/Chat-GPT-Image-20-de-mar-de-2026-09-24-24.png", premium: false },
-            { id: 4, name: "Negroni", desc: "Campari, gim, vermute rosso, Guarnição laranja e Gelo.", img: "https://conteudo.imguol.com.br/c/entretenimento/73/2020/09/10/negroni-1599771396384_v2_3x4.jpg", premium: true },
-            { id: 5, name: "Aperol Spritz", desc: "Espumante, aperol, agua com gás ou sprite, e Gelo.", img: "https://static.wixstatic.com/media/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg/v1/fill/w_480,h_638,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg", premium: true },
-            { id: 6, name: "Mojito", desc: "Rum, hortelã, xarope de menta, suco de limão, sprite e Gelo.", img: "https://www.deliciousmagazine.co.uk/wp-content/uploads/2014/01/Mojito-768x960.jpg", premium: false },
-            { id: 7, name: "Sex on the Beach", desc: "Vodka, licor de pessêgo, suco de laranja, grenadine, laranja, e Gelo.", img: "https://www.receiteria.com.br/wp-content/uploads/sex-on-the-beach-01.jpg", premium: false },
-            { id: 8, name: "Pina Colada", desc: "Rum, abacaxi, leite de cocô, leite condensado, e Gelo.", img: "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2022/09/23/1631063638-receita-pina-colada.jpg", premium: false },
+            { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false },
+            { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false },
+            { id: 3, name: "Caip Frutas", desc: "Abacaxi, morango, maracujá, abacaxi com hortelã.", img: "https://i.ibb.co/1fywzrkF/Chat-GPT-Image-20-de-mar-de-2026-09-24-24.png", premium: false },
+            { id: 4, name: "Negroni", desc: "Campari, gim, vermute rosso, Guarnição laranja e gelo.", img: "https://conteudo.imguol.com.br/c/entretenimento/73/2020/09/10/negroni-1599771396384_v2_3x4.jpg", premium: true },
+            { id: 5, name: "Aperol Spritz", desc: "Espumante, aperol, agua com gás ou sprite, e gelo.", img: "https://static.wixstatic.com/media/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg/v1/fill/w_480,h_638,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg", premium: true },
+            { id: 6, name: "Mojito", desc: "Rum, hortelã, xarope de menta, suco de limão, sprite e gelo.", img: "https://www.deliciousmagazine.co.uk/wp-content/uploads/2014/01/Mojito-768x960.jpg", premium: false },
+            { id: 7, name: "Sex on the Beach", desc: "Vodka, licor de pessêgo, suco de laranja, grenadine, laranja.", img: "https://www.receiteria.com.br/wp-content/uploads/sex-on-the-beach-01.jpg", premium: false },
+            { id: 8, name: "Pina Colada", desc: "Rum, abacaxi, leite de cocô, leite condensado, e gelo.", img: "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2022/09/23/1631063638-receita-pina-colada.jpg", premium: false },
             { id: 9, name: "Soda Italiana", desc: "Xaropes monin diversos, com agua com gás e gelo.", img: "https://resize.casapino.com.br/?u=https://cms-bomgourmet.s3.amazonaws.com/bomgourmet/2018/03/201803/liquori-soda-italiana-e2a4f9e0.jpg&w=661", premium: true },
             { id: 10, name: "Cogumelo Azul", desc: "Gin, curaçau blue, limão, sprite e gelo.", img: "https://bartenderstore.com.br/wp-content/uploads/2023/08/Gin-Tonica-Azul-edit.jpg", premium: false },
-            { id: 11, name: "Nectar", desc: "Vodka, licor de morango, leite condensado, suco de morango, e Gelo.", img: "https://cdn.deliway.com.br/blog/base/31c/0c1/78a/batidinha-morango.jpg", premium: false },
-            { id: 12, name: "Whisky Sour", desc: "Whisky, suco de limão siciliano, xarope trad. e Gelo.", img: "https://blog-distiller.imgix.net/wp-content/uploads/2018/08/24143617/whiskeysourADOBE.jpg?", premium: true },
+            { id: 11, name: "Nectar", desc: "Vodka, licor de morango, leite condensado, suco de morango.", img: "https://cdn.deliway.com.br/blog/base/31c/0c1/78a/batidinha-morango.jpg", premium: false },
+            { id: 12, name: "Whisky Sour", desc: "Whisky, suco de limão siciliano, xarope trad. e gelo.", img: "https://blog-distiller.imgix.net/wp-content/uploads/2018/08/24143617/whiskeysourADOBE.jpg?", premium: true },
             { id: 13, name: "Whisky com Gelo", desc: "Whisky selecionado e gelo.", img: "https://i.pinimg.com/474x/01/00/6d/01006d7987b4a31366abffc646d2302c.jpg", premium: true },
-            { id: 14, name: "Red Collins", desc: "Gin, xarope de hibisco, limão, agua com gás e Gelo.", img: "https://1769distillery.com/wp-content/uploads/2021/01/Pink-hibiscus-collins.jpg", premium: false },
+            { id: 14, name: "Red Collins", desc: "Gin, xarope de hibisco, limão, agua com gás e gelo.", img: "https://1769distillery.com/wp-content/uploads/2021/01/Pink-hibiscus-collins.jpg", premium: false },
             { id: 15, name: "Maracugim", desc: "Gin, maracujá, suco de limão, sprite e gelo.", img: "https://simplifica.efacil.com.br/wp-content/uploads/2025/05/hortela-de-molho-de-maracuja.jpg", premium: false },
             { id: 16, name: "Tropicall", desc: "Rum ou Gin, abacaxi, hortelã, limão thaitti, suco de laranja e gelo.", img: "https://content.paodeacucar.com/wp-content/uploads/2025/09/caipirinha-abacaxi-hortela.jpg", premium: false },
             { id: 17, name: "Caip Raisin", desc: "Vodka ou cachaça, Uvas, manjerição, açucar, suco de raisin", img: "https://www.receiteria.com.br/wp-content/uploads/gin-com-uva-e-hortela-01.jpg", premium: false },
@@ -696,7 +706,7 @@
             
         ];
 
-        let orderState = {
+        window.orderState = {
             plan: '',
             guests: 0,
             name: '',
@@ -723,14 +733,15 @@
             const guests = document.getElementById('lead-guests-barrier').value;
             
             if(!name || !wa || !date || !guests) {
-                alert("Por favor, preencha todos os campos para continuar sua experiência.");
+                const valMsg = document.getElementById('validation-msg');
+                if(valMsg) valMsg.classList.remove('hidden');
                 return;
             }
 
-            orderState.name = name;
-            orderState.whatsapp = wa;
-            orderState.eventDate = date;
-            orderState.guests = parseInt(guests);
+            window.orderState.name = name;
+            window.orderState.whatsapp = wa;
+            window.orderState.eventDate = date;
+            window.orderState.guests = parseInt(guests);
             
             document.getElementById('guestInputEssencial').value = guests;
             document.getElementById('guestInputPremium').value = guests;
@@ -745,10 +756,10 @@
                 document.getElementById('app-container').classList.remove('content-locked');
                 document.getElementById('app-container').style.height = 'auto';
                 window.updateDisplay();
-                calcTimeline(); 
+                window.calcTimeline(); 
             }, 600);
         };
-        //ESSENCIAL valores de acordo com a quantidade de convidados e bartenders+barback  //
+
         const getEssencialData = (guests) => {
             let perPerson = 21.30;
             let staff = "2 Bartenders + 1 Barback";
@@ -772,7 +783,7 @@
             
             return { perPerson, staff, extraCost };
         };
-        // PREMIUN VALORES DE ACORDO COM A QUANTIDADE DE CONVIDADOS E BARTENDERS+BARBACKS //
+
         const getPremiumData = (guests) => {
             let perPerson = 32.50;
             let staff = "3 Bartenders + 1 Barback";
@@ -827,12 +838,12 @@
             let months = (evDate.getFullYear() - clDate.getFullYear()) * 12;
             months -= clDate.getMonth();
             months += evDate.getMonth();
-            orderState.availableMonths = months <= 0 ? 1 : months;
+            window.orderState.availableMonths = months <= 0 ? 1 : months;
             
-            document.getElementById('months-count').innerText = `${orderState.availableMonths} ${orderState.availableMonths === 1 ? 'mês' : 'meses'}`;
+            document.getElementById('months-count').innerText = `${window.orderState.availableMonths} ${window.orderState.availableMonths === 1 ? 'mês' : 'meses'}`;
             document.getElementById('limit-date-str').innerText = evDate.toLocaleDateString('pt-BR');
             document.getElementById('timeline-result').classList.remove('hidden');
-            renderPaymentExamples();
+            window.renderPaymentExamples();
         };
 
         window.showMenu = function() {
@@ -853,13 +864,13 @@
         window.closeMenuVisual = function() { document.getElementById('modal-menu-visual').style.display = 'none'; };
 
         window.directSimulate = function(plan) {
-            orderState.plan = plan;
-            orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
-            const data = plan === 'Essencial' ? getEssencialData(orderState.guests) : getPremiumData(orderState.guests);
-            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
-            orderState.priceStr = fmt(orderState.totalValue);
-            orderState.isQuickSimulation = true; 
-            orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
+            window.orderState.plan = plan;
+            window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
+            const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            window.orderState.priceStr = fmt(window.orderState.totalValue);
+            window.orderState.isQuickSimulation = true; 
+            window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
             
             document.getElementById('btn-back-to-drinks').style.display = 'none';
             document.getElementById('btn-close-sim').style.display = 'inline-flex';
@@ -872,13 +883,13 @@
         };
 
         window.openForm = function(plan) {
-            orderState.plan = plan;
-            orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
-            const data = plan === 'Essencial' ? getEssencialData(orderState.guests) : getPremiumData(orderState.guests);
-            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
-            orderState.priceStr = fmt(orderState.totalValue);
-            orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
-            orderState.isQuickSimulation = false;
+            window.orderState.plan = plan;
+            window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
+            const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            window.orderState.priceStr = fmt(window.orderState.totalValue);
+            window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
+            window.orderState.isQuickSimulation = false;
             
             const buttons = document.querySelectorAll('.btn-pay-action');
             buttons.forEach(btn => btn.innerText = "Confirmar Reserva");
@@ -887,23 +898,23 @@
             document.getElementById('btn-close-sim').style.display = 'none';
             document.getElementById('simulation-notice').classList.add('hidden');
             document.getElementById('step-drinks').style.display = 'block';
-            renderDrinkSelectionGrid();
+            window.renderDrinkSelectionGrid();
         };
 
-        function renderDrinkSelectionGrid() {
+        window.renderDrinkSelectionGrid = function() {
             const grid = document.getElementById('drink-selection-grid');
-            document.getElementById('drink-limit-msg').innerText = `Selecione até ${orderState.maxDrinks} coquetéis para seu evento`;
+            document.getElementById('drink-limit-msg').innerText = `Selecione até ${window.orderState.maxDrinks} coquetéis para seu evento`;
             grid.innerHTML = DRINKS_DB.map(drink => {
-                const isSelected = orderState.drinks.includes(drink.name);
-                const isLocked = orderState.plan === 'Essencial' && drink.premium;
+                const isSelected = window.orderState.drinks.includes(drink.name);
+                const isLocked = window.orderState.plan === 'Essencial' && drink.premium;
                 return `
                     <div class="drink-selection-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
-                         onclick="${isLocked ? '' : `toggleDrink('${drink.name}')`}">
+                         onclick="${isLocked ? '' : `window.toggleDrink('${drink.name}')`}">
                         ${isLocked ? `
                             <div class="lock-overlay">
                                 <div class="lock-icon-circle">🔒</div>
                                 <span class="text-[11px] md:text-[9px] gold-text font-black uppercase tracking-widest">Plano Premium</span>
-                                <button type="button" onclick="upgradeToPremium(event)" class="mt-2 text-xs md:text-[8px] bg-[#d4af37] text-black px-4 py-2 rounded-full font-black uppercase tracking-wider">Fazer Upgrade</button>
+                                <button type="button" onclick="window.upgradeToPremium(event)" class="mt-2 text-xs md:text-[8px] bg-[#d4af37] text-black px-4 py-2 rounded-full font-black uppercase tracking-wider">Fazer Upgrade</button>
                             </div>
                         ` : ''}
                         <div class="check-icon">✓</div>
@@ -915,61 +926,61 @@
                     </div>
                 `;
             }).join('');
-            updateConfirmBtn();
-        }
+            window.updateConfirmBtn();
+        };
 
         window.toggleDrink = function(name) {
-            const idx = orderState.drinks.indexOf(name);
-            if(idx > -1) orderState.drinks.splice(idx, 1);
-            else if(orderState.drinks.length < orderState.maxDrinks) orderState.drinks.push(name);
-            renderDrinkSelectionGrid();
+            const idx = window.orderState.drinks.indexOf(name);
+            if(idx > -1) window.orderState.drinks.splice(idx, 1);
+            else if(window.orderState.drinks.length < window.orderState.maxDrinks) window.orderState.drinks.push(name);
+            window.renderDrinkSelectionGrid();
         };
 
         window.upgradeToPremium = function(e) {
             e.stopPropagation();
-            orderState.plan = 'Premium';
-            orderState.maxDrinks = 10;
-            const data = getPremiumData(orderState.guests);
-            orderState.totalValue = (orderState.guests * data.perPerson) + data.extraCost;
-            orderState.priceStr = fmt(orderState.totalValue);
-            renderDrinkSelectionGrid();
+            window.orderState.plan = 'Premium';
+            window.orderState.maxDrinks = 10;
+            const data = getPremiumData(window.orderState.guests);
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            window.orderState.priceStr = fmt(window.orderState.totalValue);
+            window.renderDrinkSelectionGrid();
         };
 
-        function updateConfirmBtn() {
+        window.updateConfirmBtn = function() {
             const btn = document.getElementById('btn-confirm-drinks');
-            btn.innerText = `Confirmar Seleção (${orderState.drinks.length} de ${orderState.maxDrinks})`;
-            btn.disabled = orderState.drinks.length === 0;
-            btn.style.opacity = orderState.drinks.length > 0 ? '1' : '0.5';
-        }
+            btn.innerText = `Confirmar Seleção (${window.orderState.drinks.length} de ${window.orderState.maxDrinks})`;
+            btn.disabled = window.orderState.drinks.length === 0;
+            btn.style.opacity = window.orderState.drinks.length > 0 ? '1' : '0.5';
+        };
 
         window.goToPayment = function() {
             document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none');
             document.getElementById('step-pay').style.display = 'block';
-            document.getElementById('payment-ref-total').innerText = orderState.priceStr;
-            renderPaymentExamples();
+            document.getElementById('payment-ref-total').innerText = window.orderState.priceStr;
+            window.renderPaymentExamples();
             window.scrollTo(0,0);
         };
 
-        function renderPaymentExamples() {
-            const v = orderState.totalValue;
-            const m = orderState.availableMonths || 1;
+        window.renderPaymentExamples = function() {
+            const v = window.orderState.totalValue;
+            const m = window.orderState.availableMonths || 1;
             document.getElementById('ex-model-1').innerHTML = `Sinal p/ Reserva: <b>${fmt(v * 0.5)}</b><br>Restante no dia: <b>${fmt(v * 0.5)}</b>`;
             let model2Txt = `Entrada (50%): <b>${fmt(v * 0.5)}</b><br>`;
-            if(m > 1) model2Txt += `Saldo em <b>${m}x Pix de ${fmt((v*0.7)/m)}</b> s/ juros`;
-            else model2Txt += `Saldo de <b>${fmt(v*0.7)}</b> p/ o dia do evento.`;
+            if(m > 1) model2Txt += `Saldo em <b>${m}x Pix de ${fmt((v*0.5)/m)}</b> s/ juros`;
+            else model2Txt += `Saldo de <b>${fmt(v*0.5)}</b> p/ o dia do evento.`;
             document.getElementById('ex-model-2').innerHTML = model2Txt;
             let model3Txt = `Valor Total: <b>${fmt(v)}</b><br>`;
             if(m > 1) model3Txt += `Simulação: <b>${m}x Pix de ${fmt(v/m)}</b> s/ juros`;
             else model3Txt += `Pagamento integral até a data do evento.`;
             document.getElementById('ex-model-3').innerHTML = model3Txt;
             document.getElementById('ex-model-4').innerHTML = `À vista Pix: <b>${fmt(v)}</b><br>No cartão 12x: <b>12x de ${fmt((v * 1.28)/12)}</b> (c/ taxas)`;
-        }
+        };
 
         window.handlePaymentAction = function(method) {
-            if (orderState.isQuickSimulation && orderState.drinks.length === 0) {
+            if (window.orderState.isQuickSimulation && window.orderState.drinks.length === 0) {
                 document.getElementById('step-pay').style.display = 'none';
                 document.getElementById('step-drinks').style.display = 'block';
-                orderState.isQuickSimulation = false; 
+                window.orderState.isQuickSimulation = false; 
                 document.getElementById('simulation-notice').classList.add('hidden');
                 document.getElementById('btn-back-to-drinks').style.display = 'inline-flex';
                 document.getElementById('btn-close-sim').style.display = 'none';
@@ -977,24 +988,24 @@
                 const buttons = document.querySelectorAll('.btn-pay-action');
                 buttons.forEach(btn => btn.innerText = "Confirmar Reserva");
                 
-                renderDrinkSelectionGrid();
+                window.renderDrinkSelectionGrid();
             } else {
-                finishOrder(method);
+                window.finishOrder(method);
             }
         };
 
         window.finishOrder = function(method) {
             const evDate = document.getElementById('eventDate').value;
             let msg = `🍸 NOVO ORÇAMENTO GMDRINKS 🍸\n\n`;
-            msg += `*CLIENTE:* ${orderState.name}\n`;
-            msg += `*WHATSAPP:* ${orderState.whatsapp}\n`;
-            msg += `*PLANO:* ${orderState.plan}\n`;
-            msg += `*CONVIDADOS:* ${orderState.guests}\n`;
-            msg += `*DRINKS ESCOLHIDOS:* ${orderState.drinks.length > 0 ? orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
+            msg += `*CLIENTE:* ${window.orderState.name}\n`;
+            msg += `*WHATSAPP:* ${window.orderState.whatsapp}\n`;
+            msg += `*PLANO:* ${window.orderState.plan}\n`;
+            msg += `*CONVIDADOS:* ${window.orderState.guests}\n`;
+            msg += `*DRINKS ESCOLHIDOS:* ${window.orderState.drinks.length > 0 ? window.orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
             msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n`;
-            msg += `*VALOR TOTAL:* ${orderState.priceStr}\n\n`;
+            msg += `*VALOR TOTAL:* ${window.orderState.priceStr}\n\n`;
             msg += `*PAGAMENTO SELECIONADO:* ${method}\n`;
-            if(orderState.availableMonths > 1) msg += `*PARCELAMENTO ESTIMADO:* ${orderState.availableMonths} meses\n`;
+            if(window.orderState.availableMonths > 1) msg += `*PARCELAMENTO ESTIMADO:* ${window.orderState.availableMonths} meses\n`;
             msg += `\nOlá! Gostaria de validar minha data com as condições simuladas no app.`;
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
@@ -1011,6 +1022,135 @@
             if(dateBarrier) dateBarrier.min = tomorrow.toISOString().split("T")[0];
             if(dateEvent) dateEvent.min = tomorrow.toISOString().split("T")[0];
             document.getElementById('closingDate').min = new Date().toISOString().split("T")[0];
+        };
+
+        // Lógica de Ativação do Painel de Admin (Clicar 5x no H1)
+        let adminClicks = 0;
+        window.triggerAdmin = function() {
+            adminClicks++;
+            if(adminClicks >= 5) {
+                document.getElementById('admin-panel').style.display = 'block';
+                if(window.fetchAdminLeads) window.fetchAdminLeads();
+                adminClicks = 0;
+            }
+            setTimeout(() => { adminClicks = 0; }, 2000); 
+        };
+    </script>
+
+    <!-- SCRIPT DO BANCO DE DADOS EM NUVEM (Firebase Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let app, auth, db, appId;
+
+        try {
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        } catch(e) {
+            console.log("Ignorando configuração do BD na pré-visualização local.");
+        }
+
+        let currentUser = null;
+        let currentLeadId = null;
+
+        if (auth) {
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch(e) { console.error(e); }
+            };
+            initAuth();
+            onAuthStateChanged(auth, (user) => { currentUser = user; });
+        }
+
+        // Intercetar o Botão Acessar Orçamentos para gravar no Banco de Dados
+        const originalUnlockApp = window.unlockApp;
+        window.unlockApp = async function() {
+            originalUnlockApp(); // Roda o original que valida a tela
+
+            // Se a pessoa passou da barreira, guarda os dados na Nuvem
+            if (currentUser && db && window.orderState.name) {
+                try {
+                    const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+                    const docRef = await addDoc(leadsRef, {
+                        name: window.orderState.name,
+                        whatsapp: window.orderState.whatsapp,
+                        eventDate: window.orderState.eventDate,
+                        guests: window.orderState.guests,
+                        timestamp: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        status: 'Captado (Iniciou Orçamento)'
+                    });
+                    currentLeadId = docRef.id;
+                } catch(e) { console.error("Erro ao gravar Lead no BD:", e); }
+            }
+        };
+
+        // Intercetar a conclusão do Pedido para atualizar com os valores escolhidos
+        const originalFinishOrder = window.finishOrder;
+        window.finishOrder = async function(method) {
+            if (currentUser && db && currentLeadId) {
+                try {
+                    const leadRef = doc(db, 'artifacts', appId, 'public', 'data', 'leads', currentLeadId);
+                    await updateDoc(leadRef, {
+                        plan: window.orderState.plan,
+                        drinks: window.orderState.drinks,
+                        totalValue: window.orderState.priceStr,
+                        paymentMethod: method,
+                        status: 'Orçamento Finalizado (Aguardando Retorno)'
+                    });
+                } catch(e) { console.error("Erro Update BD:", e); }
+            }
+            originalFinishOrder(method);
+        };
+
+        // Buscar Lista Secreta para o Painel do Dono
+        window.fetchAdminLeads = function() {
+            if(!currentUser || !db) {
+                document.getElementById('admin-leads-container').innerHTML = '<p class="text-center text-gray-500 text-xs">Banco de Dados Indisponível no momento.</p>';
+                return;
+            }
+            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+            
+            onSnapshot(leadsRef, (snapshot) => {
+                const leads = [];
+                snapshot.forEach(doc => leads.push({ id: doc.id, ...doc.data() }));
+                
+                // Ordenar do mais recente para o mais antigo
+                leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                let html = '';
+                leads.forEach(lead => {
+                    const corStatus = lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
+                    html += `
+                    <div class="bg-[#151515] p-4 rounded-xl border border-white/10 mb-3 text-left shadow-lg">
+                        <div class="flex justify-between border-b border-white/10 pb-2 mb-2">
+                            <span class="gold-text font-black uppercase text-sm">${lead.name}</span>
+                            <span class="text-[10px] text-gray-500">${new Date(lead.timestamp).toLocaleString('pt-BR')}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 space-y-2 mt-2">
+                            <p class="flex justify-between"><span>📱 WhatsApp:</span> <a href="https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-blue-400 underline font-bold">${lead.whatsapp}</a></p>
+                            <p class="flex justify-between"><span>📅 Evento:</span> <span class="text-white">${lead.eventDate || 'Não Inserida'}</span></p>
+                            <p class="flex justify-between"><span>👥 Convidados:</span> <span class="text-white">${lead.guests}</span></p>
+                            <p class="flex justify-between border-t border-white/5 pt-2 mt-2"><span>📊 Status:</span> <span class="${corStatus} font-bold">${lead.status}</span></p>
+                            ${lead.plan ? `<p class="flex justify-between"><span>🍾 Plano Ofertado:</span> <span class="gold-text font-bold">${lead.plan}</span></p>` : ''}
+                            ${lead.totalValue ? `<p class="flex justify-between"><span>💰 Valor Proposto:</span> <span class="text-white font-bold">${lead.totalValue}</span></p>` : ''}
+                        </div>
+                    </div>`;
+                });
+                document.getElementById('admin-leads-container').innerHTML = html || '<p class="text-center text-gray-500 text-xs">A sua lista de clientes captados aparecerá aqui.</p>';
+            }, (error) => {
+                console.error("Erro Snapshot:", error);
+            });
         };
     </script>
 </body>
