@@ -518,7 +518,7 @@
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">QTD.Convidados</span>
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
                                     <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
                                         <button onclick="window.stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
                                         <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
@@ -1038,135 +1038,163 @@
     </script>
 
     <!-- SCRIPT DO BANCO DE DADOS EM NUVEM (Firebase Firestore) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let app, auth, db, appId;
+    // Suas credenciais reais do projeto GMDrinks
+    const firebaseConfig = {
+        apiKey: "AIzaSyCzPZhMjCv-CrYavikjwF2Vq5kDKr5uXyg",
+        authDomain: "gmdrinks-ad157.firebaseapp.com",
+        projectId: "gmdrinks-ad157",
+        storageBucket: "gmdrinks-ad157.firebasestorage.app",
+        messagingSenderId: "885481881120",
+        appId: "1:885481881120:web:a19543bd38c1c134a7c645"
+    };
 
+    // Inicialização do Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let currentLeadId = null;
+
+    // Autenticação Silenciosa
+    // NOTA: Se der erro 'auth/configuration-not-found', ative 'Anônimo' no Console do Firebase > Authentication
+    const initAuth = async () => {
         try {
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        } catch(e) {
-            console.log("Ignorando configuração do BD na pré-visualização local.");
+            await signInAnonymously(auth);
+        } catch(e) { 
+            console.warn("Aviso: Autenticação anônima pendente de ativação no console Firebase.", e.code); 
+        }
+    };
+    
+    initAuth();
+    onAuthStateChanged(auth, (user) => { 
+        currentUser = user; 
+        if(user) console.log("Firebase: Conectado com sucesso.");
+    });
+
+    /** * INTERCEPTAÇÃO DE FUNÇÕES
+     * Conecta os botões da interface ao Banco de Dados
+     */
+
+    // 1. Gravar dados ao clicar em "Acessar Orçamentos"
+    const originalUnlockApp = window.unlockApp;
+    window.unlockApp = async function() {
+        // Captura os dados dos inputs
+        const nameInput = document.getElementById('lead-name-barrier');
+        const whatsappInput = document.getElementById('lead-whatsapp-barrier');
+        const dateInput = document.getElementById('lead-date-barrier');
+        const guestsInput = document.getElementById('lead-guests-barrier');
+
+        const name = nameInput ? nameInput.value : "";
+        const whatsapp = whatsappInput ? whatsappInput.value : "";
+        const eventDate = dateInput ? dateInput.value : "";
+        const guests = guestsInput ? guestsInput.value : "";
+
+        // Atualiza o estado global
+        if (window.orderState) {
+            window.orderState.name = name;
+            window.orderState.whatsapp = whatsapp;
+            window.orderState.eventDate = eventDate;
+            window.orderState.guests = guests;
         }
 
-        let currentUser = null;
-        let currentLeadId = null;
+        // Roda a validação visual original
+        if (typeof originalUnlockApp === "function") originalUnlockApp(); 
 
-        if (auth) {
-            const initAuth = async () => {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch(e) { console.error(e); }
-            };
-            initAuth();
-            onAuthStateChanged(auth, (user) => { currentUser = user; });
-        }
-
-        // Intercetar o Botão Acessar Orçamentos para gravar no Banco de Dados
-        const originalUnlockApp = window.unlockApp;
-        window.unlockApp = async function() {
-            originalUnlockApp(); // Roda o original que valida a tela
-
-            // Se a pessoa passou da barreira, guarda os dados na Nuvem
-            if (currentUser && db && window.orderState.name) {
-                try {
-                    const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
-                    const docRef = await addDoc(leadsRef, {
-                        name: window.orderState.name,
-                        whatsapp: window.orderState.whatsapp,
-                        eventDate: window.orderState.eventDate,
-                        guests: window.orderState.guests,
-                        timestamp: new Date().toISOString(),
-                        userId: currentUser.uid,
-                        status: 'Captado (Iniciou Orçamento)'
-                    });
-                    currentLeadId = docRef.id;
-                } catch(e) { console.error("Erro ao gravar Lead no BD:", e); }
-            }
-        };
-
-        // Intercetar a conclusão do Pedido para atualizar com os valores escolhidos
-        const originalFinishOrder = window.finishOrder;
-        window.finishOrder = async function(method) {
-            if (currentUser && db && currentLeadId) {
-                try {
-                    const leadRef = doc(db, 'artifacts', appId, 'public', 'data', 'leads', currentLeadId);
-                    await updateDoc(leadRef, {
-                        plan: window.orderState.plan,
-                        drinks: window.orderState.drinks,
-                        totalValue: window.orderState.priceStr,
-                        paymentMethod: method,
-                        status: 'Orçamento Finalizado (Aguardando Retorno)'
-                    });
-                } catch(e) { console.error("Erro Update BD:", e); }
-            }
-            originalFinishOrder(method);
-        };
-
-        // Buscar Lista Secreta para o Painel do Dono
-        window.fetchAdminLeads = function() {
-            if(!currentUser || !db) {
-                document.getElementById('admin-leads-container').innerHTML = '<p class="text-center text-gray-500 text-xs">Banco de Dados Indisponível no momento.</p>';
-                return;
-            }
-            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
-            
-            onSnapshot(leadsRef, (snapshot) => {
-                const leads = [];
-                snapshot.forEach(doc => leads.push({ id: doc.id, ...doc.data() }));
-                
-                // Ordenar do mais recente para o mais antigo
-                leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                let html = '';
-                leads.forEach(lead => {
-                    const corStatus = lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
-                    html += `
-                    <div class="bg-[#151515] p-4 rounded-xl border border-white/10 mb-3 text-left shadow-lg relative">
-                        <button onclick="window.deleteLead('${lead.id}')" class="absolute top-4 right-4 bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded text-[8px] uppercase tracking-widest font-bold hover:bg-red-500/30 transition-colors cursor-pointer z-10">Excluir</button>
-                        <div class="flex justify-between border-b border-white/10 pb-2 mb-2 pr-14">
-                            <span class="gold-text font-black uppercase text-sm">${lead.name}</span>
-                            <span class="text-[10px] text-gray-500">${new Date(lead.timestamp).toLocaleString('pt-BR')}</span>
-                        </div>
-                        <div class="text-xs text-gray-400 space-y-2 mt-2">
-                            <p class="flex justify-between"><span>📱 WhatsApp:</span> <a href="https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-blue-400 underline font-bold">${lead.whatsapp}</a></p>
-                            <p class="flex justify-between"><span>📅 Evento:</span> <span class="text-white">${lead.eventDate || 'Não Inserida'}</span></p>
-                            <p class="flex justify-between"><span>👥 Convidados:</span> <span class="text-white">${lead.guests}</span></p>
-                            <p class="flex justify-between border-t border-white/5 pt-2 mt-2"><span>📊 Status:</span> <span class="${corStatus} font-bold">${lead.status}</span></p>
-                            ${lead.plan ? `<p class="flex justify-between"><span>🍾 Plano Ofertado:</span> <span class="gold-text font-bold">${lead.plan}</span></p>` : ''}
-                            ${lead.totalValue ? `<p class="flex justify-between"><span>💰 Valor Proposto:</span> <span class="text-white font-bold">${lead.totalValue}</span></p>` : ''}
-                        </div>
-                    </div>`;
+        // Tenta salvar se houver conexão e nome
+        if (db && name) {
+            try {
+                const leadsRef = collection(db, 'leads');
+                const docRef = await addDoc(leadsRef, {
+                    name: name,
+                    whatsapp: whatsapp,
+                    eventDate: eventDate || "Não informada",
+                    guests: guests || 0,
+                    timestamp: new Date().toISOString(),
+                    userId: currentUser ? currentUser.uid : 'visitante-sem-auth',
+                    status: 'Captado (Iniciou Orçamento)'
                 });
-                document.getElementById('admin-leads-container').innerHTML = html || '<p class="text-center text-gray-500 text-xs">A sua lista de clientes captados aparecerá aqui.</p>';
-            }, (error) => {
-                console.error("Erro Snapshot:", error);
-            });
-        };
-
-        // Deletar Lead Permanentemente
-        window.deleteLead = async function(leadId) {
-            if (confirm("Deseja realmente excluir este lead? Esta ação não pode ser desfeita.")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', leadId));
-                    // Como estamos usando o "onSnapshot", a lista atualizará automaticamente assim que for deletado.
-                } catch (e) {
-                    console.error("Erro ao excluir lead: ", e);
-                    alert("Ocorreu um erro ao tentar excluir o lead.");
-                }
+                currentLeadId = docRef.id;
+                console.log("Lead registrado com sucesso!");
+            } catch(e) { 
+                console.error("Erro ao gravar no BD (verifique regras de segurança e auth):", e); 
             }
-        };
+        }
+    };
 
-    </script>
-</body>
-</html>
+    // 2. Atualizar o lead quando o orçamento é finalizado
+    const originalFinishOrder = window.finishOrder;
+    window.finishOrder = async function(method) {
+        if (db && currentLeadId) {
+            try {
+                const leadRef = doc(db, 'leads', currentLeadId);
+                await updateDoc(leadRef, {
+                    plan: window.orderState.plan || "Nenhum",
+                    drinks: window.orderState.drinks || [],
+                    totalValue: window.orderState.priceStr || "R$ 0,00",
+                    paymentMethod: method,
+                    status: 'Orçamento Finalizado'
+                });
+            } catch(e) { 
+                console.error("Erro ao atualizar no BD:", e); 
+            }
+        }
+        if (typeof originalFinishOrder === "function") originalFinishOrder(method);
+    };
+
+    // 3. Função para o Painel Administrativo
+    window.fetchAdminLeads = function() {
+        if(!db) return;
+
+        const leadsRef = collection(db, 'leads');
+        onSnapshot(leadsRef, (snapshot) => {
+            const leads = [];
+            snapshot.forEach(doc => leads.push({ id: doc.id, ...doc.data() }));
+            
+            leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            let html = '';
+            leads.forEach(lead => {
+                const isFinalizado = lead.status.includes('Finalizado');
+                const corStatus = isFinalizado ? 'text-green-400' : 'text-yellow-500';
+                
+                html += `
+                <div class="bg-[#151515] p-4 rounded-xl border border-white/10 mb-3 text-left shadow-lg relative">
+                    <button onclick="window.deleteLead('${lead.id}')" class="absolute top-4 right-4 bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded text-[8px] uppercase font-bold hover:bg-red-500/30 transition-colors cursor-pointer">Excluir</button>
+                    <div class="flex justify-between border-b border-white/10 pb-2 mb-2 pr-14">
+                        <span class="gold-text font-black uppercase text-sm">${lead.name}</span>
+                        <span class="text-[10px] text-gray-500">${new Date(lead.timestamp).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <div class="text-xs text-gray-400 space-y-2 mt-2">
+                        <p class="flex justify-between"><span>📱 WhatsApp:</span> <a href="https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-blue-400 underline font-bold">${lead.whatsapp}</a></p>
+                        <p class="flex justify-between"><span>📅 Evento:</span> <span class="text-white">${lead.eventDate}</span></p>
+                        <p class="flex justify-between"><span>👥 Convidados:</span> <span class="text-white">${lead.guests}</span></p>
+                        <p class="flex justify-between border-t border-white/5 pt-2 mt-2"><span>📊 Status:</span> <span class="${corStatus} font-bold">${lead.status}</span></p>
+                        ${lead.plan ? `<p class="flex justify-between"><span>🍾 Plano:</span> <span class="gold-text font-bold">${lead.plan}</span></p>` : ''}
+                        ${lead.totalValue ? `<p class="flex justify-between"><span>💰 Valor:</span> <span class="text-white font-bold">${lead.totalValue}</span></p>` : ''}
+                    </div>
+                </div>`;
+            });
+            
+            const container = document.getElementById('admin-leads-container');
+            if(container) container.innerHTML = html || '<p class="text-center text-gray-500 text-xs">Aguardando primeiro cliente...</p>';
+        }, (error) => {
+            console.error("Erro ao carregar lista (Auth ou Regras):", error);
+        });
+    };
+
+    window.deleteLead = async function(leadId) {
+        if (confirm("Excluir este lead permanentemente?")) {
+            try {
+                await deleteDoc(doc(db, 'leads', leadId));
+            } catch (e) {
+                console.error("Erro ao excluir:", e);
+            }
+        }
+    };
+</script>
