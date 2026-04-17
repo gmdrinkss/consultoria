@@ -371,7 +371,7 @@
                     <input type="date" id="lead-date-barrier" class="barrier-input mb-0">
                 </div>
                 <div class="w-1/3 text-left">
-                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Convidados</label>
+                    <label class="text-xs md:text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Qtd.Convidados</label>
                     <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input mb-0">
                 </div>
             </div>
@@ -414,7 +414,7 @@
                             <li class="flex items-start"><span class="list-bullet">•</span> Frutas e Xaropes</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Estrutura Completa</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Iluminação&Decoração</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span> Estrutura completa</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span>Insumos Basicos</li>
                             <li class="flex items-start"><span class="list-bullet">•</span>Gelo</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffEssencial">2 Bartenders + 1 Barback</span></li>
                         </div>
@@ -436,7 +436,7 @@
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">QTD.Convidados</span>
                                     <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
                                         <button type="button" onclick="stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
                                         <input type="number" id="guestInputEssencial" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
@@ -524,7 +524,7 @@
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Qtd.Convidados</span>
                                     <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
                                         <button onclick="stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
                                         <input type="number" id="guestInputPremium" value="50" oninput="updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
@@ -634,15 +634,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="payment-options-grid">
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">1. Reserva Padrão (50/50)</h4>
-                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal reduzido.</p>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">1. Reserva Padrão (50% / 50%)</h4>
+                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal 50%.</p>
                         <div id="ex-model-1" class="example-box"></div>
                     </div>
                     <button type="button" onclick="handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">2. Entrada + Parcelas Pix</h4>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">2. Entrada + Parcelas Via Pix</h4>
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Sem juros, parcelando livremente até o dia do evento.</p>
                         <div id="ex-model-2" class="example-box"></div>
                     </div>
@@ -650,7 +650,7 @@
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">3. Parcelamento Total Pix</h4>
+                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">3. Parcelamento Total Via Pix</h4>
                         <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Divida o valor total sem precisar de entrada imediata.</p>
                         <div id="ex-model-3" class="example-box"></div>
                     </div>
@@ -692,7 +692,7 @@
             { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false },
             { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false },
             { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false },
-            { id: 22, name: "Fakerulá", desc: "Amarulá Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false }
+            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false }
             
         ];
 
@@ -756,13 +756,18 @@
 
             if (guests < 50) perPerson = 53.20;
             else if (guests <= 70) perPerson = 38.00;
-            else if (guests <= 100) perPerson = 28.87;
-            else if (guests >= 130) perPerson = 25.32;
-            else if (guests >= 180) perPerson = 25.32;
+            else if (guests <= 99) perPerson = 28.98;
+            else if (guests <= 110) perPerson = 28.87;
+            else if (guests <= 120) perPerson = 27.48;
+            else if (guests <= 130) perPerson = 26.87;
+            else if (guests <= 150) perPerson = 25.32;
+            else if (guests <= 160) perPerson = 24.98;
+            else if (guests <= 170) perPerson = 24.10;
+            else if (guests <= 180) perPerson = 23.31;
             else if (guests <= 200) perPerson = 22.50;
 
-            if (guests > 110) { staff = "3 Bartenders + 1 Barback"; extraCost = 100.00; }
-            if (guests > 159) { staff = "4 Bartenders + 1 Barback"; extraCost = 300.00; }
+            if (guests > 115) { staff = "3 Bartenders + 1 Barback"; extraCost = 100.00; }
+            if (guests > 165) { staff = "4 Bartenders + 1 Barback"; extraCost = 300.00; }
             if (guests >= 230) { staff = "5 Bartenders + 1 Barback"; extraCost = 600.00; }
             
             return { perPerson, staff, extraCost };
@@ -949,7 +954,7 @@
             const v = orderState.totalValue;
             const m = orderState.availableMonths || 1;
             document.getElementById('ex-model-1').innerHTML = `Sinal p/ Reserva: <b>${fmt(v * 0.5)}</b><br>Restante no dia: <b>${fmt(v * 0.5)}</b>`;
-            let model2Txt = `Entrada (30%): <b>${fmt(v * 0.3)}</b><br>`;
+            let model2Txt = `Entrada (50%): <b>${fmt(v * 0.5)}</b><br>`;
             if(m > 1) model2Txt += `Saldo em <b>${m}x Pix de ${fmt((v*0.7)/m)}</b> s/ juros`;
             else model2Txt += `Saldo de <b>${fmt(v*0.7)}</b> p/ o dia do evento.`;
             document.getElementById('ex-model-2').innerHTML = model2Txt;
