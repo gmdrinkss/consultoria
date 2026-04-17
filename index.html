@@ -1037,11 +1037,11 @@
         };
     </script>
 
-    <!-- SCRIPT DO BANCO DE DADOS EM NUVEM (Firebase Firestore) -->
+   <!-- SCRIPT DO BANCO DE DADOS EM NUVEM (Firebase Firestore) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Suas credenciais reais do projeto GMDrinks
     const firebaseConfig = {
@@ -1062,7 +1062,6 @@
     let currentLeadId = null;
 
     // Autenticação Silenciosa
-    // NOTA: Se der erro 'auth/configuration-not-found', ative 'Anônimo' no Console do Firebase > Authentication
     const initAuth = async () => {
         try {
             await signInAnonymously(auth);
@@ -1077,14 +1076,11 @@
         if(user) console.log("Firebase: Conectado com sucesso.");
     });
 
-    /** * INTERCEPTAÇÃO DE FUNÇÕES
-     * Conecta os botões da interface ao Banco de Dados
-     */
+    /** * INTERCEPTAÇÃO DE FUNÇÕES */
 
     // 1. Gravar dados ao clicar em "Acessar Orçamentos"
     const originalUnlockApp = window.unlockApp;
     window.unlockApp = async function() {
-        // Captura os dados dos inputs
         const nameInput = document.getElementById('lead-name-barrier');
         const whatsappInput = document.getElementById('lead-whatsapp-barrier');
         const dateInput = document.getElementById('lead-date-barrier');
@@ -1095,7 +1091,6 @@
         const eventDate = dateInput ? dateInput.value : "";
         const guests = guestsInput ? guestsInput.value : "";
 
-        // Atualiza o estado global
         if (window.orderState) {
             window.orderState.name = name;
             window.orderState.whatsapp = whatsapp;
@@ -1103,10 +1098,9 @@
             window.orderState.guests = guests;
         }
 
-        // Roda a validação visual original
         if (typeof originalUnlockApp === "function") originalUnlockApp(); 
 
-        // Tenta salvar se houver conexão e nome
+        // CRIAÇÃO DE REGISTRO ÚNICO: Sempre usamos addDoc para garantir um novo documento por cliente
         if (db && name) {
             try {
                 const leadsRef = collection(db, 'leads');
@@ -1116,18 +1110,18 @@
                     eventDate: eventDate || "Não informada",
                     guests: guests || 0,
                     timestamp: new Date().toISOString(),
-                    userId: currentUser ? currentUser.uid : 'visitante-sem-auth',
+                    userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
                     status: 'Captado (Iniciou Orçamento)'
                 });
-                currentLeadId = docRef.id;
-                console.log("Lead registrado com sucesso!");
+                currentLeadId = docRef.id; 
+                console.log("Histórico: Novo cliente guardado com sucesso ID:", currentLeadId);
             } catch(e) { 
-                console.error("Erro ao gravar no BD (verifique regras de segurança e auth):", e); 
+                console.error("Erro ao guardar dados do cliente:", e); 
             }
         }
     };
 
-    // 2. Atualizar o lead quando o orçamento é finalizado
+    // 2. Atualizar o lead específico quando o orçamento é finalizado (sem criar um novo, apenas completa o existente)
     const originalFinishOrder = window.finishOrder;
     window.finishOrder = async function(method) {
         if (db && currentLeadId) {
@@ -1141,13 +1135,13 @@
                     status: 'Orçamento Finalizado'
                 });
             } catch(e) { 
-                console.error("Erro ao atualizar no BD:", e); 
+                console.error("Erro ao atualizar progresso do cliente:", e); 
             }
         }
         if (typeof originalFinishOrder === "function") originalFinishOrder(method);
     };
 
-    // 3. Função para o Painel Administrativo
+    // 3. Função para o Painel Administrativo - Listagem para prospecção no WhatsApp
     window.fetchAdminLeads = function() {
         if(!db) return;
 
@@ -1156,6 +1150,7 @@
             const leads = [];
             snapshot.forEach(doc => leads.push({ id: doc.id, ...doc.data() }));
             
+            // Ordena pelos mais recentes
             leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
             
             let html = '';
@@ -1163,37 +1158,61 @@
                 const isFinalizado = lead.status.includes('Finalizado');
                 const corStatus = isFinalizado ? 'text-green-400' : 'text-yellow-500';
                 
+                // Limpa o número do WhatsApp para o link
+                const waLink = `https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}`;
+                
                 html += `
-                <div class="bg-[#151515] p-4 rounded-xl border border-white/10 mb-3 text-left shadow-lg relative">
-                    <button onclick="window.deleteLead('${lead.id}')" class="absolute top-4 right-4 bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded text-[8px] uppercase font-bold hover:bg-red-500/30 transition-colors cursor-pointer">Excluir</button>
-                    <div class="flex justify-between border-b border-white/10 pb-2 mb-2 pr-14">
-                        <span class="gold-text font-black uppercase text-sm">${lead.name}</span>
-                        <span class="text-[10px] text-gray-500">${new Date(lead.timestamp).toLocaleDateString('pt-BR')}</span>
+                <div class="bg-[#151515] p-5 rounded-2xl border border-white/10 mb-4 text-left shadow-2xl relative">
+                    <div class="absolute top-4 right-4 flex gap-2">
+                        <a href="${waLink}" target="_blank" class="bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-1 rounded-lg text-[10px] uppercase font-black hover:bg-green-500/20 transition-all">WhatsApp</a>
+                        <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1 rounded-lg text-[10px] uppercase font-black hover:bg-red-500/20 cursor-pointer">Apagar</button>
                     </div>
-                    <div class="text-xs text-gray-400 space-y-2 mt-2">
-                        <p class="flex justify-between"><span>📱 WhatsApp:</span> <a href="https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-blue-400 underline font-bold">${lead.whatsapp}</a></p>
-                        <p class="flex justify-between"><span>📅 Evento:</span> <span class="text-white">${lead.eventDate}</span></p>
-                        <p class="flex justify-between"><span>👥 Convidados:</span> <span class="text-white">${lead.guests}</span></p>
-                        <p class="flex justify-between border-t border-white/5 pt-2 mt-2"><span>📊 Status:</span> <span class="${corStatus} font-bold">${lead.status}</span></p>
-                        ${lead.plan ? `<p class="flex justify-between"><span>🍾 Plano:</span> <span class="gold-text font-bold">${lead.plan}</span></p>` : ''}
-                        ${lead.totalValue ? `<p class="flex justify-between"><span>💰 Valor:</span> <span class="text-white font-bold">${lead.totalValue}</span></p>` : ''}
+
+                    <div class="border-b border-white/10 pb-3 mb-3 pr-24">
+                        <h4 class="gold-text font-black uppercase text-base leading-tight">${lead.name}</h4>
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">${new Date(lead.timestamp).toLocaleString('pt-BR')}</span>
                     </div>
+
+                    <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
+                            <span class="text-white font-medium">${lead.whatsapp}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
+                            <span class="${corStatus} font-bold">${lead.status}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data Evento</span>
+                            <span class="text-white">${lead.eventDate}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
+                            <span class="text-white">${lead.guests}</span>
+                        </div>
+                    </div>
+
+                    ${lead.plan ? `
+                    <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-bold text-gray-500">Plano Selecionado</span>
+                        <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${lead.totalValue}</span>
+                    </div>` : ''}
                 </div>`;
             });
             
             const container = document.getElementById('admin-leads-container');
-            if(container) container.innerHTML = html || '<p class="text-center text-gray-500 text-xs">Aguardando primeiro cliente...</p>';
+            if(container) container.innerHTML = html || '<p class="text-center text-gray-500 text-xs py-10">Nenhum cliente cadastrado ainda...</p>';
         }, (error) => {
-            console.error("Erro ao carregar lista (Auth ou Regras):", error);
+            console.error("Erro ao ler banco de dados:", error);
         });
     };
 
     window.deleteLead = async function(leadId) {
-        if (confirm("Excluir este lead permanentemente?")) {
+        if (confirm("Deseja remover este cliente permanentemente da sua lista de contatos?")) {
             try {
                 await deleteDoc(doc(db, 'leads', leadId));
             } catch (e) {
-                console.error("Erro ao excluir:", e);
+                console.error("Erro ao excluir registro:", e);
             }
         }
     };
