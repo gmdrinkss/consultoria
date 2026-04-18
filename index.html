@@ -341,6 +341,17 @@
         }
         
         .clickable-title { cursor: pointer; user-select: none; }
+        
+        .loading-spinner {
+            border: 2px solid rgba(212, 175, 55, 0.1);
+            border-top: 2px solid #d4af37;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
@@ -370,7 +381,7 @@
                 </div>
             </div>
             
-            <button type="button" onclick="unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-4 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+            <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-4 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
                 Acessar Orçamentos
             </button>
             <p class="text-[11px] md:text-[9px] text-gray-600 mt-6 uppercase tracking-widest">Experiência Premium Garantida</p>
@@ -380,7 +391,6 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <div id="app-container" class="content-locked w-full flex flex-col items-center">
         <header class="mt-4 mb-8 text-center">
-            <!-- Clique secreto aqui também 5x -->
             <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1 clickable-title" onclick="window.triggerAdmin()">GMDrinks</h1>
             <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto">A sofisticação que o seu evento merece em cada detalhe.</p>
         </header>
@@ -473,7 +483,7 @@
                     Mais Vendido
                 </div>
                 
-                <div class="p-6 pb-8 flex-grow flex flex-col justify-between"> <!-- Adicionado pb-8 p/ garantir respiro extra no final -->
+                <div class="p-6 pb-8 flex-grow flex flex-col justify-between"> 
                     <div>
                         <div class="flex items-center justify-between mb-4 mt-6 md:mt-0">
                             <h2 class="text-xl font-bold tracking-widest uppercase">Plano Premium</h2>
@@ -590,7 +600,6 @@
 
     <!-- MODAL DE PAGAMENTO FINAL -->
     <div id="step-pay" class="step-overlay">
-        <!-- Alterado para pb-32 para espaço extra p/ o final da tela -->
         <div class="max-w-4xl mx-auto mt-10 pb-32 px-4">
             <div id="back-button-container">
                 <div id="btn-back-to-drinks" onclick="window.backToDrinks()" class="btn-back">← Voltar para Drinks</div>
@@ -665,14 +674,16 @@
     <!-- MODAL DE ADMINISTRAÇÃO (OCULTO - BANCO DE DADOS) -->
     <div id="admin-panel" class="step-overlay" style="z-index: 10000;">
         <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
-            <div onclick="document.getElementById('admin-panel').style.display='none'" class="btn-back">← Voltar</div>
+            <div onclick="window.closeAdmin()" class="btn-back">← Voltar e Fechar</div>
             <div class="text-center mb-6">
                 <h3 class="brand-font text-3xl gold-text uppercase">Painel de Clientes</h3>
                 <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Leads Guardados</p>
             </div>
-            <!-- Aqui a lista de leads será injetada -->
             <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                <p class="text-center text-gray-500 text-xs uppercase tracking-widest mt-10">Carregando Banco de Dados...</p>
+                <div class="text-center py-20">
+                    <div class="loading-spinner mb-4"></div>
+                    <p class="text-gray-500 text-xs italic tracking-widest uppercase">Carregando Banco de Dados...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -724,40 +735,6 @@
             const val = parseFloat(v);
             if (isNaN(val)) return "R$ 0,00";
             return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        };
-
-        window.unlockApp = function() {
-            const name = document.getElementById('lead-name-barrier').value;
-            const wa = document.getElementById('lead-whatsapp-barrier').value;
-            const date = document.getElementById('lead-date-barrier').value;
-            const guests = document.getElementById('lead-guests-barrier').value;
-            
-            if(!name || !wa || !date || !guests) {
-                const valMsg = document.getElementById('validation-msg');
-                if(valMsg) valMsg.classList.remove('hidden');
-                return;
-            }
-
-            window.orderState.name = name;
-            window.orderState.whatsapp = wa;
-            window.orderState.eventDate = date;
-            window.orderState.guests = parseInt(guests);
-            
-            document.getElementById('guestInputEssencial').value = guests;
-            document.getElementById('guestInputPremium').value = guests;
-            document.getElementById('eventDate').value = date;
-
-            const barrier = document.getElementById('access-barrier');
-            barrier.style.transition = 'opacity 0.6s ease';
-            barrier.style.opacity = '0';
-            
-            setTimeout(() => {
-                barrier.style.display = 'none';
-                document.getElementById('app-container').classList.remove('content-locked');
-                document.getElementById('app-container').style.height = 'auto';
-                window.updateDisplay();
-                window.calcTimeline(); 
-            }, 600);
         };
 
         const getEssencialData = (guests) => {
@@ -1007,6 +984,10 @@
             msg += `*PAGAMENTO SELECIONADO:* ${method}\n`;
             if(window.orderState.availableMonths > 1) msg += `*PARCELAMENTO ESTIMADO:* ${window.orderState.availableMonths} meses\n`;
             msg += `\nOlá! Gostaria de validar minha data com as condições simuladas no app.`;
+            
+            // Chama a função global do Firebase para atualizar os dados antes de ir pro WhatsApp
+            if(window.finishOrderToFirebase) window.finishOrderToFirebase(method);
+            
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
@@ -1024,196 +1005,243 @@
             document.getElementById('closingDate').min = new Date().toISOString().split("T")[0];
         };
 
-        // Lógica de Ativação do Painel de Admin (Clicar 5x no H1)
+        // Lógica de Ativação do Painel de Admin (Clicar 5x)
         let adminClicks = 0;
         window.triggerAdmin = function() {
             adminClicks++;
             if(adminClicks >= 5) {
-                document.getElementById('admin-panel').style.display = 'block';
-                if(window.fetchAdminLeads) window.fetchAdminLeads();
+                localStorage.setItem('gmd_admin_session', 'true');
+                document.getElementById('admin-panel').style.display = 'flex';
+                if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
                 adminClicks = 0;
             }
             setTimeout(() => { adminClicks = 0; }, 2000); 
         };
-    </script>
+        
+        window.closeAdmin = function() {
+            localStorage.setItem('gmd_admin_session', 'false');
+            document.getElementById('admin-panel').style.display = 'none';
+        };
+        
+        window.unlockApp = async function() {
+            const name = document.getElementById('lead-name-barrier').value;
+            const whatsapp = document.getElementById('lead-whatsapp-barrier').value;
+            const eventDate = document.getElementById('lead-date-barrier').value;
+            const guests = document.getElementById('lead-guests-barrier').value;
 
-   <!-- SCRIPT DO BANCO DE DADOS EM NUVEM (Firebase Firestore) -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            if(!name || !whatsapp) {
+                const valMsg = document.getElementById('validation-msg');
+                if(valMsg) valMsg.classList.remove('hidden');
+                return;
+            }
 
-    // Suas credenciais reais do projeto GMDrinks
-    const firebaseConfig = {
-        apiKey: "AIzaSyCzPZhMjCv-CrYavikjwF2Vq5kDKr5uXyg",
-        authDomain: "gmdrinks-ad157.firebaseapp.com",
-        projectId: "gmdrinks-ad157",
-        storageBucket: "gmdrinks-ad157.firebasestorage.app",
-        messagingSenderId: "885481881120",
-        appId: "1:885481881120:web:a19543bd38c1c134a7c645"
-    };
-
-    // Inicialização do Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
-    let currentLeadId = null;
-
-    // Autenticação Silenciosa
-    const initAuth = async () => {
-        try {
-            await signInAnonymously(auth);
-        } catch(e) { 
-            console.warn("Aviso: Autenticação anônima pendente de ativação no console Firebase.", e.code); 
-        }
-    };
-    
-    initAuth();
-    onAuthStateChanged(auth, (user) => { 
-        currentUser = user; 
-        if(user) console.log("Firebase: Conectado com sucesso.");
-    });
-
-    /** * INTERCEPTAÇÃO DE FUNÇÕES */
-
-    // 1. Gravar dados ao clicar em "Acessar Orçamentos"
-    const originalUnlockApp = window.unlockApp;
-    window.unlockApp = async function() {
-        const nameInput = document.getElementById('lead-name-barrier');
-        const whatsappInput = document.getElementById('lead-whatsapp-barrier');
-        const dateInput = document.getElementById('lead-date-barrier');
-        const guestsInput = document.getElementById('lead-guests-barrier');
-
-        const name = nameInput ? nameInput.value : "";
-        const whatsapp = whatsappInput ? whatsappInput.value : "";
-        const eventDate = dateInput ? dateInput.value : "";
-        const guests = guestsInput ? guestsInput.value : "";
-
-        if (window.orderState) {
             window.orderState.name = name;
             window.orderState.whatsapp = whatsapp;
             window.orderState.eventDate = eventDate;
-            window.orderState.guests = guests;
-        }
+            window.orderState.guests = parseInt(guests);
+            
+            document.getElementById('guestInputEssencial').value = guests;
+            document.getElementById('guestInputPremium').value = guests;
+            document.getElementById('eventDate').value = eventDate;
 
-        if (typeof originalUnlockApp === "function") originalUnlockApp(); 
-
-        // CRIAÇÃO DE REGISTRO ÚNICO: Sempre usamos addDoc para garantir um novo documento por cliente
-        if (db && name) {
-            try {
-                const leadsRef = collection(db, 'leads');
-                const docRef = await addDoc(leadsRef, {
-                    name: name,
-                    whatsapp: whatsapp,
-                    eventDate: eventDate || "Não informada",
-                    guests: guests || 0,
-                    timestamp: new Date().toISOString(),
-                    userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
-                    status: 'Captado (Iniciou Orçamento)'
-                });
-                currentLeadId = docRef.id; 
-                console.log("Histórico: Novo cliente guardado com sucesso ID:", currentLeadId);
-            } catch(e) { 
-                console.error("Erro ao guardar dados do cliente:", e); 
+            // Envia para o Firebase
+            if(window.saveLeadToFirebase) {
+                window.saveLeadToFirebase({ name, whatsapp, eventDate, guests });
             }
-        }
-    };
 
-    // 2. Atualizar o lead específico quando o orçamento é finalizado (sem criar um novo, apenas completa o existente)
-    const originalFinishOrder = window.finishOrder;
-    window.finishOrder = async function(method) {
-        if (db && currentLeadId) {
+            document.getElementById('access-barrier').style.transition = 'opacity 0.6s ease';
+            document.getElementById('access-barrier').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('access-barrier').style.display = 'none';
+                document.getElementById('app-container').classList.remove('content-locked');
+                document.getElementById('app-container').style.height = 'auto';
+                window.updateDisplay();
+                window.calcTimeline(); 
+            }, 600);
+        };
+    </script>
+
+    <!-- SCRIPT REALTIME DATABASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // Suas credenciais + Link do Realtime Database
+        const firebaseConfig = {
+            apiKey: "AIzaSyCzPZhMjCv-CrYavikjwF2Vq5kDKr5uXyg",
+            authDomain: "gmdrinks-ad157.firebaseapp.com",
+            projectId: "gmdrinks-ad157",
+            storageBucket: "gmdrinks-ad157.firebasestorage.app",
+            messagingSenderId: "885481881120",
+            appId: "1:885481881120:web:a19543bd38c1c134a7c645",
+            databaseURL: "https://gmdrinks-ad157-default-rtdb.firebaseio.com" // ADICIONADO AQUI!
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+        let currentLeadId = null;
+
+        // Estado do Administrador
+        let isAdminActive = localStorage.getItem('gmd_admin_session') === 'true';
+
+        const initAuth = async () => {
             try {
-                const leadRef = doc(db, 'leads', currentLeadId);
-                await updateDoc(leadRef, {
-                    plan: window.orderState.plan || "Nenhum",
-                    drinks: window.orderState.drinks || [],
-                    totalValue: window.orderState.priceStr || "R$ 0,00",
-                    paymentMethod: method,
-                    status: 'Orçamento Finalizado'
-                });
+                await signInAnonymously(auth);
             } catch(e) { 
-                console.error("Erro ao atualizar progresso do cliente:", e); 
+                console.warn("Autenticação anônima pendente.", e.code); 
             }
-        }
-        if (typeof originalFinishOrder === "function") originalFinishOrder(method);
-    };
-
-    // 3. Função para o Painel Administrativo - Listagem para prospecção no WhatsApp
-    window.fetchAdminLeads = function() {
-        if(!db) return;
-
-        const leadsRef = collection(db, 'leads');
-        onSnapshot(leadsRef, (snapshot) => {
-            const leads = [];
-            snapshot.forEach(doc => leads.push({ id: doc.id, ...doc.data() }));
-            
-            // Ordena pelos mais recentes
-            leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
-            let html = '';
-            leads.forEach(lead => {
-                const isFinalizado = lead.status.includes('Finalizado');
-                const corStatus = isFinalizado ? 'text-green-400' : 'text-yellow-500';
-                
-                // Limpa o número do WhatsApp para o link
-                const waLink = `https://wa.me/55${lead.whatsapp.replace(/\D/g,'')}`;
-                
-                html += `
-                <div class="bg-[#151515] p-5 rounded-2xl border border-white/10 mb-4 text-left shadow-2xl relative">
-                    <div class="absolute top-4 right-4 flex gap-2">
-                        <a href="${waLink}" target="_blank" class="bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-1 rounded-lg text-[10px] uppercase font-black hover:bg-green-500/20 transition-all">WhatsApp</a>
-                        <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1 rounded-lg text-[10px] uppercase font-black hover:bg-red-500/20 cursor-pointer">Apagar</button>
-                    </div>
-
-                    <div class="border-b border-white/10 pb-3 mb-3 pr-24">
-                        <h4 class="gold-text font-black uppercase text-base leading-tight">${lead.name}</h4>
-                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">${new Date(lead.timestamp).toLocaleString('pt-BR')}</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
-                        <div>
-                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
-                            <span class="text-white font-medium">${lead.whatsapp}</span>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
-                            <span class="${corStatus} font-bold">${lead.status}</span>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data Evento</span>
-                            <span class="text-white">${lead.eventDate}</span>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
-                            <span class="text-white">${lead.guests}</span>
-                        </div>
-                    </div>
-
-                    ${lead.plan ? `
-                    <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
-                        <span class="text-[10px] uppercase font-bold text-gray-500">Plano Selecionado</span>
-                        <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${lead.totalValue}</span>
-                    </div>` : ''}
-                </div>`;
-            });
-            
-            const container = document.getElementById('admin-leads-container');
-            if(container) container.innerHTML = html || '<p class="text-center text-gray-500 text-xs py-10">Nenhum cliente cadastrado ainda...</p>';
-        }, (error) => {
-            console.error("Erro ao ler banco de dados:", error);
+        };
+        
+        initAuth();
+        onAuthStateChanged(auth, (user) => { 
+            currentUser = user; 
+            if(user && isAdminActive) {
+                document.getElementById('admin-panel').style.display = 'flex';
+                window.fetchAdminLeads();
+            }
         });
-    };
 
-    window.deleteLead = async function(leadId) {
-        if (confirm("Deseja remover este cliente permanentemente da sua lista de contatos?")) {
-            try {
-                await deleteDoc(doc(db, 'leads', leadId));
-            } catch (e) {
-                console.error("Erro ao excluir registro:", e);
+        // 1. Gravar dados ao clicar em "Acessar Orçamentos" (Agora usando Realtime DB)
+        window.saveLeadToFirebase = async function(data) {
+            if (db && data.name) {
+                try {
+                    const leadsRef = ref(db, 'leads');
+                    const newLeadRef = push(leadsRef); // Cria um ID único
+                    
+                    await set(newLeadRef, {
+                        name: data.name,
+                        whatsapp: data.whatsapp,
+                        eventDate: data.eventDate || "Não informada",
+                        guests: data.guests || 0,
+                        timestamp: new Date().toISOString(),
+                        userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
+                        status: 'Captado (Iniciou Orçamento)'
+                    });
+                    
+                    currentLeadId = newLeadRef.key; 
+                } catch(e) { 
+                    console.error("Erro ao guardar dados do cliente:", e); 
+                }
             }
-        }
-    };
-</script>
+        };
+
+        // 2. Atualizar o lead quando o orçamento é finalizado
+        window.finishOrderToFirebase = async function(method) {
+            if (db && currentLeadId) {
+                try {
+                    const leadRef = ref(db, 'leads/' + currentLeadId);
+                    await update(leadRef, {
+                        plan: window.orderState.plan || "Nenhum",
+                        drinks: window.orderState.drinks || [],
+                        totalValue: window.orderState.priceStr || "R$ 0,00",
+                        paymentMethod: method,
+                        status: 'Orçamento Finalizado'
+                    });
+                } catch(e) { 
+                    console.error("Erro ao atualizar progresso:", e); 
+                }
+            }
+        };
+
+        // 3. Função para o Painel Administrativo (Buscando do Realtime DB)
+        window.fetchAdminLeads = function() {
+            const container = document.getElementById('admin-leads-container');
+            if(!db || !container) return;
+
+            container.innerHTML = `
+                <div class="text-center py-20">
+                    <div class="loading-spinner mb-4"></div>
+                    <p class="text-gray-500 text-xs italic tracking-widest uppercase">Sincronizando Leads...</p>
+                </div>
+            `;
+
+            const leadsRef = ref(db, 'leads');
+            
+            // O onValue mantém a conexão aberta no Realtime DB
+            onValue(leadsRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p class="text-center text-gray-500 py-10 italic">Nenhum cliente preencheu os dados ainda.</p>';
+                    return;
+                }
+
+                const data = snapshot.val();
+                const leads = [];
+                
+                // Converte o objeto do Realtime DB para um Array
+                for (let id in data) {
+                    leads.push({ id: id, ...data[id] });
+                }
+                
+                // Ordena pelos mais recentes
+                leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                let html = '';
+                leads.forEach(lead => {
+                    const cleanWhatsApp = lead.whatsapp ? lead.whatsapp.replace(/\D/g,'') : '';
+                    const waLink = `https://wa.me/55${cleanWhatsApp}`;
+                    const statusClass = lead.status && lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
+                    
+                    html += `
+                    <div class="lead-card p-5 rounded-2xl mb-4 shadow-xl relative">
+                        <div class="absolute top-4 right-4 flex gap-2">
+                            <a href="${waLink}" target="_blank" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] uppercase font-black hover:bg-green-600/40 transition-all">WhatsApp</a>
+                            <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg text-[10px] uppercase font-black hover:bg-red-500/20 cursor-pointer">Apagar</button>
+                        </div>
+
+                        <div class="border-b border-white/10 pb-3 mb-3 pr-24">
+                            <h4 class="gold-text font-black uppercase text-base leading-tight">${lead.name || 'Sem Nome'}</h4>
+                            <span class="text-[9px] text-gray-500 uppercase tracking-widest">${lead.timestamp ? new Date(lead.timestamp).toLocaleString('pt-BR') : '-'}</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
+                            <div>
+                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
+                                <span class="text-white font-medium">${lead.whatsapp || '-'}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
+                                <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data Evento</span>
+                                <span class="text-white">${lead.eventDate || '-'}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
+                                <span class="text-white">${lead.guests || '0'}</span>
+                            </div>
+                        </div>
+
+                        ${lead.plan ? `
+                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center bg-black/20 p-2 rounded-lg">
+                            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Plano Selecionado</span>
+                            <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${lead.totalValue}</span>
+                        </div>` : ''}
+                    </div>`;
+                });
+                
+                container.innerHTML = html;
+            }, (error) => {
+                console.error("Erro ao escutar banco de dados:", error);
+                container.innerHTML = `<div class="text-center py-10"><p class="text-red-500 text-xs font-bold uppercase mb-2">Erro de Conexão</p><p class="text-[10px] text-gray-400">Ative o "Logon Anônimo" e coloque as regras no Firebase.</p></div>`;
+            });
+        };
+
+        window.deleteLead = async function(leadId) {
+            if (confirm("Deseja remover este cliente permanentemente da sua lista de contatos?")) {
+                try {
+                    const leadRef = ref(db, 'leads/' + leadId);
+                    await remove(leadRef);
+                } catch (e) {
+                    console.error("Erro ao excluir registro:", e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
