@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f0f0f;
+            background-color: #050505; /* Fundo levemente mais profundo */
             color: #ffffff;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
@@ -19,31 +19,94 @@
         .gold-bg { background-color: #d4af37; }
         .gold-border { border-color: #d4af37; }
         
+        /* Luzes de Fundo (Ambient Glow) */
+        .ambient-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-orb-1 {
+            position: absolute;
+            top: -20%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatGlow 15s ease-in-out infinite alternate;
+        }
+        .glow-orb-2 {
+            position: absolute;
+            bottom: -20%; right: -10%; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatGlow 20s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
+        }
+
+        .text-glow {
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Efeito de Brilho em Botões (Shine) */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            animation: shine 4s infinite cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        /* Animação Pulsante Dourada */
+        .pulse-gold {
+            animation: pulseGold 2s infinite;
+        }
+        @keyframes pulseGold {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
         /* Barreira de Acesso */
         #access-barrier {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(25px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(35px);
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
         }
         .barrier-card {
-            background: #151515;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             padding: 40px 30px;
             border-radius: 32px;
             width: 100%;
             max-width: 420px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.05);
+            backdrop-filter: blur(10px);
         }
         .barrier-input {
             width: 100%;
-            background: #000;
+            background: rgba(0,0,0,0.6);
             border: 1px solid #333;
             color: white;
             padding: 16px;
@@ -51,30 +114,56 @@
             margin-bottom: 12px;
             outline: none;
             font-size: 16px; 
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
-        .barrier-input:focus { border-color: #d4af37; }
+        .barrier-input:focus { 
+            border-color: #d4af37; 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            background: rgba(0,0,0,0.8);
+        }
 
-        /* Estado Bloqueado */
+        /* Estado Bloqueado com Revelação Majestosa */
+        #app-container {
+            transition: filter 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s;
+        }
         .content-locked {
-            filter: blur(20px);
+            filter: blur(25px) brightness(0.5);
+            transform: scale(0.95);
             pointer-events: none;
             height: 100vh;
             overflow: hidden;
+            opacity: 0.4;
+        }
+        .content-unlocked {
+            filter: blur(0) brightness(1);
+            transform: scale(1);
+            opacity: 1;
         }
 
         .card-premium-row {
-            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            background: linear-gradient(145deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
+            backdrop-filter: blur(10px);
             border: 1px solid #333;
             display: flex;
             flex-direction: row;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             min-height: 360px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card-premium-row:hover {
+            border-color: #555;
+            transform: translateY(-2px);
         }
         .card-highlight {
-            border: 1px solid #d4af37;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(212, 175, 55, 0.05);
+            position: relative;
+        }
+        .card-highlight:hover {
+            border-color: #d4af37;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.25), inset 0 0 30px rgba(212, 175, 55, 0.1);
+            transform: translateY(-4px);
         }
         
         .side-image-container {
@@ -85,19 +174,25 @@
             flex-shrink: 0;
             border-right: 1px solid rgba(212, 175, 55, 0.2);
         }
+        .side-image-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent, rgba(10,10,10,0.9));
+        }
 
         .plan-image {
             width: 150%; 
             height: 100%;
             object-fit: cover;
-            filter: brightness(0.7) contrast(1.1);
+            filter: brightness(0.8) contrast(1.2);
             transform-origin: left center;
-            animation: panLeftToRight 15s infinite alternate ease-in-out;
+            animation: panLeftToRight 20s infinite alternate ease-in-out;
         }
 
         @keyframes panLeftToRight {
-            0% { transform: scale(1.1) translateX(0); }
-            100% { transform: scale(1.1) translateX(-25%); }
+            0% { transform: scale(1.15) translateX(0); }
+            100% { transform: scale(1.15) translateX(-20%); }
         }
 
         .input-gold {
@@ -107,6 +202,10 @@
             color: #d4af37;
             text-align: center;
             outline: none;
+            transition: all 0.3s;
+        }
+        .input-gold:focus {
+            background: #333;
         }
         
         .btn-step {
@@ -117,8 +216,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
             font-size: 20px;
+        }
+        .btn-step:hover {
+            background: #444;
+            color: #fff;
         }
 
         .list-bullet { color: #d4af37; margin-right: 6px; font-weight: bold; }
@@ -130,10 +233,11 @@
         }
 
         .price-badge {
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 8px 16px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0,0,0,0));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 12px 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
         }
 
         .btn-aux {
@@ -149,10 +253,12 @@
             width: 100%;
             text-align: center;
             cursor: pointer;
+            background: rgba(212, 175, 55, 0.05);
         }
         .btn-aux:hover {
-            background: rgba(212, 175, 55, 0.1);
+            background: rgba(212, 175, 55, 0.2);
             border-color: #d4af37;
+            transform: translateY(-1px);
         }
 
         .step-overlay {
@@ -166,34 +272,37 @@
             -webkit-overflow-scrolling: touch; 
             padding: 20px;
             padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            backdrop-filter: blur(10px);
         }
 
         .drink-selection-card {
-            background: #1a1a1a;
+            background: linear-gradient(to bottom, #1a1a1a, #111);
             border: 1px solid #333;
             border-radius: 16px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             display: flex;
             flex-direction: column;
             height: 100%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
         .drink-selection-card:hover:not(.locked) {
-            border-color: #555;
-            transform: translateY(-4px);
+            border-color: #666;
+            transform: translateY(-6px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         }
         .drink-selection-card.selected {
             border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            background: linear-gradient(to bottom, rgba(212, 175, 55, 0.1), #111);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
         }
 
         .lock-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -201,28 +310,29 @@
             z-index: 20;
             text-align: center;
             padding: 10px;
+            backdrop-filter: blur(2px);
         }
         .lock-icon-circle {
-            background: #d4af37;
+            background: linear-gradient(135deg, #f9d976, #d4af37);
             color: black;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            margin-bottom: 8px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
         }
 
         .check-icon {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #d4af37;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #f9d976, #d4af37);
             color: black;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -230,8 +340,9 @@
             font-weight: bold;
             opacity: 0;
             transform: scale(0.5);
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 30;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
         .drink-selection-card.selected .check-icon {
             opacity: 1;
@@ -242,7 +353,11 @@
             width: 100%;
             height: 180px;
             object-fit: cover;
-            transition: 0.5s ease;
+            transition: transform 0.7s ease, filter 0.7s ease;
+        }
+        .drink-selection-card:hover .drink-img-thumb {
+            transform: scale(1.05);
+            filter: brightness(1.1);
         }
 
         .btn-back {
@@ -255,64 +370,83 @@
             letter-spacing: 2px;
             margin-bottom: 20px;
             cursor: pointer;
-            transition: color 0.3s;
+            transition: all 0.3s;
             padding: 10px 0; 
         }
-        .btn-back:hover { color: #d4af37; }
+        .btn-back:hover { 
+            color: #d4af37; 
+            transform: translateX(-5px);
+        }
 
         .payment-option-card {
-            background: #151515;
+            background: linear-gradient(to bottom right, #1a1a1a, #111);
             border: 1px solid #222;
             border-radius: 20px;
             padding: 24px;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
         .payment-option-card:hover {
-            border-color: #d4af3755;
-            background: #1a1a1a;
+            border-color: rgba(212, 175, 55, 0.5);
+            background: linear-gradient(to bottom right, #222, #111);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
         }
 
         .example-box {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
             border-left: 2px solid #d4af37;
             padding: 12px;
             margin-top: 12px;
             font-size: 12px; 
-            color: #aaa;
-            line-height: 1.5;
+            color: #bbb;
+            line-height: 1.6;
+            border-radius: 0 8px 8px 0;
         }
 
         .menu-visual-card {
             background: #151515;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            border: 1px solid #222;
+            border: 1px solid #333;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.4s ease;
+        }
+        .menu-visual-card:hover {
+            transform: translateY(-8px);
+            border-color: #555;
         }
         .menu-visual-img {
             width: 100%;
-            height: 220px;
+            height: 240px;
             object-fit: cover;
             border-bottom: 1px solid #d4af3733;
         }
 
         .schedule-box {
-            background: #1a1a1a;
+            background: linear-gradient(to right, #1a1a1a, #111);
             border: 1px solid #333;
             border-radius: 24px;
             padding: 20px;
             margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
         .input-date {
-            background: #000;
+            background: rgba(0,0,0,0.5);
             border: 1px solid #444;
             color: #d4af37;
             padding: 12px 10px; 
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px; 
             width: 100%;
             outline: none;
+            transition: all 0.3s;
         }
-        .input-date:focus { border-color: #d4af37; }
+        .input-date:focus { 
+            border-color: #d4af37; 
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
 
         @media (min-width: 768px) {
             .btn-aux { font-size: 9px; padding: 10px; }
@@ -322,7 +456,8 @@
 
         @media (max-width: 768px) {
             .card-premium-row { flex-direction: column; height: auto; min-height: max-content; }
-            .side-image-container { width: 100%; height: 220px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+            .side-image-container { width: 100%; height: 240px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+            .side-image-container::after { background: linear-gradient(to bottom, transparent, rgba(10,10,10,0.9)); }
             .custom-grid-list { grid-template-columns: 1fr; gap: 8px; }
             .barrier-card { padding: 30px 20px; }
         }
@@ -356,74 +491,82 @@
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
 
+    <!-- LUZES DE FUNDO (AMBIENT GLOW) -->
+    <div class="ambient-glow">
+        <div class="glow-orb-1"></div>
+        <div class="glow-orb-2"></div>
+    </div>
+
     <!-- BARREIRA DE ACESSO -->
     <div id="access-barrier">
-        <div class="barrier-card">
-            <!-- Clique secreto aqui 5x para abrir painel admin -->
-            <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter clickable-title" onclick="window.triggerAdmin()">GMDrinks</h1>
-            <p class="text-xs md:text-[10px] text-gray-500 uppercase tracking-[0.4em] mb-6">Consultoria de Drinks</p>
-            
-            <p id="validation-msg" class="text-red-500 text-[10px] hidden mb-4 font-bold uppercase tracking-widest bg-red-900/20 p-2 rounded-lg border border-red-500/20">Por favor, preencha todos os campos.</p>
+        <div class="barrier-card relative overflow-hidden">
+            <!-- Brilho interno do card -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-[#d4af37] rounded-full blur-[60px] opacity-20 pointer-events-none"></div>
 
-            <div class="space-y-1">
+            <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter clickable-title text-glow" onclick="window.triggerAdmin()">GMDrinks</h1>
+            <p class="text-xs md:text-[10px] text-gray-400 uppercase tracking-[0.4em] mb-6">Consultoria de Drinks</p>
+            
+            <p id="validation-msg" class="text-red-500 text-[10px] hidden mb-4 font-bold uppercase tracking-widest bg-red-900/20 p-2 rounded-lg border border-red-500/20 backdrop-blur-sm">Por favor, preencha todos os campos.</p>
+
+            <div class="space-y-1 relative z-10">
                 <input type="text" id="lead-name-barrier" placeholder="Seu Nome Completo" class="barrier-input">
                 <input type="tel" id="lead-whatsapp-barrier" placeholder="WhatsApp (DDD)" class="barrier-input">
                 
                 <div class="flex gap-3 text-left">
                     <div class="flex-1">
-                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Data do Evento</label>
+                        <label class="text-[9px] text-gray-400 uppercase font-bold ml-1 mb-1 block tracking-widest">Data do Evento</label>
                         <input type="date" id="lead-date-barrier" class="barrier-input">
                     </div>
                     <div class="w-1/3">
-                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Convidados</label>
+                        <label class="text-[9px] text-gray-400 uppercase font-bold ml-1 mb-1 block tracking-widest">Convidados</label>
                         <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input">
                     </div>
                 </div>
 
-                <!-- NOVA LINHA: LOCAL DO EVENTO -->
+                <!-- LINHA: LOCAL DO EVENTO -->
                 <div class="text-left mt-3">
-                    <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Local do Evento (Frete/Deslocamento)</label>
+                    <label class="text-[9px] text-gray-400 uppercase font-bold ml-1 tracking-widest block mb-1">Local do Evento (Frete/Deslocamento)</label>
                     <select id="lead-region-barrier" class="barrier-input mb-0">
                         <option value="" disabled selected hidden>Selecione a Região</option>
-                        <option value="0">BH(Frete Grátis)</option>
+                        <option value="0">Belo Horizonte (Frete Grátis)</option>
                         <option value="150">Região Metropolitana (Até 50km) - R$ 150,00</option>
-                        <option value="200">Interior (51km a 100km) - R$ 200,00</option>
-                        <option value="400">Acima de 100km - R$ 400,00</option>
-                        <option value="0">Outras Regições (Sob Consulta)</option>
+                        <option value="300">Interior (51km a 100km) - R$ 300,00</option>
+                        <option value="500">Acima de 100km - R$ 500,00</option>
+                        <option value="0">Outros Estados (Sob Consulta)</option>
                     </select>
                 </div>
             </div>
             
-            <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-6 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+            <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-xl text-sm md:text-[11px] tracking-widest mt-6 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all btn-shine relative z-10">
                 Acessar Orçamentos
             </button>
-            <p class="text-[11px] md:text-[9px] text-gray-600 mt-6 uppercase tracking-widest">Experiência Premium Garantida</p>
+            <p class="text-[11px] md:text-[9px] text-gray-500 mt-6 uppercase tracking-widest relative z-10">Experiência Premium Garantida</p>
         </div>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div id="app-container" class="content-locked w-full flex flex-col items-center">
         <header class="mt-4 mb-8 text-center">
-            <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1 clickable-title" onclick="window.triggerAdmin()">GMDrinks</h1>
-            <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto">A sofisticação que o seu evento merece em cada detalhe.</p>
+            <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1 clickable-title text-glow" onclick="window.triggerAdmin()">GMDrinks</h1>
+            <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto font-light">A sofisticação que o seu evento merece em cada detalhe.</p>
         </header>
 
-        <main id="main-content" class="w-full max-w-5xl space-y-8">
+        <main id="main-content" class="w-full max-w-5xl space-y-10">
             
             <!-- Plano Essencial -->
-            <section class="card-premium-row rounded-3xl">
+            <section class="card-premium-row rounded-[2rem]">
                 <div class="side-image-container">
                     <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200" alt="[Imagem de Coquetéis Clássicos]" class="plan-image">
                 </div>
                 
-                <div class="p-6 flex-grow flex flex-col justify-between">
+                <div class="p-6 md:p-8 flex-grow flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-xl font-bold tracking-widest uppercase">Plano Essencial</h2>
+                        <div class="flex items-center justify-between mb-5">
+                            <h2 class="text-2xl font-bold tracking-widest uppercase">Plano Essencial</h2>
                             <span id="label-region-essencial" class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Calculando Frete...</span>
                         </div>
                         
-                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-4">
+                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-5">
                             <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> 8 drinks à escolha</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> 4 horas de Open Bar</li>
@@ -431,54 +574,53 @@
                             <li class="flex items-start"><span class="list-bullet">•</span> Taças e Copos</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Frutas e Xaropes</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Estrutura Completa</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span> Iluminação&Decoração</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span> Estrutura completa</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> Iluminação & Decoração</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffEssencial">2 Bartenders + 1 Barback</span></li>
                         </div>
 
-                        <!-- NOVA SEÇÃO: TAGS DE BEBIDAS INCLUSAS (ESSENCIAL) -->
-                        <div class="mt-2 p-3 rounded-xl bg-black/40 border border-white/5">
-                            <span class="block text-[8px] uppercase text-gray-500 font-bold tracking-[0.2em] mb-2">Marcas Inclusas</span>
-                            <div class="flex flex-wrap gap-1.5">
-                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">VODKA ORLOF</span>
-                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">RUM MONTILLA</span>
-                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">GIN ROCKS</span>
-                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">XAROPES/LICORES ARTESANAIS</span>
+                        <!-- TAGS DE BEBIDAS INCLUSAS (ESSENCIAL) -->
+                        <div class="mt-2 p-4 rounded-xl bg-black/50 border border-white/5 shadow-inner">
+                            <span class="block text-[9px] uppercase text-gray-500 font-bold tracking-[0.2em] mb-2">Marcas Inclusas</span>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">VODKA ORLOF</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">RUM MONTILLA</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">GIN ROCKS</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">XAROPES ARTESANAIS</span>
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="space-y-4 pt-4 border-t border-white/5 mt-4">
+                    <div class="space-y-4 pt-6 border-t border-white/10 mt-6">
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                            <div class="flex items-center gap-5 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">QTD.Convidados</span>
-                                    <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <div class="flex items-center bg-black/40 p-1 rounded-xl border border-white/10">
                                         <button type="button" onclick="window.stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputEssencial" value="50" oninput="window.updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <input type="number" id="guestInputEssencial" value="50" oninput="window.updateDisplay()" class="input-gold w-16 h-[44px] text-lg font-bold">
                                         <button type="button" onclick="window.stepValue('Essencial', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end sm:items-start">
                                     <span class="text-xs md:text-[0.7rem] text-[#888] uppercase font-bold">Por Pessoa</span>
-                                    <div class="text-lg font-bold text-white" id="perPersonEssencial">R$ 0,00</div>
+                                    <div class="text-xl font-bold text-white" id="perPersonEssencial">R$ 0,00</div>
                                 </div>
                             </div>
 
-                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[140px] w-full sm:w-auto">
+                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[160px] w-full sm:w-auto">
                                 <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
-                                <div class="text-xl font-bold gold-text" id="priceEssencial">R$ 0,00</div>
+                                <div class="text-2xl font-bold gold-text" id="priceEssencial">R$ 0,00</div>
                             </div>
                         </div>
                         
                         <div class="space-y-3 mt-4">
-                            <button type="button" onclick="window.openForm('Essencial')" class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
-                                Escolho este Plano !
+                            <button type="button" onclick="window.openForm('Essencial')" class="w-full py-4 rounded-xl border gold-border gold-text font-bold uppercase text-xs md:text-[11px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all btn-shine">
+                                Escolho este Plano
                             </button>
                             
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="button" onclick="window.showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button type="button" onclick="window.showMenu()" class="btn-aux">Ver Cardápio</button>
                                 <button type="button" onclick="window.directSimulate('Essencial')" class="btn-aux">Simular Pagamento</button>
                             </div>
                         </div>
@@ -487,85 +629,80 @@
             </section>
 
             <!-- Plano Premium -->
-            <section class="card-premium-row card-highlight rounded-3xl relative">
+            <section class="card-premium-row card-highlight rounded-[2rem] relative mt-10">
                 <div class="side-image-container">
                     <img src="https://wallpapercave.com/wp/wp12235428.jpg" alt="[Imagem de Coquetéis Premium]" class="plan-image" style="animation-delay: -5s;">
                 </div>
                 
-                <div class="absolute top-4 right-6 gold-bg text-black text-xs md:text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg z-10">
-                    Mais Vendido
+                <div class="absolute top-4 right-6 gold-bg text-black text-xs md:text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-[0_5px_15px_rgba(212,175,55,0.4)] z-10 pulse-gold">
+                    Mais Escolhido
                 </div>
                 
-                <div class="p-6 pb-8 flex-grow flex flex-col justify-between"> 
+                <div class="p-6 md:p-8 flex-grow flex flex-col justify-between"> 
                     <div>
-                        <div class="flex items-center justify-between mb-4 mt-6 md:mt-0">
-                            <h2 class="text-xl font-bold tracking-widest uppercase">Plano Premium</h2>
-                            <span id="label-region-premium" class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Calculando Frete...</span>
+                        <div class="flex items-center justify-between mb-5 mt-6 md:mt-0">
+                            <h2 class="text-2xl font-bold tracking-widest uppercase">Plano Premium</h2>
+                            <span id="label-region-premium" class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest text-glow">Calculando Frete...</span>
                         </div>
                         
-                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-3">            
+                        <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-4">            
                             <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
-                            <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span>BEBIDAS PREMIUN!</li>
+                            <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> BEBIDAS PREMIUM</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 10 drinks à escolha</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 5 horas de serviço</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças e copos</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura completa</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Iluminação&Decoração</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags divertidas</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças de Cristal</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes Importados</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura Iluminada</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags e Guarnições</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 50 Shots Exclusivos</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Insumos Premium</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Até 10 drinks à escolha</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffPremium">4 Bartenders + 1 Barback</span></li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio personalizado</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio Personalizado</li>
                         </div>
 
-                        <!-- NOVA SEÇÃO: TAGS DE BEBIDAS INCLUSAS (PREMIUM) -->
-                        <div class="mt-2 p-3 rounded-xl bg-gradient-to-r from-[#d4af37]/10 to-transparent border border-[#d4af37]/30">
-                            <span class="block text-[8px] uppercase gold-text font-bold tracking-[0.2em] mb-2">Carta Premium Inclusa</span>
-                            <div class="flex flex-wrap gap-1.5">
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">VODKA ABSOLUT</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">RUM BACARDI</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">GIN TANQUERAY</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">XAROPES MONIN</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">LICOR STOCKS</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">WHISKY JACK DANIELS</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-0.5 rounded-md text-white font-semibold">CAMPARI</span>
+                        <!-- TAGS DE BEBIDAS INCLUSAS (PREMIUM) -->
+                        <div class="mt-2 p-4 rounded-xl bg-gradient-to-r from-[#d4af37]/10 to-transparent border border-[#d4af37]/30 shadow-inner">
+                            <span class="block text-[9px] uppercase gold-text font-bold tracking-[0.2em] mb-2">Carta Premium Inclusa</span>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">VODKA ABSOLUT</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">RUM BACARDI</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">GIN TANQUERAY</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">XAROPES MONIN</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">WHISKY JACK DANIELS</span>
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="space-y-4 pt-4 border-t border-white/5 mt-4">
+                    <div class="space-y-4 pt-6 border-t border-white/10 mt-6">
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                            <div class="flex items-center gap-5 w-full sm:w-auto justify-between sm:justify-start">
                                 <div class="flex flex-col items-start space-y-1">
-                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">QTD.Convidados</span>
-                                    <div class="flex items-center bg-black/30 p-1 rounded-xl border border-white/5">
+                                    <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
+                                    <div class="flex items-center bg-black/40 p-1 rounded-xl border border-white/10">
                                         <button onclick="window.stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay()" class="input-gold w-14 h-[44px] text-lg font-bold">
+                                        <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay()" class="input-gold w-16 h-[44px] text-lg font-bold">
                                         <button onclick="window.stepValue('Premium', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end sm:items-start">
                                     <span class="text-xs md:text-[0.7rem] text-[#888] uppercase font-bold">Por Pessoa</span>
-                                    <div class="text-lg font-bold text-white" id="perPersonPremium">R$ 0,00</div>
+                                    <div class="text-xl font-bold text-white" id="perPersonPremium">R$ 0,00</div>
                                 </div>
                             </div>
 
-                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[140px] w-full sm:w-auto">
+                            <div class="price-badge flex flex-col items-center sm:items-end min-w-[160px] w-full sm:w-auto">
                                 <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
-                                <div class="text-xl font-bold gold-text" id="pricePremium">R$ 0,00</div>
+                                <div class="text-2xl font-bold gold-text text-glow" id="pricePremium">R$ 0,00</div>
                             </div>
                         </div>
 
                         <div class="space-y-3 mt-4">
-                            <button onclick="window.openForm('Premium')"class="w-full py-4 rounded-full border gold-border gold-text font-bold uppercase text-xs md:text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
-                                Escolho este Plano !
+                            <button onclick="window.openForm('Premium')" class="w-full py-4 rounded-xl gold-bg text-black font-black uppercase text-xs md:text-[11px] tracking-widest hover:brightness-110 transition-all btn-shine shadow-[0_5px_20px_rgba(212,175,55,0.3)]">
+                                Escolho este Plano
                             </button>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button onclick="window.showMenu()" class="btn-aux">Nosso Cardápio</button>
+                                <button onclick="window.showMenu()" class="btn-aux">Ver Cardápio</button>
                                 <button onclick="window.directSimulate('Premium')" class="btn-aux">Simular Pagamento</button>
                             </div>
                         </div>
@@ -577,33 +714,33 @@
 
     <!-- MODAL: CARDÁPIO VISUAL -->
     <div id="modal-menu-visual" class="step-overlay">
-        <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
-            <div onclick="window.closeMenuVisual()" class="btn-back">← Voltar</div>
-            <div class="text-center mb-10">
-                <h3 class="brand-font text-4xl gold-text uppercase">O Cardápio</h3>
-                <p class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-[0.3em]">Artesanal & Sofisticado</p>
+        <div class="max-w-5xl mx-auto mt-6 pb-20 px-4">
+            <div onclick="window.closeMenuVisual()" class="btn-back">← Fechar Galeria</div>
+            <div class="text-center mb-12">
+                <h3 class="brand-font text-5xl gold-text uppercase text-glow">O Cardápio</h3>
+                <p class="text-gray-400 text-sm md:text-xs mt-3 uppercase tracking-[0.4em]">Artesanal & Sofisticado</p>
             </div>
-            <div id="menu-grid-display" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+            <div id="menu-grid-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
         </div>
     </div>
 
     <!-- MODAL: SELEÇÃO VISUAL DE DRINKS -->
     <div id="step-drinks" class="step-overlay">
-        <div class="max-w-5xl mx-auto mt-10 px-4 pb-32">
+        <div class="max-w-6xl mx-auto mt-10 px-4 pb-32">
             <div id="drink-back-container">
                 <div onclick="window.closeAll()" class="btn-back">← Voltar para Planos</div>
             </div>
             
-            <div class="text-center mb-8">
-                <h3 class="brand-font text-3xl gold-text uppercase">A Sua Seleção</h3>
-                <p id="drink-limit-msg" class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-widest"></p>
+            <div class="text-center mb-10">
+                <h3 class="brand-font text-4xl gold-text uppercase text-glow">A Sua Seleção</h3>
+                <p id="drink-limit-msg" class="text-gray-400 text-xs md:text-[11px] mt-2 uppercase tracking-widest"></p>
             </div>
 
-            <div id="drink-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="drink-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
 
-            <div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black to-transparent z-50">
+            <div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/90 to-transparent z-50">
                 <div class="max-w-md mx-auto">
-                    <button type="button" id="btn-confirm-drinks" onclick="window.goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_0_30px_rgba(212,175,55,0.3)] opacity-50">
+                    <button type="button" id="btn-confirm-drinks" onclick="window.goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_10px_40px_rgba(212,175,55,0.4)] opacity-50 transition-all btn-shine">
                         Confirmar Seleção (0)
                     </button>
                 </div>
@@ -619,29 +756,52 @@
                 <div id="btn-close-sim" onclick="window.closeAll()" class="btn-back" style="display:none;">← Voltar para Planos</div>
             </div>
             
-            <div class="text-center mb-6">
-                <h3 class="brand-font text-3xl gold-text uppercase">Opções de Pagamento</h3>
-                <p class="text-gray-400 text-xs md:text-[10px] mt-2 uppercase tracking-widest">Orçamento Base: <span id="payment-ref-total" class="text-white font-bold"></span></p>
-                <div id="simulation-notice" class="mt-2 text-xs md:text-[9px] gold-text uppercase tracking-widest font-black hidden">
+            <div class="text-center mb-8">
+                <h3 class="brand-font text-4xl gold-text uppercase text-glow">Opções de Pagamento</h3>
+                <div id="simulation-notice" class="mt-4 text-[10px] gold-text uppercase tracking-widest font-black hidden bg-[#d4af37]/10 p-3 rounded-xl border border-[#d4af37]/30 inline-block">
                     ⚠ Visualização Prévia - Personalize seu cardápio abaixo
                 </div>
             </div>
 
-            <div class="schedule-box">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                    <div>
-                        <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Data prevista do evento</label>
-                        <input type="date" id="eventDate" onchange="window.calcTimeline()" class="input-date">
+            <!-- CAIXA DE PREÇO TOTAL E CUPOM -->
+            <div class="mb-10 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] p-8 md:p-10 rounded-[2.5rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative overflow-hidden">
+                <div class="absolute -top-20 -right-20 w-48 h-48 bg-[#d4af37] rounded-full blur-[80px] opacity-20"></div>
+                <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-[#d4af37] rounded-full blur-[80px] opacity-10"></div>
+                
+                <div class="relative z-10 text-center">
+                    <p class="text-gray-400 text-xs md:text-[11px] uppercase tracking-[0.3em] font-bold mb-4">Investimento Estimado</p>
+                    
+                    <!-- AREA DINÂMICA DE PREÇO -->
+                    <div id="price-container" class="my-6 flex flex-col items-center">
+                        <h2 class="text-5xl md:text-6xl font-bold gold-text text-glow">R$ 0,00</h2>
                     </div>
-                    <div>
-                        <label class="text-xs md:text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Previsão de fechamento</label>
-                        <input type="date" id="closingDate" onchange="window.calcTimeline()" class="input-date">
+
+                    <!-- CAMPO DE CUPOM -->
+                    <div class="max-w-sm mx-auto mt-8">
+                        <div class="flex gap-2">
+                            <input type="text" id="coupon-input" placeholder="CUPOM DE DESCONTO" class="w-full bg-black/60 border border-white/20 text-white px-5 py-4 rounded-xl text-sm uppercase outline-none focus:border-[#d4af37] transition-all placeholder:capitalize shadow-inner">
+                            <button type="button" onclick="window.applyCoupon()" class="gold-bg text-black px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[#d4af37]/20">Aplicar</button>
+                        </div>
+                        <p id="coupon-msg" class="text-xs mt-3 hidden"></p>
                     </div>
                 </div>
-                <div id="timeline-result" class="mt-4 p-4 bg-black/40 rounded-xl border border-white/5 text-center hidden">
-                    <p class="text-xs md:text-[10px] text-gray-400 uppercase tracking-widest">
-                        Tempo de parcelamento: <span id="months-count" class="gold-text font-bold">0 meses</span> 
-                        <span class="mx-2 opacity-30">|</span> 
+            </div>
+
+            <div class="schedule-box bg-[#151515] border-white/10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                    <div>
+                        <label class="text-xs md:text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Data prevista do evento</label>
+                        <input type="date" id="eventDate" onchange="window.calcTimeline()" class="input-date bg-black/60">
+                    </div>
+                    <div>
+                        <label class="text-xs md:text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Previsão de fechamento</label>
+                        <input type="date" id="closingDate" onchange="window.calcTimeline()" class="input-date bg-black/60">
+                    </div>
+                </div>
+                <div id="timeline-result" class="mt-6 p-5 bg-black/50 rounded-xl border border-white/5 text-center hidden">
+                    <p class="text-xs md:text-[11px] text-gray-300 uppercase tracking-widest">
+                        Tempo de parcelamento: <span id="months-count" class="gold-text font-black">0 meses</span> 
+                        <span class="mx-3 opacity-30">|</span> 
                         Quitação até: <span id="limit-date-str" class="text-white font-bold">--/--/--</span>
                     </p>
                 </div>
@@ -650,35 +810,35 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="payment-options-grid">
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">1. Reserva Padrão (50% / 50%)</h4>
-                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal 50%.</p>
+                        <h4 class="gold-text font-bold text-base uppercase mb-3">1. Reserva Padrão (50% / 50%)</h4>
+                        <p class="text-xs md:text-[11px] text-gray-400 leading-relaxed uppercase tracking-widest">Garanta a data do seu evento com sinal 50%.</p>
                         <div id="ex-model-1" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="window.handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Reserva 50/50')" class="btn-pay-action mt-8 w-full py-4 border border-white/20 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-gold-text hover:bg-white/5 transition-all">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">2. Entrada + Parcelas Via Pix</h4>
-                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Sem juros, parcelando livremente até o dia do evento.</p>
+                        <h4 class="gold-text font-bold text-base uppercase mb-3">2. Entrada + Parcelas Via Pix</h4>
+                        <p class="text-xs md:text-[11px] text-gray-400 leading-relaxed uppercase tracking-widest">Sem juros, parcelando livremente até o dia do evento.</p>
                         <div id="ex-model-2" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="window.handlePaymentAction('Entrada + Parcelas Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Entrada + Parcelas Pix')" class="btn-pay-action mt-8 w-full py-4 border border-white/20 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-gold-text hover:bg-white/5 transition-all">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">3. Parcelamento Total Via Pix</h4>
-                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Divida o valor total sem precisar de entrada imediata.</p>
+                        <h4 class="gold-text font-bold text-base uppercase mb-3">3. Parcelamento Total Via Pix</h4>
+                        <p class="text-xs md:text-[11px] text-gray-400 leading-relaxed uppercase tracking-widest">Divida o valor total sem precisar de entrada imediata.</p>
                         <div id="ex-model-3" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="window.handlePaymentAction('Parcelamento Total Pix')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Parcelamento Total Pix')" class="btn-pay-action mt-8 w-full py-4 border border-white/20 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-gold-text hover:bg-white/5 transition-all">Confirmar Reserva</button>
                 </div>
                 <div class="payment-option-card flex flex-col justify-between">
                     <div>
-                        <h4 class="gold-text font-bold text-base md:text-sm uppercase mb-3">4. Cartão de Crédito</h4>
-                        <p class="text-xs md:text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Via Mercado Pago (Com taxas de parcelamento do banco).</p>
+                        <h4 class="gold-text font-bold text-base uppercase mb-3">4. Cartão de Crédito</h4>
+                        <p class="text-xs md:text-[11px] text-gray-400 leading-relaxed uppercase tracking-widest">Via Mercado Pago (Com taxas de parcelamento do banco).</p>
                         <div id="ex-model-4" class="example-box"></div>
                     </div>
-                    <button type="button" onclick="window.handlePaymentAction('Cartão de Crédito')" class="btn-pay-action mt-6 w-full py-4 md:py-3 border border-white/10 rounded-full text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-gold-text">Confirmar Reserva</button>
+                    <button type="button" onclick="window.handlePaymentAction('Cartão de Crédito')" class="btn-pay-action mt-8 w-full py-4 border border-white/20 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-gold-text hover:bg-white/5 transition-all">Confirmar Reserva</button>
                 </div>
             </div>
         </div>
@@ -688,8 +848,8 @@
     <div id="admin-panel" class="step-overlay" style="z-index: 10000;">
         <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
             <div onclick="window.closeAdmin()" class="btn-back">← Voltar e Fechar</div>
-            <div class="text-center mb-6">
-                <h3 class="brand-font text-3xl gold-text uppercase">Painel de Clientes</h3>
+            <div class="text-center mb-8">
+                <h3 class="brand-font text-4xl gold-text uppercase text-glow">Painel de Clientes</h3>
                 <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Leads Guardados</p>
             </div>
             <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
@@ -704,6 +864,17 @@
     <!-- SCRIPT DE LÓGICA DO ORÇAMENTO -->
     <script>
         const WHATSAPP_NUMBER = "5531983684231";
+        
+        // BANCO DE CUPONS
+        const COUPONS_DB = {
+            'DESC05': 0.05, 
+            'DESC10': 0.10, 
+            'DESC15': 0.15, 
+            'VIP20': 0.20,
+            'CASAMENTODAANA': 0.15,
+            'JOAO10': 0.10
+        };
+
         const DRINKS_DB = [
             { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false },
             { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false },
@@ -726,8 +897,8 @@
             { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false },
             { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false },
             { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false },
-            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false }
-            
+            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false },
+            { id: 23, name: "Paradise", desc: "Rum ou Vodka, Grenadine, Suco de Laranja, Curaçu Blue, e Gelo", img: "https://i.pinimg.com/736x/43/e8/dd/43e8dd2e1dc58b2b5c3412720f5fca2a.jpg", premium: false }
         ];
 
         window.orderState = {
@@ -742,8 +913,12 @@
             isQuickSimulation: false,
             availableMonths: 0,
             eventDate: '',
-            regionName: '',    // ADICIONADO: Nome da Região
-            displacementFee: 0 // ADICIONADO: Valor da Taxa de Deslocamento
+            regionName: '',    
+            displacementFee: 0, 
+            couponCode: '',
+            discountPercent: 0,
+            discountValue: 0,
+            finalTotal: 0
         };
 
         const fmt = (v) => {
@@ -801,12 +976,10 @@
             const guestsE = parseInt(document.getElementById('guestInputEssencial').value) || 0;
             const dataE = getEssencialData(guestsE);
             document.getElementById('perPersonEssencial').innerText = fmt(dataE.perPerson);
-            // SOMA DO FRETE APLICADA AQUI NO PREÇO EXIBIDO
             const totalE = (guestsE * dataE.perPerson) + dataE.extraCost + window.orderState.displacementFee;
             document.getElementById('priceEssencial').innerText = fmt(totalE);
             document.getElementById('staffEssencial').innerText = dataE.staff;
             
-            // Atualiza a Label de Região no card
             const labelE = document.getElementById('label-region-essencial');
             if(window.orderState.displacementFee === 0) {
                 labelE.innerText = "Frete Grátis na Região";
@@ -817,12 +990,10 @@
             const guestsP = parseInt(document.getElementById('guestInputPremium').value) || 0;
             const dataP = getPremiumData(guestsP);
             document.getElementById('perPersonPremium').innerText = fmt(dataP.perPerson);
-            // SOMA DO FRETE APLICADA AQUI NO PREÇO EXIBIDO
             const totalP = (guestsP * dataP.perPerson) + dataP.extraCost + window.orderState.displacementFee;
             document.getElementById('pricePremium').innerText = fmt(totalP);
             document.getElementById('staffPremium').innerText = dataP.staff;
 
-            // Atualiza a Label de Região no card
             const labelP = document.getElementById('label-region-premium');
             if(window.orderState.displacementFee === 0) {
                 labelP.innerText = "Frete Grátis na Região";
@@ -862,11 +1033,11 @@
             const grid = document.getElementById('menu-grid-display');
             grid.innerHTML = DRINKS_DB.map(drink => `
                 <div class="menu-visual-card relative">
-                    ${drink.premium ? '<span class="absolute top-2 right-2 bg-black/80 text-[#d4af37] text-[8px] px-2 py-1 rounded-full font-bold uppercase z-10">Premium</span>' : ''}
+                    ${drink.premium ? '<span class="absolute top-3 right-3 bg-black/90 text-[#d4af37] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase z-10 border border-[#d4af37]/30 shadow-[0_0_10px_rgba(212,175,55,0.3)]">Premium</span>' : ''}
                     <img src="${drink.img}" class="menu-visual-img" alt="[Imagem de ${drink.name}]">
-                    <div class="p-6">
-                        <h4 class="gold-text brand-font text-2xl mb-2">${drink.name}</h4>
-                        <p class="text-gray-400 text-xs md:text-[10px] leading-relaxed uppercase tracking-widest">${drink.desc}</p>
+                    <div class="p-6 bg-gradient-to-b from-[#151515] to-black">
+                        <h4 class="gold-text brand-font text-2xl mb-2 text-glow">${drink.name}</h4>
+                        <p class="text-gray-400 text-xs md:text-[11px] leading-relaxed uppercase tracking-widest">${drink.desc}</p>
                     </div>
                 </div>
             `).join('');
@@ -875,15 +1046,26 @@
 
         window.closeMenuVisual = function() { document.getElementById('modal-menu-visual').style.display = 'none'; };
 
+        window.resetCoupon = function() {
+            window.orderState.couponCode = '';
+            window.orderState.discountPercent = 0;
+            window.orderState.discountValue = 0;
+            window.orderState.finalTotal = window.orderState.totalValue;
+            
+            const msg = document.getElementById('coupon-msg');
+            if(msg) msg.classList.add('hidden');
+        };
+
         window.directSimulate = function(plan) {
             window.orderState.plan = plan;
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
             
-            // SOMA DO FRETE INJETADA NO TOTAL FINAL
             window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             
+            window.resetCoupon();
+
             window.orderState.isQuickSimulation = true; 
             window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
             
@@ -902,10 +1084,11 @@
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
             
-            // SOMA DO FRETE INJETADA NO TOTAL FINAL
             window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             
+            window.resetCoupon();
+
             window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
             window.orderState.isQuickSimulation = false;
             
@@ -931,15 +1114,15 @@
                         ${isLocked ? `
                             <div class="lock-overlay">
                                 <div class="lock-icon-circle">🔒</div>
-                                <span class="text-[11px] md:text-[9px] gold-text font-black uppercase tracking-widest">Plano Premium</span>
-                                <button type="button" onclick="window.upgradeToPremium(event)" class="mt-2 text-xs md:text-[8px] bg-[#d4af37] text-black px-4 py-2 rounded-full font-black uppercase tracking-wider">Fazer Upgrade</button>
+                                <span class="text-[11px] md:text-[9px] gold-text font-black uppercase tracking-widest text-glow">Plano Premium</span>
+                                <button type="button" onclick="window.upgradeToPremium(event)" class="mt-3 text-xs md:text-[9px] bg-gradient-to-r from-[#d4af37] to-[#f9d976] text-black px-5 py-2.5 rounded-full font-black uppercase tracking-wider shadow-lg hover:scale-105 transition-all">Fazer Upgrade</button>
                             </div>
                         ` : ''}
                         <div class="check-icon">✓</div>
                         <img src="${drink.img}" class="drink-img-thumb" alt="[Imagem de ${drink.name}]">
-                        <div class="p-4">
+                        <div class="p-5">
                             <h4 class="text-sm md:text-xs font-black gold-text uppercase">${drink.name}</h4>
-                            <p class="text-xs md:text-[9px] text-gray-500 mt-1 uppercase tracking-tighter line-clamp-2">${drink.desc}</p>
+                            <p class="text-xs md:text-[9px] text-gray-400 mt-2 uppercase tracking-tighter line-clamp-2">${drink.desc}</p>
                         </div>
                     </div>
                 `;
@@ -960,7 +1143,6 @@
             window.orderState.maxDrinks = 10;
             const data = getPremiumData(window.orderState.guests);
             
-            // SOMA DO FRETE INJETADA NO TOTAL FINAL NO UPGRADE
             window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             window.renderDrinkSelectionGrid();
@@ -970,30 +1152,88 @@
             const btn = document.getElementById('btn-confirm-drinks');
             btn.innerText = `Confirmar Seleção (${window.orderState.drinks.length} de ${window.orderState.maxDrinks})`;
             btn.disabled = window.orderState.drinks.length === 0;
-            btn.style.opacity = window.orderState.drinks.length > 0 ? '1' : '0.5';
+            if(window.orderState.drinks.length > 0) {
+                btn.style.opacity = '1';
+                btn.classList.add('pulse-gold');
+            } else {
+                btn.style.opacity = '0.5';
+                btn.classList.remove('pulse-gold');
+            }
         };
 
         window.goToPayment = function() {
             document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none');
             document.getElementById('step-pay').style.display = 'block';
-            document.getElementById('payment-ref-total').innerText = window.orderState.priceStr;
-            window.renderPaymentExamples();
+            
+            const cupomInputEl = document.getElementById('coupon-input');
+            if(cupomInputEl && cupomInputEl.value && window.orderState.discountPercent === 0) {
+                window.applyCoupon();
+            } else {
+                window.renderPaymentExamples();
+            }
+            
             window.scrollTo(0,0);
         };
 
+        window.applyCoupon = function() {
+            const input = document.getElementById('coupon-input').value.trim().toUpperCase();
+            const msgEl = document.getElementById('coupon-msg');
+            
+            if(!input) return;
+
+            if(COUPONS_DB[input]) {
+                window.orderState.couponCode = input;
+                window.orderState.discountPercent = COUPONS_DB[input];
+                
+                msgEl.innerHTML = `✓ Cupom de ${COUPONS_DB[input] * 100}% aplicado com sucesso!`;
+                msgEl.className = "text-[11px] mt-3 text-green-400 font-bold uppercase tracking-widest block text-center";
+            } else {
+                window.orderState.couponCode = '';
+                window.orderState.discountPercent = 0;
+                
+                msgEl.innerHTML = "✕ Cupom inválido ou expirado.";
+                msgEl.className = "text-[11px] mt-3 text-red-500 font-bold uppercase tracking-widest block text-center";
+            }
+            
+            window.renderPaymentExamples();
+        };
+
         window.renderPaymentExamples = function() {
-            const v = window.orderState.totalValue;
+            let v = window.orderState.totalValue;
+            let discountValue = 0;
+
+            if (window.orderState.discountPercent > 0) {
+                discountValue = v * window.orderState.discountPercent;
+                v = v - discountValue;
+            }
+
+            window.orderState.finalTotal = v;
+            window.orderState.discountValue = discountValue;
+
+            const priceContainer = document.getElementById('price-container');
+            if (window.orderState.discountPercent > 0) {
+                priceContainer.innerHTML = `
+                    <h3 class="text-2xl md:text-3xl font-bold text-gray-500 line-through mb-1">${fmt(window.orderState.totalValue)}</h3>
+                    <p class="text-sm text-green-400 uppercase font-black tracking-widest mb-1">Desconto: -${fmt(discountValue)}</p>
+                    <h2 class="text-5xl md:text-6xl font-bold gold-text mt-2 text-glow">${fmt(v)}</h2>
+                `;
+            } else {
+                priceContainer.innerHTML = `
+                    <h2 class="text-5xl md:text-6xl font-bold gold-text text-glow">${fmt(v)}</h2>
+                `;
+            }
+
             const m = window.orderState.availableMonths || 1;
-            document.getElementById('ex-model-1').innerHTML = `Sinal p/ Reserva: <b>${fmt(v * 0.5)}</b><br>Restante no dia: <b>${fmt(v * 0.5)}</b>`;
-            let model2Txt = `Entrada (50%): <b>${fmt(v * 0.5)}</b><br>`;
-            if(m > 1) model2Txt += `Saldo em <b>${m}x Pix de ${fmt((v*0.5)/m)}</b> s/ juros`;
-            else model2Txt += `Saldo de <b>${fmt(v*0.5)}</b> p/ o dia do evento.`;
+            document.getElementById('ex-model-1').innerHTML = `Sinal p/ Reserva: <b class="text-white">${fmt(v * 0.5)}</b><br>Restante no dia: <b class="text-white">${fmt(v * 0.5)}</b>`;
+            let model2Txt = `Entrada (50%): <b class="text-white">${fmt(v * 0.5)}</b><br>`;
+            if(m > 1) model2Txt += `Saldo em <b class="text-white">${m}x Pix de ${fmt((v*0.5)/m)}</b> s/ juros`;
+            else model2Txt += `Saldo de <b class="text-white">${fmt(v*0.5)}</b> p/ o dia do evento.`;
             document.getElementById('ex-model-2').innerHTML = model2Txt;
-            let model3Txt = `Valor Total: <b>${fmt(v)}</b><br>`;
-            if(m > 1) model3Txt += `Simulação: <b>${m}x Pix de ${fmt(v/m)}</b> s/ juros`;
+            let model3Txt = `Valor Total: <b class="text-white">${fmt(v)}</b><br>`;
+            if(m > 1) model3Txt += `Simulação: <b class="text-white">${m}x Pix de ${fmt(v/m)}</b> s/ juros`;
             else model3Txt += `Pagamento integral até a data do evento.`;
             document.getElementById('ex-model-3').innerHTML = model3Txt;
-            document.getElementById('ex-model-4').innerHTML = `À vista Pix: <b>${fmt(v)}</b><br>No cartão 12x: <b>12x de ${fmt((v * 1.28)/12)}</b> (c/ taxas)`;
+            document.getElementById('ex-model-4').innerHTML = `À vista Pix: <b class="text-white">${fmt(v)}</b><br>No cartão 12x: <b class="text-white">12x de ${fmt((v * 1.28)/12)}</b> (c/ taxas)`;
         };
 
         window.handlePaymentAction = function(method) {
@@ -1020,16 +1260,24 @@
             msg += `*CLIENTE:* ${window.orderState.name}\n`;
             msg += `*WHATSAPP:* ${window.orderState.whatsapp}\n`;
             msg += `*PLANO:* ${window.orderState.plan}\n`;
-            msg += `*LOCAL DO EVENTO:* ${window.orderState.regionName}\n`; // ADICIONADO AQUI
+            msg += `*LOCAL DO EVENTO:* ${window.orderState.regionName}\n`; 
             msg += `*CONVIDADOS:* ${window.orderState.guests}\n`;
             msg += `*DRINKS ESCOLHIDOS:* ${window.orderState.drinks.length > 0 ? window.orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
-            msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n`;
-            msg += `*VALOR TOTAL:* ${window.orderState.priceStr}\n\n`;
+            msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n\n`;
+            
+            if(window.orderState.discountPercent > 0) {
+                msg += `*VALOR ORIGINAL:* ${fmt(window.orderState.totalValue)}\n`;
+                msg += `*CUPOM APLICADO:* ${window.orderState.couponCode} (-${window.orderState.discountPercent * 100}%)\n`;
+                msg += `*DESCONTO:* -${fmt(window.orderState.discountValue)}\n`;
+                msg += `*VALOR FINAL:* ${fmt(window.orderState.finalTotal)}\n\n`;
+            } else {
+                msg += `*VALOR TOTAL:* ${fmt(window.orderState.totalValue)}\n\n`;
+            }
+
             msg += `*PAGAMENTO SELECIONADO:* ${method}\n`;
             if(window.orderState.availableMonths > 1) msg += `*PARCELAMENTO ESTIMADO:* ${window.orderState.availableMonths} meses\n`;
             msg += `\nOlá! Gostaria de validar minha data com as condições simuladas no app.`;
             
-            // Chama a função global do Firebase para atualizar os dados antes de ir pro WhatsApp
             if(window.finishOrderToFirebase) window.finishOrderToFirebase(method);
             
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -1047,9 +1295,18 @@
             if(dateBarrier) dateBarrier.min = tomorrow.toISOString().split("T")[0];
             if(dateEvent) dateEvent.min = tomorrow.toISOString().split("T")[0];
             document.getElementById('closingDate').min = new Date().toISOString().split("T")[0];
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const cupomUrl = urlParams.get('cupom');
+            
+            if(cupomUrl) {
+                const inputCupom = document.getElementById('coupon-input');
+                if(inputCupom) {
+                    inputCupom.value = cupomUrl.toUpperCase();
+                }
+            }
         };
 
-        // Lógica de Ativação do Painel de Admin (Clicar 5x)
         let adminClicks = 0;
         window.triggerAdmin = function() {
             adminClicks++;
@@ -1076,7 +1333,6 @@
             const regionValue = regionSelect.value;
             const valMsg = document.getElementById('validation-msg');
 
-            // VALIDAÇÃO: AGORA A REGIÃO TAMBÉM É OBRIGATÓRIA
             if(!name || !whatsapp || !eventDate || !guests || !regionValue) {
                 if(valMsg) {
                     valMsg.innerText = "Por favor, preencha todos os campos.";
@@ -1085,9 +1341,9 @@
                 return;
             }
 
-            if(parseInt(guests) < 20) {
+            if(parseInt(guests) < 50) {
                 if(valMsg) {
-                    valMsg.innerText = "O número mínimo de convidados é 20.";
+                    valMsg.innerText = "O número mínimo de convidados é 50.";
                     valMsg.classList.remove('hidden');
                 }
                 return;
@@ -1095,7 +1351,6 @@
 
             if(valMsg) valMsg.classList.add('hidden');
 
-            // ATUALIZAÇÃO DO STATE COM A REGIÃO ESCOLHIDA E A TAXA
             window.orderState.name = name;
             window.orderState.whatsapp = whatsapp;
             window.orderState.eventDate = eventDate;
@@ -1107,37 +1362,39 @@
             document.getElementById('guestInputPremium').value = guests;
             document.getElementById('eventDate').value = eventDate;
 
-            // Envia para o Firebase (AGORA COM REGIÃO)
             if(window.saveLeadToFirebase) {
                 window.saveLeadToFirebase({ 
                     name, 
                     whatsapp, 
                     eventDate, 
                     guests,
-                    regionName: window.orderState.regionName // ADICIONADO AO FIREBASE
+                    regionName: window.orderState.regionName
                 });
             }
 
-            document.getElementById('access-barrier').style.transition = 'opacity 0.6s ease';
+            // O EFEITO UAU DE TRANSIÇÃO
             document.getElementById('access-barrier').style.opacity = '0';
+            document.getElementById('access-barrier').style.visibility = 'hidden';
+            
+            const appContainer = document.getElementById('app-container');
+            appContainer.classList.remove('content-locked');
+            appContainer.classList.add('content-unlocked');
             
             setTimeout(() => {
                 document.getElementById('access-barrier').style.display = 'none';
-                document.getElementById('app-container').classList.remove('content-locked');
-                document.getElementById('app-container').style.height = 'auto';
+                appContainer.style.height = 'auto';
                 window.updateDisplay();
                 window.calcTimeline(); 
-            }, 600);
+            }, 1000);
         };
     </script>
 
-    <!-- SCRIPT REALTIME DATABASE -->
+    <!-- SCRIPT REALTIME DATABASE (MANTIDO INTACTO) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Suas credenciais + Link do Realtime Database
         const firebaseConfig = {
             apiKey: "AIzaSyCzPZhMjCv-CrYavikjwF2Vq5kDKr5uXyg",
             authDomain: "gmdrinks-ad157.firebaseapp.com",
@@ -1155,7 +1412,6 @@
         let currentUser = null;
         let currentLeadId = null;
 
-        // Estado do Administrador
         let isAdminActive = localStorage.getItem('gmd_admin_session') === 'true';
 
         const initAuth = async () => {
@@ -1186,7 +1442,7 @@
                         whatsapp: data.whatsapp,
                         eventDate: data.eventDate || "Não informada",
                         guests: data.guests || 0,
-                        region: data.regionName || "Não informada", // DADO DE DESLOCAMENTO SALVO
+                        region: data.regionName || "Não informada",
                         timestamp: new Date().toISOString(),
                         userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
                         status: 'Captado (Iniciou Orçamento)'
@@ -1207,6 +1463,9 @@
                         plan: window.orderState.plan || "Nenhum",
                         drinks: window.orderState.drinks || [],
                         totalValue: window.orderState.priceStr || "R$ 0,00",
+                        coupon: window.orderState.couponCode || "Nenhum",
+                        discountValue: window.orderState.discountValue || 0,
+                        finalValue: window.orderState.finalTotal || window.orderState.totalValue,
                         paymentMethod: method,
                         status: 'Orçamento Finalizado'
                     });
@@ -1250,6 +1509,11 @@
                     const waLink = `https://wa.me/55${cleanWhatsApp}`;
                     const statusClass = lead.status && lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
                     
+                    let priceText = lead.totalValue;
+                    if(lead.coupon && lead.coupon !== "Nenhum") {
+                        priceText = `${lead.totalValue} <span class="text-green-400 ml-1">-${Number(lead.discountValue).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${lead.coupon})</span>`;
+                    }
+
                     html += `
                     <div class="lead-card p-5 rounded-2xl mb-4 shadow-xl relative">
                         <div class="absolute top-4 right-4 flex gap-2">
@@ -1271,7 +1535,6 @@
                                 <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
                                 <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
                             </div>
-                            <!-- AQUI FOI INSERIDO A REGIÃO E DATA LADO A LADO -->
                             <div>
                                 <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local</span>
                                 <span class="text-white">${lead.eventDate || '-'} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${lead.region || '-'}</span></span>
@@ -1285,7 +1548,7 @@
                         ${lead.plan ? `
                         <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center bg-black/20 p-2 rounded-lg">
                             <span class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Plano Selecionado</span>
-                            <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${lead.totalValue}</span>
+                            <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${priceText}</span>
                         </div>` : ''}
                     </div>`;
                 });
