@@ -139,7 +139,7 @@
         .btn-aux {
             border: 1px solid rgba(212, 175, 55, 0.4);
             color: #d4af37;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -371,17 +371,30 @@
                 
                 <div class="flex gap-3 text-left">
                     <div class="flex-1">
-                        <label class="text-[10px] text-gray-500 uppercase font-bold ml-1 mb-1 block">Data do Evento</label>
+                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Data do Evento</label>
                         <input type="date" id="lead-date-barrier" class="barrier-input">
                     </div>
                     <div class="w-1/3">
-                        <label class="text-[10px] text-gray-500 uppercase font-bold ml-1 mb-1 block">QTD.Convidados</label>
+                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Convidados</label>
                         <input type="number" id="lead-guests-barrier" placeholder="Ex: 50" min="50" class="barrier-input">
                     </div>
                 </div>
+
+                <!-- NOVA LINHA: LOCAL DO EVENTO -->
+                <div class="text-left mt-3">
+                    <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 tracking-widest block mb-1">Local do Evento (Frete/Deslocamento)</label>
+                    <select id="lead-region-barrier" class="barrier-input mb-0">
+                        <option value="" disabled selected hidden>Selecione a Região</option>
+                        <option value="0">BH(Frete Grátis)</option>
+                        <option value="150">Região Metropolitana (Até 50km) - R$ 150,00</option>
+                        <option value="200">Interior (51km a 100km) - R$ 200,00</option>
+                        <option value="400">Acima de 100km - R$ 400,00</option>
+                        <option value="0">Outras Regições (Sob Consulta)</option>
+                    </select>
+                </div>
             </div>
             
-            <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-4 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+            <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-full text-sm md:text-[11px] tracking-widest hover:brightness-110 mt-6 shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
                 Acessar Orçamentos
             </button>
             <p class="text-[11px] md:text-[9px] text-gray-600 mt-6 uppercase tracking-widest">Experiência Premium Garantida</p>
@@ -407,7 +420,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-bold tracking-widest uppercase">Plano Essencial</h2>
-                            <span class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest" >Frete Gratis"BH"Região</span>
+                            <span id="label-region-essencial" class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Calculando Frete...</span>
                         </div>
                         
                         <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-4">
@@ -487,7 +500,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4 mt-6 md:mt-0">
                             <h2 class="text-xl font-bold tracking-widest uppercase">Plano Premium</h2>
-                            <span class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Frete Grátis BH"Região"</span>
+                            <span id="label-region-premium" class="text-xs md:text-[10px] gold-text font-bold uppercase tracking-widest">Calculando Frete...</span>
                         </div>
                         
                         <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-3">            
@@ -728,7 +741,9 @@
             maxDrinks: 0,
             isQuickSimulation: false,
             availableMonths: 0,
-            eventDate: ''
+            eventDate: '',
+            regionName: '',    // ADICIONADO: Nome da Região
+            displacementFee: 0 // ADICIONADO: Valor da Taxa de Deslocamento
         };
 
         const fmt = (v) => {
@@ -786,14 +801,34 @@
             const guestsE = parseInt(document.getElementById('guestInputEssencial').value) || 0;
             const dataE = getEssencialData(guestsE);
             document.getElementById('perPersonEssencial').innerText = fmt(dataE.perPerson);
-            document.getElementById('priceEssencial').innerText = fmt((guestsE * dataE.perPerson) + dataE.extraCost);
+            // SOMA DO FRETE APLICADA AQUI NO PREÇO EXIBIDO
+            const totalE = (guestsE * dataE.perPerson) + dataE.extraCost + window.orderState.displacementFee;
+            document.getElementById('priceEssencial').innerText = fmt(totalE);
             document.getElementById('staffEssencial').innerText = dataE.staff;
+            
+            // Atualiza a Label de Região no card
+            const labelE = document.getElementById('label-region-essencial');
+            if(window.orderState.displacementFee === 0) {
+                labelE.innerText = "Frete Grátis na Região";
+            } else {
+                labelE.innerText = `+ Deslocamento: ${fmt(window.orderState.displacementFee)}`;
+            }
 
             const guestsP = parseInt(document.getElementById('guestInputPremium').value) || 0;
             const dataP = getPremiumData(guestsP);
             document.getElementById('perPersonPremium').innerText = fmt(dataP.perPerson);
-            document.getElementById('pricePremium').innerText = fmt((guestsP * dataP.perPerson) + dataP.extraCost);
+            // SOMA DO FRETE APLICADA AQUI NO PREÇO EXIBIDO
+            const totalP = (guestsP * dataP.perPerson) + dataP.extraCost + window.orderState.displacementFee;
+            document.getElementById('pricePremium').innerText = fmt(totalP);
             document.getElementById('staffPremium').innerText = dataP.staff;
+
+            // Atualiza a Label de Região no card
+            const labelP = document.getElementById('label-region-premium');
+            if(window.orderState.displacementFee === 0) {
+                labelP.innerText = "Frete Grátis na Região";
+            } else {
+                labelP.innerText = `+ Deslocamento: ${fmt(window.orderState.displacementFee)}`;
+            }
         };
 
         window.stepValue = function(plan, amount) {
@@ -844,8 +879,11 @@
             window.orderState.plan = plan;
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            
+            // SOMA DO FRETE INJETADA NO TOTAL FINAL
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
+            
             window.orderState.isQuickSimulation = true; 
             window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
             
@@ -863,8 +901,11 @@
             window.orderState.plan = plan;
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            
+            // SOMA DO FRETE INJETADA NO TOTAL FINAL
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
+            
             window.orderState.maxDrinks = plan === 'Essencial' ? 8 : 10;
             window.orderState.isQuickSimulation = false;
             
@@ -918,7 +959,9 @@
             window.orderState.plan = 'Premium';
             window.orderState.maxDrinks = 10;
             const data = getPremiumData(window.orderState.guests);
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost;
+            
+            // SOMA DO FRETE INJETADA NO TOTAL FINAL NO UPGRADE
+            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             window.renderDrinkSelectionGrid();
         };
@@ -977,6 +1020,7 @@
             msg += `*CLIENTE:* ${window.orderState.name}\n`;
             msg += `*WHATSAPP:* ${window.orderState.whatsapp}\n`;
             msg += `*PLANO:* ${window.orderState.plan}\n`;
+            msg += `*LOCAL DO EVENTO:* ${window.orderState.regionName}\n`; // ADICIONADO AQUI
             msg += `*CONVIDADOS:* ${window.orderState.guests}\n`;
             msg += `*DRINKS ESCOLHIDOS:* ${window.orderState.drinks.length > 0 ? window.orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
             msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n`;
@@ -1009,7 +1053,7 @@
         let adminClicks = 0;
         window.triggerAdmin = function() {
             adminClicks++;
-            if(adminClicks >= 5) {
+            if(adminClicks >= 7) {
                 localStorage.setItem('gmd_admin_session', 'true');
                 document.getElementById('admin-panel').style.display = 'flex';
                 if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
@@ -1028,25 +1072,50 @@
             const whatsapp = document.getElementById('lead-whatsapp-barrier').value;
             const eventDate = document.getElementById('lead-date-barrier').value;
             const guests = document.getElementById('lead-guests-barrier').value;
+            const regionSelect = document.getElementById('lead-region-barrier');
+            const regionValue = regionSelect.value;
+            const valMsg = document.getElementById('validation-msg');
 
-            if(!name || !whatsapp) {
-                const valMsg = document.getElementById('validation-msg');
-                if(valMsg) valMsg.classList.remove('hidden');
+            // VALIDAÇÃO: AGORA A REGIÃO TAMBÉM É OBRIGATÓRIA
+            if(!name || !whatsapp || !eventDate || !guests || !regionValue) {
+                if(valMsg) {
+                    valMsg.innerText = "Por favor, preencha todos os campos.";
+                    valMsg.classList.remove('hidden');
+                }
                 return;
             }
 
+            if(parseInt(guests) < 20) {
+                if(valMsg) {
+                    valMsg.innerText = "O número mínimo de convidados é 20.";
+                    valMsg.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if(valMsg) valMsg.classList.add('hidden');
+
+            // ATUALIZAÇÃO DO STATE COM A REGIÃO ESCOLHIDA E A TAXA
             window.orderState.name = name;
             window.orderState.whatsapp = whatsapp;
             window.orderState.eventDate = eventDate;
             window.orderState.guests = parseInt(guests);
+            window.orderState.displacementFee = parseFloat(regionValue) || 0;
+            window.orderState.regionName = regionSelect.options[regionSelect.selectedIndex].text;
             
             document.getElementById('guestInputEssencial').value = guests;
             document.getElementById('guestInputPremium').value = guests;
             document.getElementById('eventDate').value = eventDate;
 
-            // Envia para o Firebase
+            // Envia para o Firebase (AGORA COM REGIÃO)
             if(window.saveLeadToFirebase) {
-                window.saveLeadToFirebase({ name, whatsapp, eventDate, guests });
+                window.saveLeadToFirebase({ 
+                    name, 
+                    whatsapp, 
+                    eventDate, 
+                    guests,
+                    regionName: window.orderState.regionName // ADICIONADO AO FIREBASE
+                });
             }
 
             document.getElementById('access-barrier').style.transition = 'opacity 0.6s ease';
@@ -1076,7 +1145,7 @@
             storageBucket: "gmdrinks-ad157.firebasestorage.app",
             messagingSenderId: "885481881120",
             appId: "1:885481881120:web:a19543bd38c1c134a7c645",
-            databaseURL: "https://gmdrinks-ad157-default-rtdb.firebaseio.com" // ADICIONADO AQUI!
+            databaseURL: "https://gmdrinks-ad157-default-rtdb.firebaseio.com"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -1106,18 +1175,18 @@
             }
         });
 
-        // 1. Gravar dados ao clicar em "Acessar Orçamentos" (Agora usando Realtime DB)
         window.saveLeadToFirebase = async function(data) {
             if (db && data.name) {
                 try {
                     const leadsRef = ref(db, 'leads');
-                    const newLeadRef = push(leadsRef); // Cria um ID único
+                    const newLeadRef = push(leadsRef); 
                     
                     await set(newLeadRef, {
                         name: data.name,
                         whatsapp: data.whatsapp,
                         eventDate: data.eventDate || "Não informada",
                         guests: data.guests || 0,
+                        region: data.regionName || "Não informada", // DADO DE DESLOCAMENTO SALVO
                         timestamp: new Date().toISOString(),
                         userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
                         status: 'Captado (Iniciou Orçamento)'
@@ -1130,7 +1199,6 @@
             }
         };
 
-        // 2. Atualizar o lead quando o orçamento é finalizado
         window.finishOrderToFirebase = async function(method) {
             if (db && currentLeadId) {
                 try {
@@ -1148,7 +1216,6 @@
             }
         };
 
-        // 3. Função para o Painel Administrativo (Buscando do Realtime DB)
         window.fetchAdminLeads = function() {
             const container = document.getElementById('admin-leads-container');
             if(!db || !container) return;
@@ -1162,7 +1229,6 @@
 
             const leadsRef = ref(db, 'leads');
             
-            // O onValue mantém a conexão aberta no Realtime DB
             onValue(leadsRef, (snapshot) => {
                 if (!snapshot.exists()) {
                     container.innerHTML = '<p class="text-center text-gray-500 py-10 italic">Nenhum cliente preencheu os dados ainda.</p>';
@@ -1172,12 +1238,10 @@
                 const data = snapshot.val();
                 const leads = [];
                 
-                // Converte o objeto do Realtime DB para um Array
                 for (let id in data) {
                     leads.push({ id: id, ...data[id] });
                 }
                 
-                // Ordena pelos mais recentes
                 leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
                 let html = '';
@@ -1207,9 +1271,10 @@
                                 <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
                                 <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
                             </div>
+                            <!-- AQUI FOI INSERIDO A REGIÃO E DATA LADO A LADO -->
                             <div>
-                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data Evento</span>
-                                <span class="text-white">${lead.eventDate || '-'}</span>
+                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local</span>
+                                <span class="text-white">${lead.eventDate || '-'} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${lead.region || '-'}</span></span>
                             </div>
                             <div>
                                 <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
