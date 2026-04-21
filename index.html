@@ -1477,8 +1477,8 @@
             const user = document.getElementById('admin-user').value;
             const pass = document.getElementById('admin-pass').value;
             
-            // Defina o SEU USUÁRIO e SENHA aqui
-            if(user === 'admin' && pass === 'gmdrinks2024') {
+            // DeDEFINA SUA SUA SENHA DE USUARIO AQUI //
+            if(user === 'ADMINGM' && pass === 'RETEIME123') {
                 document.getElementById('admin-login-modal').style.display = 'none';
                 localStorage.setItem('gmd_admin_session', 'true');
                 document.getElementById('admin-panel').style.display = 'flex';
@@ -1548,7 +1548,7 @@
                 }
                 return;
             }
-
+            //QUANTIDADE MINIMA DE CONVIDADOS NO PAINEL//
             if(parseInt(guests) < 20) {
                 if(valMsg) {
                     valMsg.innerText = "O número mínimo de convidados é 20.";
