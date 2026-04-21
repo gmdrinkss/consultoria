@@ -580,7 +580,7 @@
                         <div class="custom-grid-list text-gray-300 text-sm md:text-[11px] mb-5">
                             <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> 8 drinks à escolha</li>
-                            <li class="flex items-start"><span class="list-bullet">•</span> 4 horas de Open Bar</li>
+                            <li class="flex items-start"><span class="list-bullet">•</span> <span id="duration-essencial-list">4 horas</span> de Open Bar</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Taças e Copos</li>
                             <li class="flex items-start"><span class="list-bullet">•</span> Frutas e Xaropes</li>
@@ -589,6 +589,7 @@
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffEssencial">2 Bartenders + 1 Barback</span></li>
                         </div>
 
+                        <!-- TAGS DE BEBIDAS INCLUSAS (ESSENCIAL) -->
                         <div class="mt-2 p-4 rounded-xl bg-black/50 border border-white/5 shadow-inner">
                             <span class="block text-[9px] uppercase text-gray-500 font-bold tracking-[0.2em] mb-2">Marcas Inclusas</span>
                             <div class="flex flex-wrap gap-2">
@@ -596,9 +597,10 @@
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">RUM MONTILLA</span>
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">GIN ROCKS</span>
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">CONHAQUE PRESIDENTE</span>
-                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">XAROPES/LICORES ARTESANAIS</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">XAROPE/LICORES ARTESANAIS</span>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="space-y-4 pt-6 border-t border-white/10 mt-6">
@@ -621,6 +623,23 @@
                             <div class="price-badge flex flex-col items-center sm:items-end min-w-[160px] w-full sm:w-auto">
                                 <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
                                 <div class="text-2xl font-bold gold-text" id="priceEssencial">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <!-- CAMPO: ADICIONAR HORA EXTRA (ESSENCIAL) -->
+                        <div class="mt-4 p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col shadow-inner">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-0.5">Duração do Evento</p>
+                                    <p class="text-sm font-bold text-white"><span id="duration-essencial-display">4 Horas</span></p>
+                                </div>
+                                <button type="button" id="btn-extra-hour-essencial" onclick="window.toggleExtraHour('Essencial')" class="bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                                    + Adicionar Hora
+                                </button>
+                            </div>
+                            <div class="border-t border-white/5 mt-3 pt-3 flex justify-between items-center">
+                                <span class="text-[9px] text-gray-500 uppercase tracking-widest flex items-center gap-1">⏱ +1 Hora de Bar</span>
+                                <p id="extra-hour-price-essencial" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">R$ 0,00</p>
                             </div>
                         </div>
                         
@@ -659,10 +678,10 @@
                             <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> 100% OPEN BAR</li>
                             <li class="flex items-start font-bold gold-text uppercase"><span class="list-bullet">•</span> BEBIDAS PREMIUM</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 10 drinks à escolha</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> 5 horas de serviço</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> <span id="duration-premium-list">5 horas</span> de serviço</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Todas as bebidas e Licores</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças e Copos</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes Importados</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura Completa</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags Divertidas</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 50 Shots Exclusivos</li>
@@ -670,6 +689,7 @@
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio Personalizado</li>
                         </div>
 
+                        <!-- TAGS DE BEBIDAS INCLUSAS (PREMIUM) -->
                         <div class="mt-2 p-4 rounded-xl bg-gradient-to-r from-[#d4af37]/10 to-transparent border border-[#d4af37]/30 shadow-inner">
                             <span class="block text-[9px] uppercase gold-text font-bold tracking-[0.2em] mb-2">Carta Premium Inclusa</span>
                             <div class="flex flex-wrap gap-2">
@@ -678,9 +698,9 @@
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">GIN TANQUERAY</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">XAROPES MONIN</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">LICOR STOCKS</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">CAMPARI</span>
-                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">LICOR 43</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">WHISKY JACK DANIELS</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">LICOR 43</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">CAMPARI</span>
                             </div>
                         </div>
 
@@ -706,6 +726,23 @@
                             <div class="price-badge flex flex-col items-center sm:items-end min-w-[160px] w-full sm:w-auto">
                                 <span class="text-xs md:text-[9px] uppercase text-gray-400 font-bold mb-1">Total Estimado</span>
                                 <div class="text-2xl font-bold gold-text text-glow" id="pricePremium">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <!-- CAMPO: ADICIONAR HORA EXTRA (PREMIUM) -->
+                        <div class="mt-4 p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col shadow-inner">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] uppercase font-bold text-gray-500 tracking-widest mb-0.5">Duração do Evento</p>
+                                    <p class="text-sm font-bold text-white"><span id="duration-premium-display">5 Horas</span></p>
+                                </div>
+                                <button type="button" id="btn-extra-hour-premium" onclick="window.toggleExtraHour('Premium')" class="bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                                    + Adicionar Hora
+                                </button>
+                            </div>
+                            <div class="border-t border-white/5 mt-3 pt-3 flex justify-between items-center">
+                                <span class="text-[9px] text-gray-500 uppercase tracking-widest flex items-center gap-1">⏱ +1 Hora de Bar</span>
+                                <p id="extra-hour-price-premium" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">R$ 0,00</p>
                             </div>
                         </div>
 
@@ -884,7 +921,13 @@
 
     <!-- SCRIPT DE LÓGICA DO ORÇAMENTO -->
     <script>
+        // ==========================================
+        // CONFIGURAÇÕES PRINCIPAIS E TAXAS
+        // ==========================================
         const WHATSAPP_NUMBER = "5531983684231";
+        
+        // Aqui você altera a porcentagem de acréscimo da HORA EXTRA (Ex: 0.20 = 20%)
+        const TAXA_HORA_EXTRA = 0.20; 
         
         // BANCO DE CUPONS
         const COUPONS_DB = {
@@ -939,10 +982,13 @@
             couponCode: '',
             discountPercent: 0,
             discountValue: 0,
-            finalTotal: 0
+            finalTotal: 0,
+            extraHourEssencial: false, 
+            extraHourPremium: false,   
+            hasExtraHour: false,       
+            durationStr: ''            
         };
 
-        // Estado das abas do painel Admin
         window.currentAdminTab = 'todos';
 
         const fmt = (v) => {
@@ -996,11 +1042,47 @@
             return { perPerson, staff, extraCost };
         };
 
+        window.toggleExtraHour = function(plan) {
+            if(plan === 'Essencial') {
+                window.orderState.extraHourEssencial = !window.orderState.extraHourEssencial;
+                const btn = document.getElementById('btn-extra-hour-essencial');
+                if(window.orderState.extraHourEssencial) {
+                    btn.innerHTML = "− Remover Hora";
+                    btn.className = "bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-red-500/30 transition-all";
+                    document.getElementById('duration-essencial-display').innerText = "5 Horas";
+                    document.getElementById('duration-essencial-list').innerText = "5 horas";
+                } else {
+                    btn.innerHTML = "+ Adicionar Hora";
+                    btn.className = "bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#d4af37] hover:text-black transition-all";
+                    document.getElementById('duration-essencial-display').innerText = "4 Horas";
+                    document.getElementById('duration-essencial-list').innerText = "4 horas";
+                }
+            } else {
+                window.orderState.extraHourPremium = !window.orderState.extraHourPremium;
+                const btn = document.getElementById('btn-extra-hour-premium');
+                if(window.orderState.extraHourPremium) {
+                    btn.innerHTML = "− Remover Hora";
+                    btn.className = "bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-red-500/30 transition-all";
+                    document.getElementById('duration-premium-display').innerText = "6 Horas";
+                    document.getElementById('duration-premium-list').innerText = "6 horas";
+                } else {
+                    btn.innerHTML = "+ Adicionar Hora";
+                    btn.className = "bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/30 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#d4af37] hover:text-black transition-all";
+                    document.getElementById('duration-premium-display').innerText = "5 Horas";
+                    document.getElementById('duration-premium-list').innerText = "5 horas";
+                }
+            }
+            window.updateDisplay();
+        };
+
         window.updateDisplay = function() {
+            // Essencial
             const guestsE = parseInt(document.getElementById('guestInputEssencial').value) || 0;
             const dataE = getEssencialData(guestsE);
-            document.getElementById('perPersonEssencial').innerText = fmt(dataE.perPerson);
-            const totalE = (guestsE * dataE.perPerson) + dataE.extraCost + window.orderState.displacementFee;
+            const extraCostE = (dataE.perPerson * TAXA_HORA_EXTRA) * guestsE;
+            const perPersonE = window.orderState.extraHourEssencial ? dataE.perPerson * (1 + TAXA_HORA_EXTRA) : dataE.perPerson;
+            document.getElementById('perPersonEssencial').innerText = fmt(perPersonE);
+            const totalE = (guestsE * perPersonE) + dataE.extraCost + window.orderState.displacementFee;
             document.getElementById('priceEssencial').innerText = fmt(totalE);
             document.getElementById('staffEssencial').innerText = dataE.staff;
             
@@ -1010,11 +1092,15 @@
             } else {
                 labelE.innerText = `+ Deslocamento: ${fmt(window.orderState.displacementFee)}`;
             }
+            document.getElementById('extra-hour-price-essencial').innerText = `+ ${fmt(extraCostE)}`;
 
+            // Premium
             const guestsP = parseInt(document.getElementById('guestInputPremium').value) || 0;
             const dataP = getPremiumData(guestsP);
-            document.getElementById('perPersonPremium').innerText = fmt(dataP.perPerson);
-            const totalP = (guestsP * dataP.perPerson) + dataP.extraCost + window.orderState.displacementFee;
+            const extraCostP = (dataP.perPerson * TAXA_HORA_EXTRA) * guestsP;
+            const perPersonP = window.orderState.extraHourPremium ? dataP.perPerson * (1 + TAXA_HORA_EXTRA) : dataP.perPerson;
+            document.getElementById('perPersonPremium').innerText = fmt(perPersonP);
+            const totalP = (guestsP * perPersonP) + dataP.extraCost + window.orderState.displacementFee;
             document.getElementById('pricePremium').innerText = fmt(totalP);
             document.getElementById('staffPremium').innerText = dataP.staff;
 
@@ -1024,6 +1110,7 @@
             } else {
                 labelP.innerText = `+ Deslocamento: ${fmt(window.orderState.displacementFee)}`;
             }
+            document.getElementById('extra-hour-price-premium').innerText = `+ ${fmt(extraCostP)}`;
         };
 
         window.stepValue = function(plan, amount) {
@@ -1085,7 +1172,11 @@
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
             
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
+            window.orderState.hasExtraHour = plan === 'Essencial' ? window.orderState.extraHourEssencial : window.orderState.extraHourPremium;
+            window.orderState.durationStr = plan === 'Essencial' ? (window.orderState.hasExtraHour ? '5 Horas' : '4 Horas') : (window.orderState.hasExtraHour ? '6 Horas' : '5 Horas');
+
+            const finalPerPerson = window.orderState.hasExtraHour ? data.perPerson * (1 + TAXA_HORA_EXTRA) : data.perPerson;
+            window.orderState.totalValue = (window.orderState.guests * finalPerPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             
             window.resetCoupon();
@@ -1108,7 +1199,11 @@
             window.orderState.guests = parseInt(document.getElementById(`guestInput${plan}`).value);
             const data = plan === 'Essencial' ? getEssencialData(window.orderState.guests) : getPremiumData(window.orderState.guests);
             
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
+            window.orderState.hasExtraHour = plan === 'Essencial' ? window.orderState.extraHourEssencial : window.orderState.extraHourPremium;
+            window.orderState.durationStr = plan === 'Essencial' ? (window.orderState.hasExtraHour ? '5 Horas' : '4 Horas') : (window.orderState.hasExtraHour ? '6 Horas' : '5 Horas');
+
+            const finalPerPerson = window.orderState.hasExtraHour ? data.perPerson * (1 + TAXA_HORA_EXTRA) : data.perPerson;
+            window.orderState.totalValue = (window.orderState.guests * finalPerPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             
             window.resetCoupon();
@@ -1167,7 +1262,8 @@
             window.orderState.maxDrinks = 10;
             const data = getPremiumData(window.orderState.guests);
             
-            window.orderState.totalValue = (window.orderState.guests * data.perPerson) + data.extraCost + window.orderState.displacementFee;
+            const finalPerPerson = window.orderState.hasExtraHour ? data.perPerson * (1 + TAXA_HORA_EXTRA) : data.perPerson;
+            window.orderState.totalValue = (window.orderState.guests * finalPerPerson) + data.extraCost + window.orderState.displacementFee;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
             window.renderDrinkSelectionGrid();
         };
@@ -1293,6 +1389,7 @@
             msg += `*CLIENTE:* ${window.orderState.name}\n`;
             msg += `*WHATSAPP:* ${window.orderState.whatsapp}\n`;
             msg += `*PLANO:* ${window.orderState.plan}\n`;
+            msg += `*DURAÇÃO:* ${window.orderState.durationStr}\n`;
             msg += `*LOCAL DO EVENTO:* ${window.orderState.regionName}\n`; 
             msg += `*CONVIDADOS:* ${window.orderState.guests}\n`;
             msg += `*DRINKS ESCOLHIDOS:* ${window.orderState.drinks.length > 0 ? window.orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
@@ -1514,6 +1611,7 @@
                     const leadRef = ref(db, 'leads/' + currentLeadId);
                     await update(leadRef, {
                         plan: window.orderState.plan || "Nenhum",
+                        duration: window.orderState.durationStr || "Padrão",
                         drinks: window.orderState.drinks || [],
                         totalValue: window.orderState.priceStr || "R$ 0,00",
                         coupon: window.orderState.couponCode || "Nenhum",
@@ -1582,7 +1680,6 @@
             });
         };
 
-        // Função adicionada para o botão "Salvar Detalhes na Agenda"
         window.saveLeadDetails = async function(leadId, btnElement) {
             const addressInput = document.getElementById(`address-${leadId}`);
             const payInfoInput = document.getElementById(`payinfo-${leadId}`);
@@ -1675,8 +1772,8 @@
                             <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${lead.eventDate || '-'} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${lead.region || '-'}</span></span>
                         </div>
                         <div>
-                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
-                            <span class="text-white">${lead.guests || '0'}</span>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados / Duração</span>
+                            <span class="text-white">${lead.guests || '0'} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${lead.duration || '-'}</span></span>
                         </div>
                     </div>
 
