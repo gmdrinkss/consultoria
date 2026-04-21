@@ -487,6 +487,19 @@
             display: inline-block;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Estilo da aba ativa no painel admin */
+        .admin-tab-active {
+            border-bottom: 2px solid #d4af37;
+            color: #d4af37;
+        }
+        .admin-tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+        }
+        .admin-tab-inactive:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
@@ -585,6 +598,7 @@
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">VODKA ORLOF</span>
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">RUM MONTILLA</span>
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">GIN ROCKS</span>
+                                <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">CONHAQUE PRESIDENTE</span>
                                 <span class="text-[9px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-300">XAROPES/LICORES ARTESANAIS</span>
                             </div>
                         </div>
@@ -651,13 +665,11 @@
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 10 drinks à escolha</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 5 horas de serviço</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Todas as bebidas e licores</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças e Copos </li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Iluminação&Decoração</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura Completa</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags Divertidas</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Taças e Copos</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Frutas e Xaropes Importados</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Estrutura Iluminada</li>
+                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Tags e Guarnições</li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> 50 Shots Exclusivos</li>
-                            <li class="flex items-start text-white"><span class="list-bullet">•</span> Insumos Premiun</li>
                             <li class="flex items-start text-white font-semibold"><span class="list-bullet">✓</span> <span id="staffPremium">4 Bartenders + 1 Barback</span></li>
                             <li class="flex items-start text-white"><span class="list-bullet">•</span> Cardápio Personalizado</li>
                         </div>
@@ -670,7 +682,10 @@
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">RUM BACARDI</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">GIN TANQUERAY</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">XAROPES MONIN</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">LICOR STOCKS</span>
                                 <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">WHISKY JACK DANIELS</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">CAMPARI</span>
+                                <span class="text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40 shadow-[0_0_10px_rgba(212,175,55,0.1)] px-2 py-1 rounded-md text-white font-semibold tracking-wide">LICOR 43</span>
                             </div>
                         </div>
 
@@ -728,22 +743,31 @@
 
     <!-- MODAL: SELEÇÃO VISUAL DE DRINKS -->
     <div id="step-drinks" class="step-overlay">
-        <div class="max-w-6xl mx-auto mt-10 px-4 pb-32">
-            <div id="drink-back-container">
+        <!-- O container agora é flex e ocupa a tela inteira para o footer ficar sempre no final -->
+        <div class="max-w-6xl mx-auto mt-6 md:mt-10 flex flex-col px-0 md:px-4" style="min-height: calc(100dvh - 40px);">
+            <div id="drink-back-container" class="px-5 md:px-0">
                 <div onclick="window.closeAll()" class="btn-back">← Voltar para Planos</div>
             </div>
             
-            <div class="text-center mb-10">
+            <div class="text-center mb-10 px-5 md:px-0">
                 <h3 class="brand-font text-4xl gold-text uppercase text-glow">A Sua Seleção</h3>
                 <p id="drink-limit-msg" class="text-gray-400 text-xs md:text-[11px] mt-2 uppercase tracking-widest"></p>
             </div>
 
-            <div id="drink-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <!-- Grade de drinks -->
+            <div id="drink-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12 px-5 md:px-0"></div>
 
-            <div class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/90 to-transparent z-50">
-                <div class="max-w-md mx-auto">
+            <!-- Espaçador para empurrar o rodapé para baixo -->
+            <div class="flex-grow"></div>
+
+            <!-- RODAPÉ FIXO (STICKY) -->
+            <div class="sticky bottom-0 pt-16 pb-6 bg-gradient-to-t from-black via-black/95 to-transparent z-50 mt-auto -mx-5 px-5 sm:mx-0 sm:px-0">
+                <div class="max-w-md mx-auto text-center">
+                    <p id="sticky-drink-counter" class="text-[10px] gold-text font-bold uppercase tracking-widest mb-3 text-glow">
+                        0 DE 0 DRINKS SELECIONADOS
+                    </p>
                     <button type="button" id="btn-confirm-drinks" onclick="window.goToPayment()" disabled class="w-full py-5 gold-bg text-black font-black uppercase text-sm md:text-xs tracking-widest rounded-full shadow-[0_10px_40px_rgba(212,175,55,0.4)] opacity-50 transition-all btn-shine">
-                        Confirmar Seleção (0)
+                        Confirmar Seleção
                     </button>
                 </div>
             </div>
@@ -850,11 +874,17 @@
     <div id="admin-panel" class="step-overlay" style="z-index: 10000;">
         <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
             <div onclick="window.closeAdmin()" class="btn-back">← Voltar e Fechar</div>
-            <div class="text-center mb-8">
+            <div class="text-center mb-6">
                 <h3 class="brand-font text-4xl gold-text uppercase text-glow">Painel de Clientes</h3>
-                <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Leads Guardados</p>
+                <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Gestão de Leads</p>
+                
+                <!-- TABS DE FILTRO DA AGENDA -->
+                <div class="flex justify-center gap-6 mt-8 border-b border-white/10 pb-1">
+                    <button onclick="window.setAdminTab('todos')" id="tab-todos" class="admin-tab-active text-[10px] uppercase font-bold tracking-widest pb-2 transition-all">Todos os Leads</button>
+                    <button onclick="window.setAdminTab('reservados')" id="tab-reservados" class="admin-tab-inactive text-[10px] uppercase font-bold tracking-widest pb-2 transition-all">Agenda (Reservados)</button>
+                </div>
             </div>
-            <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 mt-4">
                 <div class="text-center py-20">
                     <div class="loading-spinner mb-4"></div>
                     <p class="text-gray-500 text-xs italic tracking-widest uppercase">Carregando Banco de Dados...</p>
@@ -899,8 +929,8 @@
             { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false },
             { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false },
             { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false },
-            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false },
-            { id: 23, name: "Paradise", desc: "Rum ou Vodka, Grenadine, Suco de Laranja, Curaçu Blue, e Gelo", img: "https://i.pinimg.com/736x/43/e8/dd/43e8dd2e1dc58b2b5c3412720f5fca2a.jpg", premium: false }
+            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false }
+            
         ];
 
         window.orderState = {
@@ -922,6 +952,9 @@
             discountValue: 0,
             finalTotal: 0
         };
+
+        // Estado das abas do painel Admin
+        window.currentAdminTab = 'todos';
 
         const fmt = (v) => {
             const val = parseFloat(v);
@@ -1152,9 +1185,18 @@
 
         window.updateConfirmBtn = function() {
             const btn = document.getElementById('btn-confirm-drinks');
-            btn.innerText = `Confirmar Seleção (${window.orderState.drinks.length} de ${window.orderState.maxDrinks})`;
-            btn.disabled = window.orderState.drinks.length === 0;
-            if(window.orderState.drinks.length > 0) {
+            const counter = document.getElementById('sticky-drink-counter');
+            const count = window.orderState.drinks.length;
+            const max = window.orderState.maxDrinks;
+            
+            btn.innerText = `Confirmar Seleção (${count} de ${max})`;
+            
+            if (counter) {
+                counter.innerText = `${count} DE ${max} DRINKS SELECIONADOS`;
+            }
+            
+            btn.disabled = count === 0;
+            if(count > 0) {
                 btn.style.opacity = '1';
                 btn.classList.add('pulse-gold');
             } else {
@@ -1325,6 +1367,23 @@
             localStorage.setItem('gmd_admin_session', 'false');
             document.getElementById('admin-panel').style.display = 'none';
         };
+
+        window.setAdminTab = function(tabName) {
+            window.currentAdminTab = tabName;
+            document.getElementById('tab-todos').className = tabName === 'todos' 
+                ? 'admin-tab-active text-[10px] uppercase font-bold tracking-widest pb-2 transition-all' 
+                : 'admin-tab-inactive text-[10px] uppercase font-bold tracking-widest pb-2 transition-all';
+            
+            document.getElementById('tab-reservados').className = tabName === 'reservados' 
+                ? 'admin-tab-active text-[10px] uppercase font-bold tracking-widest pb-2 transition-all' 
+                : 'admin-tab-inactive text-[10px] uppercase font-bold tracking-widest pb-2 transition-all';
+            
+            if(typeof window.renderAdminLeads === 'function') {
+                window.renderAdminLeads();
+            } else if(typeof window.fetchAdminLeads === 'function') {
+                window.fetchAdminLeads();
+            }
+        };
         
         window.unlockApp = async function() {
             const name = document.getElementById('lead-name-barrier').value;
@@ -1391,7 +1450,7 @@
         };
     </script>
 
-    <!-- SCRIPT REALTIME DATABASE (MANTIDO INTACTO) -->
+    <!-- SCRIPT REALTIME DATABASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1413,8 +1472,10 @@
 
         let currentUser = null;
         let currentLeadId = null;
-
         let isAdminActive = localStorage.getItem('gmd_admin_session') === 'true';
+        
+        let globalLeads = [];
+        window.adminListenerAttached = false;
 
         const initAuth = async () => {
             try {
@@ -1429,7 +1490,7 @@
             currentUser = user; 
             if(user && isAdminActive) {
                 document.getElementById('admin-panel').style.display = 'flex';
-                window.fetchAdminLeads();
+                if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
             }
         });
 
@@ -1447,7 +1508,8 @@
                         region: data.regionName || "Não informada",
                         timestamp: new Date().toISOString(),
                         userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
-                        status: 'Captado (Iniciou Orçamento)'
+                        status: 'Captado (Iniciou Orçamento)',
+                        isReserved: false
                     });
                     
                     currentLeadId = newLeadRef.key; 
@@ -1477,9 +1539,27 @@
             }
         };
 
+        window.toggleReservation = async function(leadId, currentStatus) {
+            if (db && leadId) {
+                try {
+                    const leadRef = ref(db, 'leads/' + leadId);
+                    await update(leadRef, {
+                        isReserved: !currentStatus
+                    });
+                } catch(e) { 
+                    console.error("Erro ao atualizar reserva:", e); 
+                }
+            }
+        };
+
         window.fetchAdminLeads = function() {
             const container = document.getElementById('admin-leads-container');
             if(!db || !container) return;
+
+            if(window.adminListenerAttached) {
+                window.renderAdminLeads();
+                return;
+            }
 
             container.innerHTML = `
                 <div class="text-center py-20">
@@ -1491,75 +1571,104 @@
             const leadsRef = ref(db, 'leads');
             
             onValue(leadsRef, (snapshot) => {
+                window.adminListenerAttached = true;
                 if (!snapshot.exists()) {
-                    container.innerHTML = '<p class="text-center text-gray-500 py-10 italic">Nenhum cliente preencheu os dados ainda.</p>';
+                    globalLeads = [];
+                    window.renderAdminLeads();
                     return;
                 }
 
                 const data = snapshot.val();
-                const leads = [];
+                globalLeads = [];
                 
                 for (let id in data) {
-                    leads.push({ id: id, ...data[id] });
+                    globalLeads.push({ id: id, ...data[id] });
                 }
                 
-                leads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                let html = '';
-                leads.forEach(lead => {
-                    const cleanWhatsApp = lead.whatsapp ? lead.whatsapp.replace(/\D/g,'') : '';
-                    const waLink = `https://wa.me/55${cleanWhatsApp}`;
-                    const statusClass = lead.status && lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
-                    
-                    let priceText = lead.totalValue;
-                    if(lead.coupon && lead.coupon !== "Nenhum") {
-                        priceText = `${lead.totalValue} <span class="text-green-400 ml-1">-${Number(lead.discountValue).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${lead.coupon})</span>`;
-                    }
-
-                    html += `
-                    <div class="lead-card p-5 rounded-2xl mb-4 shadow-xl relative">
-                        <div class="absolute top-4 right-4 flex gap-2">
-                            <a href="${waLink}" target="_blank" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] uppercase font-black hover:bg-green-600/40 transition-all">WhatsApp</a>
-                            <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg text-[10px] uppercase font-black hover:bg-red-500/20 cursor-pointer">Apagar</button>
-                        </div>
-
-                        <div class="border-b border-white/10 pb-3 mb-3 pr-24">
-                            <h4 class="gold-text font-black uppercase text-base leading-tight">${lead.name || 'Sem Nome'}</h4>
-                            <span class="text-[9px] text-gray-500 uppercase tracking-widest">${lead.timestamp ? new Date(lead.timestamp).toLocaleString('pt-BR') : '-'}</span>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
-                            <div>
-                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
-                                <span class="text-white font-medium">${lead.whatsapp || '-'}</span>
-                            </div>
-                            <div>
-                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
-                                <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
-                            </div>
-                            <div>
-                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local</span>
-                                <span class="text-white">${lead.eventDate || '-'} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${lead.region || '-'}</span></span>
-                            </div>
-                            <div>
-                                <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
-                                <span class="text-white">${lead.guests || '0'}</span>
-                            </div>
-                        </div>
-
-                        ${lead.plan ? `
-                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center bg-black/20 p-2 rounded-lg">
-                            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Plano Selecionado</span>
-                            <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${priceText}</span>
-                        </div>` : ''}
-                    </div>`;
-                });
-                
-                container.innerHTML = html;
+                globalLeads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                window.renderAdminLeads();
             }, (error) => {
                 console.error("Erro ao escutar banco de dados:", error);
                 container.innerHTML = `<div class="text-center py-10"><p class="text-red-500 text-xs font-bold uppercase mb-2">Erro de Conexão</p><p class="text-[10px] text-gray-400">Ative o "Logon Anônimo" e coloque as regras no Firebase.</p></div>`;
             });
+        };
+
+        window.renderAdminLeads = function() {
+            const container = document.getElementById('admin-leads-container');
+            if(!container) return;
+
+            let leadsToRender = [...globalLeads];
+
+            if(window.currentAdminTab === 'reservados') {
+                leadsToRender = leadsToRender.filter(lead => lead.isReserved === true);
+            }
+
+            if(leadsToRender.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 py-10 italic">${window.currentAdminTab === 'reservados' ? 'Sua agenda está vazia no momento.' : 'Nenhum cliente preencheu os dados.'}</p>`;
+                return;
+            }
+            
+            let html = '';
+            leadsToRender.forEach(lead => {
+                const cleanWhatsApp = lead.whatsapp ? lead.whatsapp.replace(/\D/g,'') : '';
+                const waLink = `https://wa.me/55${cleanWhatsApp}`;
+                const isReserved = lead.isReserved === true;
+                const statusClass = lead.status && lead.status.includes('Finalizado') ? 'text-green-400' : 'text-yellow-500';
+                
+                const cardBorderClass = isReserved ? 'border border-[#d4af37] shadow-[0_0_20px_rgba(212,175,55,0.15)] bg-[#111]' : 'border border-transparent shadow-xl bg-[#151515]';
+                const reserveBtnClass = isReserved 
+                    ? 'bg-gray-800 text-gray-400 border border-gray-600 hover:bg-gray-700' 
+                    : 'bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/50 hover:bg-[#d4af37]/40';
+
+                let priceText = lead.totalValue;
+                if(lead.coupon && lead.coupon !== "Nenhum") {
+                    priceText = `${lead.totalValue} <span class="text-green-400 ml-1">-${Number(lead.discountValue).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${lead.coupon})</span>`;
+                }
+
+                html += `
+                <div class="lead-card p-5 rounded-2xl mb-4 relative transition-all ${cardBorderClass}">
+                    <div class="absolute top-4 right-4 flex gap-2">
+                        <button onclick="window.toggleReservation('${lead.id}', ${isReserved})" class="${reserveBtnClass} px-3 py-1.5 rounded-lg text-[9px] uppercase font-black transition-all flex items-center gap-1">
+                            ${isReserved ? '✕ Remover' : '🗓 Reservar'}
+                        </button>
+                        <a href="${waLink}" target="_blank" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] uppercase font-black hover:bg-green-600/40 transition-all flex items-center justify-center">WhatsApp</a>
+                        <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 w-8 h-8 rounded-lg flex items-center justify-center text-lg hover:bg-red-500/20 cursor-pointer">×</button>
+                    </div>
+
+                    <div class="border-b border-white/10 pb-3 mb-3 pr-40">
+                        ${isReserved ? '<span class="inline-block bg-[#d4af37] text-black text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 shadow-lg">🗓 Evento Reservado na Agenda</span>' : ''}
+                        <h4 class="${isReserved ? 'gold-text' : 'text-white'} font-black uppercase text-base leading-tight">${lead.name || 'Sem Nome'}</h4>
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">${lead.timestamp ? new Date(lead.timestamp).toLocaleString('pt-BR') : '-'}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
+                            <span class="text-white font-medium">${lead.whatsapp || '-'}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
+                            <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local</span>
+                            <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${lead.eventDate || '-'} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${lead.region || '-'}</span></span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados</span>
+                            <span class="text-white">${lead.guests || '0'}</span>
+                        </div>
+                    </div>
+
+                    ${lead.plan ? `
+                    <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center bg-black/20 p-2 rounded-lg">
+                        <span class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Plano Selecionado</span>
+                        <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${priceText}</span>
+                    </div>` : ''}
+                </div>`;
+            });
+
+            container.innerHTML = html;
         };
 
         window.deleteLead = async function(leadId) {
