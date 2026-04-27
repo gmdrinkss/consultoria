@@ -986,8 +986,6 @@
             { id: 23, name: "Paradise", desc: "Rum ou Gin, Suco de Laranja, Grenadine, Suco de Abacaxi, Curaçau Blue e Gelo ", img: "https://i.pinimg.com/736x/43/e8/dd/43e8dd2e1dc58b2b5c3412720f5fca2a.jpg", premium: false },
             { id: 24, name: "Garibaldi", desc: "Campari & Suco de Laranja e Gelo", img: "https://www.estadao.com.br/resizer/OuWF2B0C6CIxMZMWfQ6Q6QBlwjU=/arc-anglerfish-arc2-prod-estadao/public/PLGD23C32VJXXNE6T6AWNTUOGQ.jpg", premium: true },
             { id: 25, name: "Dry Martini", desc: "Gim, Vermute Seco", img: "https://cdn.casaeculinaria.com/wp-content/uploads/2024/02/09100159/dry-martini.webp", premium: true }
-            
-            
         ];
 
         window.orderState = {
@@ -1021,7 +1019,7 @@
             if (isNaN(val)) return "R$ 0,00";
             return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         };
-         //DEFINIR VALORES DE CONVIDADOS E EQUIPE PLANO ESSENCIAL//
+
         const getEssencialData = (guests) => {
             let perPerson = 21.30;
             let staff = "2 Bartenders + 1 Barback";
@@ -1040,7 +1038,6 @@
             else if (guests <= 180) perPerson = 23.31;
             else if (guests <= 200) perPerson = 22.50;
 
-
             if(guests > 119) { staff ="3 Bartenders+1 Barback"; extraCost = 100.00; }
             if (guests > 165) { staff ="4 Bartenders+1 Barback"; extraCost = 300.00; }
             if (guests >= 230) { staff ="5 Bartenders+1 Barback"; extraCost = 600.00; }
@@ -1050,7 +1047,7 @@
             
             return { perPerson, staff, extraCost };
         };
-         //DEFINDIR VALORES POR CONVIDADOS E EQUIPE PLANO PREMIUN//
+
         const getPremiumData = (guests) => {
             let perPerson = 32.50;
             let staff = "3 Bartenders + 1 Barback";
@@ -1158,8 +1155,8 @@
             const clDateVal = document.getElementById('closingDate').value || new Date().toISOString().split("T")[0];
             
             if(!evDateVal) return;
-            const evDate = new Date(evDateVal);
-            const clDate = new Date(clDateVal);
+            const evDate = new Date(evDateVal + 'T12:00:00');
+            const clDate = new Date(clDateVal + 'T12:00:00');
             
             let months = (evDate.getFullYear() - clDate.getFullYear()) * 12;
             months -= clDate.getMonth();
@@ -1425,7 +1422,7 @@
             msg += `*LOCAL DO EVENTO:* ${window.orderState.regionName}\n`; 
             msg += `*CONVIDADOS:* ${window.orderState.guests}\n`;
             msg += `*DRINKS ESCOLHIDOS:* ${window.orderState.drinks.length > 0 ? window.orderState.drinks.join(', ') : 'A definir no WhatsApp'}\n`;
-            msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate).toLocaleDateString('pt-BR') : 'Não informada'}\n\n`;
+            msg += `*DATA DO EVENTO:* ${evDate ? new Date(evDate + 'T12:00:00').toLocaleDateString('pt-BR') : 'Não informada'}\n\n`;
             
             if(window.orderState.discountPercent > 0) {
                 msg += `*VALOR ORIGINAL:* ${fmt(window.orderState.totalValue)}\n`;
@@ -1597,9 +1594,15 @@
                 return;
             }
             
+            let formattedEventDate = eventDate;
+            if (eventDate && eventDate !== "Não informada" && eventDate.includes('-')) {
+                const d = new Date(eventDate + 'T12:00:00');
+                if (!isNaN(d)) formattedEventDate = d.toLocaleDateString('pt-BR');
+            }
+            
             let msg = `Olá ${name || ''}! Tudo bem? 🍸\n\n`;
-            msg += `Vi que você iniciou uma simulação de orçamento com a GMDrinks para o seu evento no dia ${eventDate || ''} para ${guests || ''} convidados, mas não chegou a finalizar.\n\n`;
-            msg += `Meus parabéns! Você Acaba de ganhar 15% de desconto, válido por 12 horas garanta já sua reserva — *Cupom*: DESC15`;
+            msg += `Vi que você iniciou uma simulação de orçamento com a GMDrinks para o seu evento no dia ${formattedEventDate || ''} para ${guests || ''} convidados, mas não chegou a finalizar.\n\n`;
+            msg += `Meus parabéns! Você Acaba de ganhar 15% de desconto, válido por 12 horas garanta já sua reserva — *Cupom*: DESC15 `;
             
             window.open(`https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         };
@@ -1812,6 +1815,12 @@
                     priceText = `${lead.totalValue} <span class="text-green-400 ml-1">-${Number(lead.discountValue).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${lead.coupon})</span>`;
                 }
 
+                let displayDate = lead.eventDate || '-';
+                if (lead.eventDate && lead.eventDate !== "Não informada" && lead.eventDate.includes('-')) {
+                    const d = new Date(lead.eventDate + 'T12:00:00');
+                    if (!isNaN(d)) displayDate = d.toLocaleDateString('pt-BR');
+                }
+
                 html += `
                 <div class="lead-card p-5 rounded-2xl mb-4 relative transition-all ${cardBorderClass}">
                     <div class="absolute top-4 right-4 flex gap-2 flex-wrap justify-end max-w-[60%]">
@@ -1844,7 +1853,7 @@
                         </div>
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local Original</span>
-                            <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${lead.eventDate || '-'} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${lead.region || '-'}</span></span>
+                            <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${displayDate} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${lead.region || '-'}</span></span>
                         </div>
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados / Duração</span>
