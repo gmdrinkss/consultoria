@@ -419,6 +419,27 @@
             border-bottom: 1px solid #d4af3733;
         }
 
+        /* NOVO: Zona de preview em vídeo (estilo trailer) dentro do card do Cardápio */
+        .menu-preview-zone {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            border-bottom: 1px solid #d4af3733;
+        }
+        .menu-preview-video-box { position: absolute; inset: 0; z-index: 0; background: #000; }
+        .menu-preview-poster {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 10; transition: opacity 0.5s ease;
+        }
+        .menu-preview-badge {
+            position: absolute; bottom: 10px; left: 10px; z-index: 20;
+            font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700;
+            color: #d4af37; background: rgba(0,0,0,0.75); padding: 5px 10px; border-radius: 999px;
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .menu-preview-zone:hover .menu-preview-badge { opacity: 1; }
+
         .schedule-box {
             background: linear-gradient(to right, #1a1a1a, #111);
             border: 1px solid #333;
@@ -951,32 +972,32 @@
         };
         // LISTA DOS DRINKS //
         const DRINKS_DB = [
-            { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false },
-            { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false },
-            { id: 3, name: "Caip Frutas", desc: "Abacaxi, morango, maracujá, abacaxi com hortelã.", img: "https://i.ibb.co/1fywzrkF/Chat-GPT-Image-20-de-mar-de-2026-09-24-24.png", premium: false },
-            { id: 4, name: "Negroni", desc: "Campari, gim, vermute rosso, Guarnição laranja e gelo.", img: "https://conteudo.imguol.com.br/c/entretenimento/73/2020/09/10/negroni-1599771396384_v2_3x4.jpg", premium: true },
-            { id: 5, name: "Aperol Spritz", desc: "Espumante, aperol, agua com gás ou sprite, e gelo.", img: "https://static.wixstatic.com/media/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg/v1/fill/w_480,h_638,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg", premium: true },
-            { id: 6, name: "Mojito", desc: "Rum, hortelã, xarope de menta, suco de limão, sprite e gelo.", img: "https://www.deliciousmagazine.co.uk/wp-content/uploads/2014/01/Mojito-768x960.jpg", premium: false },
-            { id: 7, name: "Sex on the Beach", desc: "Vodka, licor de pessêgo, suco de laranja, grenadine, laranja.", img: "https://thumbs.dreamstime.com/b/sexo-no-cocktail-da-praia-fundo-preto-115887247.jpg", premium: false },
-            { id: 8, name: "Pina Colada", desc: "Rum, abacaxi, leite de cocô, leite condensado, e gelo.", img: "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2022/09/23/1631063638-receita-pina-colada.jpg", premium: false },
-            { id: 9, name: "Soda Italiana", desc: "Xaropes monin diversos, com agua com gás e gelo.", img: "https://resize.casapino.com.br/?u=https://cms-bomgourmet.s3.amazonaws.com/bomgourmet/2018/03/201803/liquori-soda-italiana-e2a4f9e0.jpg&w=661", premium: true },
-            { id: 10, name: "Cogumelo Azul", desc: "Gin, curaçau blue, limão, sprite e gelo.", img: "https://bartenderstore.com.br/wp-content/uploads/2023/08/Gin-Tonica-Azul-edit.jpg", premium: false },
-            { id: 11, name: "Nectar", desc: "Vodka, licor de morango, leite condensado, suco de morango.", img: "https://cdn.deliway.com.br/blog/base/31c/0c1/78a/batidinha-morango.jpg", premium: false },
-            { id: 12, name: "Whisky Sour", desc: "Whisky, suco de limão siciliano, xarope trad. e gelo.", img: "https://blog-distiller.imgix.net/wp-content/uploads/2018/08/24143617/whiskeysourADOBE.jpg?", premium: true },
-            { id: 13, name: "Whisky com Gelo", desc: "Whisky selecionado e gelo.", img: "https://i.pinimg.com/474x/01/00/6d/01006d7987b4a31366abffc646d2302c.jpg", premium: true },
-            { id: 14, name: "Red Collins", desc: "Gin, xarope de hibisco, limão, agua com gás e gelo.", img: "https://socialbauru.com.br/wp-content/uploads/2026/06/bar-aeroclube-drink-684x1024.jpg", premium: false },
-            { id: 15, name: "Maracugim", desc: "Gin, maracujá, suco de limão, sprite e gelo.", img: "https://simplifica.efacil.com.br/wp-content/uploads/2025/05/hortela-de-molho-de-maracuja.jpg", premium: false },
-            { id: 16, name: "Tropicall", desc: "Rum ou Gin, abacaxi, hortelã, limão thaitti, suco de laranja e gelo.", img: "https://content.paodeacucar.com/wp-content/uploads/2025/09/caipirinha-abacaxi-hortela.jpg", premium: false },
-            { id: 17, name: "Raisin", desc: "Vodka ou cachaça, Uvas, manjerição, açucar, suco de raisin", img: "https://i.pinimg.com/originals/78/57/2a/78572aa9fb9f1611543b1102ffc7f569.jpg", premium: false },
-            { id: 18, name: "Harumê", desc: "Vodka ou Gin, Creme de abacaxi, Calda de Hibisco, Xarope Trad., Suco de Limão, Hortelã e Gelo", img: "https://mapadacachaca.com.br/wp-content/uploads/2026/03/serenia-coquetel-cachaca-vibra-brasil-optimized.jpg", premium: false },
-            { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false },
-            { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false },
-            { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false },
-            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false },
-            { id: 23, name: "Paradise", desc: "Rum ou Gin, Suco de Laranja, Grenadine, Suco de Abacaxi, Curaçau Blue e Gelo ", img: "https://i.pinimg.com/736x/43/e8/dd/43e8dd2e1dc58b2b5c3412720f5fca2a.jpg", premium: false },
-            { id: 24, name: "Garibaldi", desc: "Campari & Suco de Laranja e Gelo", img: "https://www.estadao.com.br/resizer/OuWF2B0C6CIxMZMWfQ6Q6QBlwjU=/arc-anglerfish-arc2-prod-estadao/public/PLGD23C32VJXXNE6T6AWNTUOGQ.jpg", premium: true },
-            { id: 25, name: "Dry Martini", desc: "Gim, Vermute Seco", img: "https://cdn.casaeculinaria.com/wp-content/uploads/2024/02/09100159/dry-martini.webp", premium: true },
-            { id: 26, name: "Cuba Libre", desc: "Rum, Cola Cola, limão e gelo", img: "https://res.cloudinary.com/cocktailarium/image/private/f_auto/b_auto:border_gradient:4,c_pad,h_432,w_648/q_100/v1/cocktails/CUBA_LIBRE_1_lkaoaw", premium: true }
+            { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833319/gintonica_jxu7ty.mp4" },
+            { id: 2, name: "Moscow Mule", desc: "Vodka, suco de limão, gengibre, espuma de gengibre, sprite e gelo", img: "https://blogs.correiobraziliense.com.br/lianasabo/wp-content/uploads/sites/25/2022/03/WhatsApp-Image-2022-03-17-at-17.41.24-550x524.jpeg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833316/moscow_btk02y.mp4" },
+            { id: 3, name: "Caip Frutas", desc: "Abacaxi, morango, maracujá, abacaxi com hortelã.", img: "https://i.ibb.co/1fywzrkF/Chat-GPT-Image-20-de-mar-de-2026-09-24-24.png", premium: false, video: "./videos/caips.mp4" },
+            { id: 4, name: "Negroni", desc: "Campari, gim, vermute rosso, Guarnição laranja e gelo.", img: "https://conteudo.imguol.com.br/c/entretenimento/73/2020/09/10/negroni-1599771396384_v2_3x4.jpg", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833318/negroni_qnvblm.mp4" },
+            { id: 5, name: "Aperol Spritz", desc: "Espumante, aperol, agua com gás ou sprite, e gelo.", img: "https://static.wixstatic.com/media/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg/v1/fill/w_480,h_638,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a037bb_2d6d3e0e33144a24a84e97335b6a309c~mv2.jpg", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833287/aperol_km7vyi.mp4" },
+            { id: 6, name: "Mojito", desc: "Rum, hortelã, xarope de menta, suco de limão, sprite e gelo.", img: "https://www.deliciousmagazine.co.uk/wp-content/uploads/2014/01/Mojito-768x960.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833318/mojito_tql1hq.mp4" },
+            { id: 7, name: "Sex on the Beach", desc: "Vodka, licor de pessêgo, suco de laranja, grenadine, laranja.", img: "https://thumbs.dreamstime.com/b/sexo-no-cocktail-da-praia-fundo-preto-115887247.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833327/sexonthebeach_uwsise.mp4" },
+            { id: 8, name: "Pina Colada", desc: "Rum, abacaxi, leite de cocô, leite condensado, e gelo.", img: "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2022/09/23/1631063638-receita-pina-colada.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833338/pinacolada_m06rsl.mp4" },
+            { id: 9, name: "Soda Italiana", desc: "Xaropes monin diversos, com agua com gás e gelo.", img: "https://resize.casapino.com.br/?u=https://cms-bomgourmet.s3.amazonaws.com/bomgourmet/2018/03/201803/liquori-soda-italiana-e2a4f9e0.jpg&w=661", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833335/soda_mnhr5e.mp4" },
+            { id: 10, name: "Cogumelo Azul", desc: "Gin, curaçau blue, limão, sprite e gelo.", img: "https://bartenderstore.com.br/wp-content/uploads/2023/08/Gin-Tonica-Azul-edit.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833296/azul_yjxixw.mp4" },
+            { id: 11, name: "Nectar", desc: "Vodka, licor de morango, leite condensado, suco de morango.", img: "https://cdn.deliway.com.br/blog/base/31c/0c1/78a/batidinha-morango.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833325/nectar_lo9xdn.mp4" },
+            { id: 12, name: "Whisky Sour", desc: "Whisky, suco de limão siciliano, xarope trad. e gelo.", img: "https://blog-distiller.imgix.net/wp-content/uploads/2018/08/24143617/whiskeysourADOBE.jpg?", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833349/whiskysour_opbuuf.mp4" },
+            { id: 13, name: "Whisky com Gelo", desc: "Whisky selecionado e gelo.", img: "https://i.pinimg.com/474x/01/00/6d/01006d7987b4a31366abffc646d2302c.jpg", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833341/whiskygelo_n5ceu4.mp4" },
+            { id: 14, name: "Red Collins", desc: "Gin, xarope de hibisco, limão, agua com gás e gelo.", img: "https://socialbauru.com.br/wp-content/uploads/2026/06/bar-aeroclube-drink-684x1024.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833329/redcollins_nhqmqq.mp4" },
+            { id: 15, name: "Maracugim", desc: "Gin, maracujá, suco de limão, sprite e gelo.", img: "https://simplifica.efacil.com.br/wp-content/uploads/2025/05/hortela-de-molho-de-maracuja.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833312/maracuja_xhudv8.mp4" },
+            { id: 16, name: "Tropicall", desc: "Rum ou Gin, abacaxi, hortelã, limão thaitti, suco de laranja e gelo.", img: "https://content.paodeacucar.com/wp-content/uploads/2025/09/caipirinha-abacaxi-hortela.jpg", premium: false, video: "./videos/tropical.mp4" },
+            { id: 17, name: "Raisin", desc: "Vodka ou cachaça, Uvas, manjerição, açucar, suco de raisin", img: "https://i.pinimg.com/originals/78/57/2a/78572aa9fb9f1611543b1102ffc7f569.jpg", premium: false, video: "./videos/raisin.mp4" },
+            { id: 18, name: "Harumê", desc: "Vodka ou Gin, Creme de abacaxi, Calda de Hibisco, Xarope Trad., Suco de Limão, Hortelã e Gelo", img: "https://mapadacachaca.com.br/wp-content/uploads/2026/03/serenia-coquetel-cachaca-vibra-brasil-optimized.jpg", premium: false, video: "./videos/harume.mp4" },
+            { id: 19, name: "Thé vert", desc: "Vodka ou Gin, matte limão ou pessêgo, suco de limão, guaraná e Gelo", img: "https://kanfa.com.br/wp-content/uploads/2021/05/drinks-com-cha-4.jpg", premium: false, video: "./videos/thevert.mp4" },
+            { id: 20, name: "Gin Tropical", desc: "Gin, Energetico Tropical, Rodelas de limão, alegrim, e Gelo", img: "https://static.wixstatic.com/media/49591c_a5a98e67b69c4c408b2b9948126b9105~mv2.jpg", premium: false, video: "./videos/gintropical.mp4" },
+            { id: 21, name: "Alquimia", desc: "Cachaça de canela e cravo, suco de limão, concentrado de maracujá, xarope trad. e Gelo", img: "https://i.pinimg.com/736x/78/e8/ab/78e8ab4883790656d56c0018d1faae8e.jpg", premium: false, video: "./videos/alquimia.mp4" },
+            { id: 22, name: "Fakerula", desc: "Amarula Caseila, conhaque, chocolate, creme de leite, leite condensado, leite e gelo", img: "https://conteudo.imguol.com.br/c8/2015/08/21/emarula-1440181194962_1024x768.jpg", premium: false, video: "./videos/fakerula.mp4" },
+            { id: 23, name: "Paradise", desc: "Rum ou Gin, Suco de Laranja, Grenadine, Suco de Abacaxi, Curaçau Blue e Gelo ", img: "https://i.pinimg.com/736x/43/e8/dd/43e8dd2e1dc58b2b5c3412720f5fca2a.jpg", premium: false, video: "./videos/paradise.mp4" },
+            { id: 24, name: "Garibaldi", desc: "Campari & Suco de Laranja e Gelo", img: "https://www.estadao.com.br/resizer/OuWF2B0C6CIxMZMWfQ6Q6QBlwjU=/arc-anglerfish-arc2-prod-estadao/public/PLGD23C32VJXXNE6T6AWNTUOGQ.jpg", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833304/garibaldi_ldr7pv.mp4" },
+            { id: 25, name: "Dry Martini", desc: "Gim, Vermute Seco", img: "https://cdn.casaeculinaria.com/wp-content/uploads/2024/02/09100159/dry-martini.webp", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833299/drymartini_mqkprd.mp4" },
+            { id: 26, name: "Cuba Libre", desc: "Rum, Cola Cola, limão e gelo", img: "https://res.cloudinary.com/cocktailarium/image/private/f_auto/b_auto:border_gradient:4,c_pad,h_432,w_648/q_100/v1/cocktails/CUBA_LIBRE_1_lkaoaw", premium: true, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833316/cubalibre_f0lkhr.mp4" }
         ];
 
         window.orderState = {
@@ -1188,20 +1209,62 @@
 
         window.showMenu = function() {
             const grid = document.getElementById('menu-grid-display');
-            grid.innerHTML = DRINKS_DB.map(drink => `
+            grid.innerHTML = DRINKS_DB.map(drink => {
+                const videoUrl = (drink.video || '').trim();
+                return `
                 <div class="menu-visual-card relative">
-                    ${drink.premium ? '<span class="absolute top-3 right-3 bg-black/90 text-[#d4af37] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase z-10 border border-[#d4af37]/30 shadow-[0_0_10px_rgba(212,175,55,0.3)]">Premium</span>' : ''}
-                    <img src="${drink.img}" class="menu-visual-img" alt="[Imagem de ${drink.name}]">
+                    ${drink.premium ? '<span class="absolute top-3 right-3 bg-black/90 text-[#d4af37] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase z-30 border border-[#d4af37]/30 shadow-[0_0_10px_rgba(212,175,55,0.3)]">Premium</span>' : ''}
+                    <div class="menu-preview-zone"
+                         onmouseenter="window.startMenuPreview('${drink.id}', '${videoUrl}')"
+                         onmouseleave="window.stopMenuPreview('${drink.id}')"
+                         ontouchstart="window.startMenuPreview('${drink.id}', '${videoUrl}')">
+                        <div id="menu-preview-box-${drink.id}" class="menu-preview-video-box"></div>
+                        <img id="menu-poster-${drink.id}" src="${drink.img}" class="menu-preview-poster" alt="[Imagem de ${drink.name}]">
+                        ${videoUrl ? '<span class="menu-preview-badge">▶ Trailer em Exibição</span>' : ''}
+                    </div>
                     <div class="p-6 bg-gradient-to-b from-[#151515] to-black">
                         <h4 class="gold-text brand-font text-2xl mb-2 text-glow">${drink.name}</h4>
                         <p class="text-gray-400 text-xs md:text-[11px] leading-relaxed uppercase tracking-widest">${drink.desc}</p>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             document.getElementById('modal-menu-visual').style.display = 'block';
         };
 
-        window.closeMenuVisual = function() { document.getElementById('modal-menu-visual').style.display = 'none'; };
+        let menuPreviewTimer = null;
+        let activeMenuPreviewId = null;
+
+        // NOVO: Toca o "trailer" do drink em loop mudo, com pequeno delay pra não carregar vídeo à toa
+        window.startMenuPreview = function(id, videoUrl) {
+            if (!videoUrl || activeMenuPreviewId === id) return;
+            clearTimeout(menuPreviewTimer);
+            menuPreviewTimer = setTimeout(() => {
+                activeMenuPreviewId = id;
+                const box = document.getElementById(`menu-preview-box-${id}`);
+                const poster = document.getElementById(`menu-poster-${id}`);
+                if (!box || !poster) return;
+                box.innerHTML = `<video class="w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline><source src="${videoUrl}" type="video/mp4"></video>`;
+                poster.style.opacity = '0';
+            }, 400);
+        };
+
+        window.stopMenuPreview = function(id) {
+            clearTimeout(menuPreviewTimer);
+            if (activeMenuPreviewId === id) {
+                const box = document.getElementById(`menu-preview-box-${id}`);
+                const poster = document.getElementById(`menu-poster-${id}`);
+                if (poster) poster.style.opacity = '1';
+                setTimeout(() => {
+                    if (box && activeMenuPreviewId !== id) box.innerHTML = '';
+                }, 500);
+                activeMenuPreviewId = null;
+            }
+        };
+
+        window.closeMenuVisual = function() {
+            document.getElementById('modal-menu-visual').style.display = 'none';
+            if (activeMenuPreviewId) window.stopMenuPreview(activeMenuPreviewId);
+        };
 
         window.resetCoupon = function() {
             window.orderState.couponCode = '';
@@ -1473,7 +1536,7 @@
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
-        window.closeAll = function() { document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none'); document.getElementById('modal-menu-visual').style.display = 'none'; };
+        window.closeAll = function() { document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none'); document.getElementById('modal-menu-visual').style.display = 'none'; if (activeMenuPreviewId) window.stopMenuPreview(activeMenuPreviewId); };
         window.backToDrinks = function() { window.closeAll(); document.getElementById('step-drinks').style.display = 'block'; };
 
         window.onload = function() { 
