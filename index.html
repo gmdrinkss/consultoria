@@ -967,8 +967,8 @@
             'DESC10': 0.10, 
             'DESC15': 0.15, 
             'VIP20': 0.20,
-            'CASAMENTODAANA': 0.15,
-            'JOAO10': 0.10
+            'FAZENDAPARADISOGMDRINKS': 0.15,
+            'CERIMONIALTOCCANTESGMDRINKS': 0.15,
         };
         // LISTA DOS DRINKS //
         const DRINKS_DB = [
@@ -1052,6 +1052,7 @@
             else if (guests <= 170) perPerson = 27.50;
             else if (guests <= 180) perPerson = 26.20;
             else if (guests <= 200) perPerson = 25.49;
+            else if (guests <= 250) perPerson = 25.30;
 
             if(guests > 119) { staff ="3 Bartenders+1 Barback"; extraCost = 100.00; }
             if (guests > 165) { staff ="4 Bartenders+1 Barback"; extraCost = 300.00; }
