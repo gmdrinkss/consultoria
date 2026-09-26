@@ -516,6 +516,80 @@
         .admin-tab-inactive:hover {
             color: #ffffff;
         }
+
+        /* ===== CRONÔMETRO DE PROMOÇÃO ===== */
+        .promo-banner-box {
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(0,0,0,0.4));
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 25px rgba(212,175,55,0.05);
+        }
+        .promo-time-box {
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            min-width: 54px;
+            padding: 8px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .promo-time-num {
+            font-size: 20px;
+            font-weight: 800;
+            color: #d4af37;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 15px rgba(212,175,55,0.4);
+        }
+        .promo-time-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #999;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+        .promo-time-sep {
+            color: #d4af37;
+            font-weight: 800;
+            font-size: 18px;
+            opacity: 0.5;
+        }
+        @media (max-width: 500px) {
+            .promo-time-box { min-width: 44px; padding: 6px 4px; }
+            .promo-time-num { font-size: 15px; }
+        }
+
+        /* Switch estilo iOS para ativar/desativar a promoção no painel admin */
+        .promo-toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; }
+        .promo-toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .promo-toggle-slider {
+            position: absolute; inset: 0; cursor: pointer;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            border-radius: 999px;
+        }
+        .promo-toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: #777;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+        .promo-toggle-switch input:checked + .promo-toggle-slider {
+            background-color: rgba(212, 175, 55, 0.25);
+            border-color: #d4af37;
+        }
+        .promo-toggle-switch input:checked + .promo-toggle-slider::before {
+            transform: translateX(22px);
+            background-color: #d4af37;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
@@ -574,6 +648,17 @@
             <h1 class="brand-font text-4xl md:text-5xl gold-text tracking-widest uppercase mb-1 clickable-title text-glow" onclick="window.triggerAdmin()">GMDrinks</h1>
             <p class="max-w-xl text-gray-400 text-sm md:text-xs italic mx-auto font-light">A sofisticação que o seu evento merece em cada detalhe.</p>
         </header>
+
+        <div id="promo-banner" class="hidden promo-banner-box w-full max-w-5xl mb-8 md:mb-10 px-5 py-5 md:px-8 md:py-6 flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <span class="text-3xl">🔥</span>
+                <div>
+                    <p class="gold-text font-black uppercase text-xs md:text-sm tracking-widest text-glow">Oferta por Tempo Limitado</p>
+                    <p class="text-gray-400 text-[10px] md:text-[11px] uppercase tracking-widest mt-0.5">Garanta seu desconto antes que o tempo acabe</p>
+                </div>
+            </div>
+            <div id="promo-countdown" class="flex items-center gap-2 md:gap-3"></div>
+        </div>
 
         <main id="main-content" class="w-full max-w-5xl space-y-10">
 
@@ -937,6 +1022,39 @@
     <div id="admin-panel" class="step-overlay" style="z-index: 10000;">
         <div class="max-w-4xl mx-auto mt-6 pb-20 px-4">
             <div onclick="window.closeAdmin()" class="btn-back">← Sair e Fechar</div>
+
+            <div class="schedule-box bg-[#151515] border-[#d4af37]/25 text-left">
+                <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+                    <h4 class="gold-text font-black uppercase text-sm md:text-base tracking-widest flex items-center gap-2">
+                        <span>⏳</span> Cronômetro da Promoção
+                    </h4>
+                    <div class="flex items-center gap-3">
+                        <span id="promo-status-badge" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-full bg-gray-700/50 text-gray-400 border border-gray-600">Inativa</span>
+                        <label class="promo-toggle-switch" title="Ativar / Desativar Promoção">
+                            <input type="checkbox" id="promo-active-toggle" onchange="window.togglePromoActive(this.checked)">
+                            <span class="promo-toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Dias Restantes</label>
+                        <input type="number" id="promo-days-input" min="0" value="0" class="input-date bg-black/60 text-center">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-500 uppercase font-bold ml-1 mb-1 block tracking-widest">Horas Restantes</label>
+                        <input type="number" id="promo-hours-input" min="0" max="23" value="0" class="input-date bg-black/60 text-center">
+                    </div>
+                </div>
+
+                <button type="button" onclick="window.startPromoTimer()" class="w-full gold-bg text-black py-3.5 rounded-xl font-black uppercase text-xs tracking-widest hover:brightness-110 transition-all shadow-[0_5px_15px_rgba(212,175,55,0.25)]">
+                    🚀 Definir Tempo e Ativar Promoção
+                </button>
+
+                <p id="promo-admin-info" class="text-[10px] text-gray-500 uppercase tracking-widest mt-4 text-center"></p>
+            </div>
+
             <div class="text-center mb-6">
                 <h3 class="brand-font text-4xl gold-text uppercase text-glow">Painel de Clientes</h3>
                 <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Gestão de Leads</p>
@@ -1748,6 +1866,139 @@
                 if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
             }
         });
+
+        // ==========================================
+        // CRONÔMETRO DA PROMOÇÃO (sincronizado via Firebase)
+        // O prazo final (endTime) é salvo como um timestamp absoluto.
+        // Assim, quando o cliente sair e voltar ao site (ou atualizar a página),
+        // o cronômetro continua exatamente de onde parou, refletindo o tempo real.
+        // ==========================================
+        const promoConfigRef = ref(db, 'promoConfig');
+        let promoCountdownInterval = null;
+
+        function formatPromoUnit(value) {
+            return String(Math.max(0, value)).padStart(2, '0');
+        }
+
+        window.updatePromoCountdownDisplay = function(endTime) {
+            const countdownEl = document.getElementById('promo-countdown');
+            if (!countdownEl) return;
+
+            const remaining = endTime - Date.now();
+            const days = Math.floor(remaining / 86400000);
+            const hours = Math.floor((remaining % 86400000) / 3600000);
+            const minutes = Math.floor((remaining % 3600000) / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+
+            countdownEl.innerHTML = `
+                <div class="promo-time-box"><span class="promo-time-num">${formatPromoUnit(days)}</span><span class="promo-time-label">Dias</span></div>
+                <span class="promo-time-sep">:</span>
+                <div class="promo-time-box"><span class="promo-time-num">${formatPromoUnit(hours)}</span><span class="promo-time-label">Horas</span></div>
+                <span class="promo-time-sep">:</span>
+                <div class="promo-time-box"><span class="promo-time-num">${formatPromoUnit(minutes)}</span><span class="promo-time-label">Min</span></div>
+                <span class="promo-time-sep">:</span>
+                <div class="promo-time-box"><span class="promo-time-num">${formatPromoUnit(seconds)}</span><span class="promo-time-label">Seg</span></div>
+            `;
+        };
+
+        window.renderPromoState = function(data) {
+            const banner = document.getElementById('promo-banner');
+            const statusBadge = document.getElementById('promo-status-badge');
+            const adminInfo = document.getElementById('promo-admin-info');
+            const toggle = document.getElementById('promo-active-toggle');
+
+            if (promoCountdownInterval) {
+                clearInterval(promoCountdownInterval);
+                promoCountdownInterval = null;
+            }
+
+            const now = Date.now();
+            const hasEndTime = !!(data && typeof data.endTime === 'number' && data.endTime > 0);
+            const isRunning = !!(data && data.active && hasEndTime && data.endTime > now);
+            const isExpired = !!(data && data.active && hasEndTime && data.endTime <= now);
+
+            if (toggle) toggle.checked = !!(data && data.active);
+
+            if (banner) {
+                if (isRunning) {
+                    banner.classList.remove('hidden');
+                    window.updatePromoCountdownDisplay(data.endTime);
+                    promoCountdownInterval = setInterval(() => {
+                        if (data.endTime - Date.now() <= 0) {
+                            clearInterval(promoCountdownInterval);
+                            banner.classList.add('hidden');
+                            return;
+                        }
+                        window.updatePromoCountdownDisplay(data.endTime);
+                    }, 1000);
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+
+            if (statusBadge) {
+                if (isRunning) {
+                    statusBadge.textContent = 'Ativa';
+                    statusBadge.className = 'text-[9px] font-black uppercase px-3 py-1.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/40';
+                } else if (isExpired) {
+                    statusBadge.textContent = 'Expirada';
+                    statusBadge.className = 'text-[9px] font-black uppercase px-3 py-1.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40';
+                } else {
+                    statusBadge.textContent = 'Inativa';
+                    statusBadge.className = 'text-[9px] font-black uppercase px-3 py-1.5 rounded-full bg-gray-700/50 text-gray-400 border border-gray-600';
+                }
+            }
+
+            if (adminInfo) {
+                if (hasEndTime) {
+                    const d = new Date(data.endTime);
+                    adminInfo.textContent = `Prazo definido para: ${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+                } else {
+                    adminInfo.textContent = 'Nenhum tempo definido ainda. Preencha os campos acima e clique em ativar.';
+                }
+            }
+        };
+
+        onValue(promoConfigRef, (snapshot) => {
+            const data = snapshot.exists() ? snapshot.val() : { active: false, endTime: 0 };
+            window.renderPromoState(data);
+        }, (error) => {
+            console.error("Erro ao escutar configuração da promoção:", error);
+        });
+
+        window.startPromoTimer = async function() {
+            const daysInput = document.getElementById('promo-days-input');
+            const hoursInput = document.getElementById('promo-hours-input');
+            const days = parseInt(daysInput ? daysInput.value : 0) || 0;
+            const hours = parseInt(hoursInput ? hoursInput.value : 0) || 0;
+
+            if (days <= 0 && hours <= 0) {
+                alert('Defina ao menos 1 dia ou 1 hora para iniciar a promoção.');
+                return;
+            }
+
+            const durationMs = (days * 86400000) + (hours * 3600000);
+            const endTime = Date.now() + durationMs;
+
+            try {
+                await set(promoConfigRef, {
+                    active: true,
+                    endTime: endTime,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (e) {
+                console.error("Erro ao salvar a promoção:", e);
+                alert('Não foi possível salvar a promoção. Verifique sua conexão e tente novamente.');
+            }
+        };
+
+        window.togglePromoActive = async function(isActive) {
+            try {
+                await update(promoConfigRef, { active: isActive });
+            } catch (e) {
+                console.error("Erro ao atualizar status da promoção:", e);
+            }
+        };
 
         window.saveLeadToFirebase = async function(data) {
             if (db && data.name) {
