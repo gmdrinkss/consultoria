@@ -590,6 +590,57 @@
             background-color: #d4af37;
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
         }
+
+        /* ===== RASTREAMENTO DE LEADS (PAINEL ADMIN) ===== */
+        .lead-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 4px 8px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
+        }
+        .badge-online  { background: rgba(34,197,94,0.15);  color: #4ade80; border-color: rgba(34,197,94,0.4); }
+        .badge-away    { background: rgba(234,179,8,0.12);  color: #facc15; border-color: rgba(234,179,8,0.35); }
+        .badge-offline { background: rgba(255,255,255,0.04); color: #9ca3af; border-color: rgba(255,255,255,0.1); }
+        .badge-hot     { background: rgba(239,68,68,0.15);  color: #f87171; border-color: rgba(239,68,68,0.4); }
+        .badge-warm    { background: rgba(249,115,22,0.12); color: #fb923c; border-color: rgba(249,115,22,0.35); }
+        .badge-cold    { background: rgba(56,189,248,0.10); color: #7dd3fc; border-color: rgba(56,189,248,0.3); }
+        .badge-neutral { background: rgba(212,175,55,0.08); color: #d4af37; border-color: rgba(212,175,55,0.3); }
+
+        .online-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+            box-shadow: 0 0 0 0 rgba(74,222,128,0.6); animation: onlinePulse 1.6s infinite;
+        }
+        @keyframes onlinePulse {
+            0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
+            100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+
+        .journey-list { border-left: 1px solid rgba(212,175,55,0.3); margin-left: 6px; padding-left: 14px; }
+        .journey-item { position: relative; padding: 5px 0; font-size: 10px; color: #d1d5db; line-height: 1.4; }
+        .journey-item::before {
+            content: ''; position: absolute; left: -18px; top: 10px; width: 7px; height: 7px;
+            border-radius: 50%; background: #d4af37; box-shadow: 0 0 6px rgba(212,175,55,0.6);
+        }
+        .journey-item.session::before { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.6); }
+        .journey-time { color: #6b7280; font-size: 9px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+
+        .admin-select {
+            background: #0d0d0d; border: 1px solid #333; color: #d4af37; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+            padding: 8px 10px; border-radius: 10px; outline: none;
+        }
+
+        #admin-toast-container {
+            position: fixed; top: 16px; right: 16px; z-index: 10050;
+            display: flex; flex-direction: column; gap: 10px; max-width: 320px; pointer-events: none;
+        }
+        .admin-toast {
+            background: #111; border: 1px solid rgba(212,175,55,0.5); border-radius: 14px;
+            padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            font-size: 11px; color: #fff; pointer-events: auto;
+            animation: toastIn 0.35s ease;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 pb-10">
@@ -606,6 +657,8 @@
             <h1 class="brand-font text-4xl gold-text mb-2 uppercase tracking-tighter clickable-title text-glow" onclick="window.triggerAdmin()">GMDrinks</h1>
             <p class="text-xs md:text-[10px] text-gray-400 uppercase tracking-[0.4em] mb-6">Consultoria de Drinks</p>
             
+            <p id="welcome-back-msg" class="hidden gold-text text-[11px] mb-4 font-bold uppercase tracking-widest bg-[#d4af37]/10 p-2.5 rounded-lg border border-[#d4af37]/30"></p>
+
             <p id="validation-msg" class="text-red-500 text-[10px] hidden mb-4 font-bold uppercase tracking-widest bg-red-900/20 p-2 rounded-lg border border-red-500/20 backdrop-blur-sm">Por favor, preencha todos os campos.</p>
 
             <div class="space-y-1 relative z-10">
@@ -639,7 +692,8 @@
             <button type="button" onclick="window.unlockApp()" class="w-full py-5 gold-bg text-black font-black uppercase rounded-xl text-sm md:text-[11px] tracking-widest mt-6 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all btn-shine relative z-10">
                 Acessar Orçamentos
             </button>
-            <p class="text-[11px] md:text-[9px] text-gray-500 mt-6 uppercase tracking-widest relative z-10">Experiência Premium Garantida</p>
+            <p class="text-[10px] md:text-[9px] text-gray-500 mt-4 leading-relaxed relative z-10">Ao continuar, você concorda com o uso dos seus dados e da sua navegação nesta página para elaborarmos e acompanharmos o seu orçamento, conforme a LGPD.</p>
+            <p class="text-[11px] md:text-[9px] text-gray-500 mt-4 uppercase tracking-widest relative z-10">Experiência Premium Garantida</p>
         </div>
     </div>
 
@@ -707,7 +761,7 @@
                                     <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
                                     <div class="flex items-center bg-black/40 p-1 rounded-xl border border-white/10">
                                         <button type="button" onclick="window.stepValue('Essencial', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputEssencial" value="50" oninput="window.updateDisplay()" class="input-gold w-16 h-[44px] text-lg font-bold">
+                                        <input type="number" id="guestInputEssencial" value="50" oninput="window.updateDisplay(); window.trackGuestsChange(this.id === 'guestInputEssencial' ? 'Essencial' : 'Premium')" class="input-gold w-16 h-[44px] text-lg font-bold">
                                         <button type="button" onclick="window.stepValue('Essencial', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
@@ -813,7 +867,7 @@
                                     <span class="text-xs md:text-[10px] uppercase font-bold text-gray-400 tracking-wider">Convidados</span>
                                     <div class="flex items-center bg-black/40 p-1 rounded-xl border border-white/10">
                                         <button onclick="window.stepValue('Premium', -1)" class="btn-step rounded-l-lg">−</button>
-                                        <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay()" class="input-gold w-16 h-[44px] text-lg font-bold">
+                                        <input type="number" id="guestInputPremium" value="50" oninput="window.updateDisplay(); window.trackGuestsChange(this.id === 'guestInputEssencial' ? 'Essencial' : 'Premium')" class="input-gold w-16 h-[44px] text-lg font-bold">
                                         <button onclick="window.stepValue('Premium', 1)" class="btn-step rounded-r-lg">+</button>
                                     </div>
                                 </div>
@@ -1006,15 +1060,15 @@
             </div>
             <div class="space-y-5">
                 <div>
-                    <label class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block ml-1">Usuário</label>
-                    <input type="text" id="admin-user" placeholder="Digite o usuário" class="w-full bg-black border border-gray-700 p-4 rounded-xl text-sm text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
+                    <label class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block ml-1">E-mail</label>
+                    <input type="email" id="admin-user" autocomplete="username" placeholder="Digite o e-mail do admin" class="w-full bg-black border border-gray-700 p-4 rounded-xl text-sm text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
                 </div>
                 <div>
                     <label class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block ml-1">Senha</label>
-                    <input type="password" id="admin-pass" placeholder="Digite a senha" class="w-full bg-black border border-gray-700 p-4 rounded-xl text-sm text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
+                    <input type="password" id="admin-pass" autocomplete="current-password" placeholder="Digite a senha" onkeydown="if(event.key==='Enter') window.processAdminLogin()" class="w-full bg-black border border-gray-700 p-4 rounded-xl text-sm text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
                 </div>
                 <p id="admin-error-msg" class="text-red-500 text-[10px] hidden text-center font-bold uppercase tracking-widest bg-red-500/10 py-2 rounded-lg">Credenciais Incorretas</p>
-                <button type="button" onclick="window.processAdminLogin()" class="w-full gold-bg text-black py-4 mt-2 rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_5px_15px_rgba(212,175,55,0.3)]">Entrar no Painel</button>
+                <button type="button" id="admin-login-btn" onclick="window.processAdminLogin()" class="w-full gold-bg text-black py-4 mt-2 rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_5px_15px_rgba(212,175,55,0.3)]">Entrar no Painel</button>
             </div>
         </div>
     </div>
@@ -1055,13 +1109,43 @@
                 <p id="promo-admin-info" class="text-[10px] text-gray-500 uppercase tracking-widest mt-4 text-center"></p>
             </div>
 
+            <div class="schedule-box bg-[#151515] border-[#d4af37]/25 text-left">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                    <h4 class="gold-text font-black uppercase text-sm md:text-base tracking-widest flex items-center gap-2">
+                        <span>🎟</span> Cupons de Desconto
+                    </h4>
+                    <span class="text-[9px] text-gray-500 uppercase tracking-widest">Ficam guardados no Firebase, não no código</span>
+                </div>
+                <div class="flex gap-2 mb-4 flex-wrap sm:flex-nowrap">
+                    <input type="text" id="coupon-new-code" placeholder="CÓDIGO (EX: NATAL15)" class="input-date bg-black/60 uppercase flex-1 min-w-[160px]">
+                    <input type="number" id="coupon-new-percent" placeholder="% OFF" min="0" max="99" step="any" class="input-date bg-black/60 text-center w-24 sm:w-28">
+                    <button type="button" onclick="window.addCoupon()" class="gold-bg text-black px-5 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:brightness-110 transition-all whitespace-nowrap">+ Adicionar</button>
+                </div>
+                <p id="coupon-admin-msg" class="text-[10px] uppercase tracking-widest font-bold mb-3 hidden"></p>
+                <div id="admin-coupons-list" class="flex flex-wrap gap-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Carregando cupons...</p>
+                </div>
+            </div>
+
             <div class="text-center mb-6">
                 <h3 class="brand-font text-4xl gold-text uppercase text-glow">Painel de Clientes</h3>
                 <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Acesso Restrito - Gestão de Leads</p>
-                
-                <div class="flex justify-center gap-6 mt-8 border-b border-white/10 pb-1">
+
+                <div id="admin-stats-bar" class="flex justify-center flex-wrap gap-2 mt-6"></div>
+
+                <div class="flex justify-center gap-6 mt-6 border-b border-white/10 pb-1">
                     <button onclick="window.setAdminTab('todos')" id="tab-todos" class="admin-tab-active text-[10px] uppercase font-bold tracking-widest pb-2 transition-all">Todos os Leads</button>
                     <button onclick="window.setAdminTab('reservados')" id="tab-reservados" class="admin-tab-inactive text-[10px] uppercase font-bold tracking-widest pb-2 transition-all">Agenda (Reservados)</button>
+                </div>
+
+                <div class="flex justify-between items-center gap-3 mt-4 flex-wrap">
+                    <select id="admin-sort-select" onchange="window.setAdminSort(this.value)" class="admin-select">
+                        <option value="recentes">Mais recentes</option>
+                        <option value="quentes">🔥 Mais quentes</option>
+                        <option value="online">🟢 Online primeiro</option>
+                        <option value="tempo">⏱ Mais tempo de tela</option>
+                    </select>
+                    <button type="button" id="admin-alerts-btn" onclick="window.toggleAdminAlerts()" class="admin-select hover:border-[#d4af37] transition-all">🔕 Alertas desligados</button>
                 </div>
             </div>
             <div id="admin-leads-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 mt-4">
@@ -1073,24 +1157,39 @@
         </div>
     </div>
 
+    <div id="admin-toast-container"></div>
+
     <script>
         // ==========================================
         // CONFIGURAÇÕES PRINCIPAIS E TAXAS
         // ==========================================
         const WHATSAPP_NUMBER = "5531983684231";
         
-        // BANCO DE CUPONS
-        const COUPONS_DB = {
-            'DESC05': 0.05, 
-            'DESC10': 0.10, 
-            'DESC15': 0.15, 
-            'VIP20': 0.20,
-            'FAZENDAPARADISOGMDRINKS': 0.15,
-            'CERIMONIALTOCCANTESGMDRINKS': 0.15,
-            'CIBELLE': 0.00001,
-            'ROSILDA': 0.00001,
-            
+        // CUPONS: agora ficam no Firebase (nó "coupons") e são gerenciados pelo Painel Admin.
+        // Assim ninguém consegue ver a lista de cupons abrindo o código-fonte do site.
+
+        // ==========================================
+        // RASTREAMENTO DE NAVEGAÇÃO (atalhos usados pelo site)
+        // window.trackEvent é definido no módulo do Firebase mais abaixo.
+        // ==========================================
+        window.track = function(type, detail) {
+            try { if (typeof window.trackEvent === 'function') window.trackEvent(type, detail || ''); } catch (e) {}
         };
+
+        const trackDebounceTimers = {};
+        window.trackDebounced = function(key, type, getDetail, delay) {
+            clearTimeout(trackDebounceTimers[key]);
+            trackDebounceTimers[key] = setTimeout(() => window.track(type, getDetail()), delay || 2000);
+        };
+
+        window.trackGuestsChange = function(plan) {
+            window.trackDebounced('guests-' + plan, 'alterou_convidados', () => {
+                const val = parseInt(document.getElementById(`guestInput${plan}`).value) || 0;
+                return `${plan}: ${val} convidados`;
+            });
+        };
+
+        const videosVistosNaSessao = new Set();
         // LISTA DOS DRINKS //
         const DRINKS_DB = [
             { id: 1, name: "Gin Tônica", desc: "Gin, limão, agua tônica, especiarias e gelo.", img: "https://canaldareceita.com.br/wp-content/uploads/2025/02/GIN-TONICA.jpg", premium: false, video: "https://res.cloudinary.com/s9v2u9sg/video/upload/v1783833319/gintonica_jxu7ty.mp4" },
@@ -1231,6 +1330,10 @@
                 window.orderState.extraHoursPremium = Math.max(0, window.orderState.extraHoursPremium + amount);
                 document.getElementById('extra-hours-premium-count').innerText = `${window.orderState.extraHoursPremium} Horas`;
             }
+            window.trackDebounced('hours-' + plan, 'ajustou_horas', () => {
+                const n = plan === 'Essencial' ? window.orderState.extraHoursEssencial : window.orderState.extraHoursPremium;
+                return `${plan}: +${n} hora(s) extra(s)`;
+            });
             window.updateDisplay();
         };
 
@@ -1246,7 +1349,7 @@
             const subtotalE = baseTotalE + totalHorasExtrasE + window.orderState.displacementFee;
             const valorCheioE = subtotalE / 0.75;
             
-            document.getElementById('perPersonEssencial').innerText = fmt((baseTotalE + totalHorasExtrasE) / guestsE);
+            document.getElementById('perPersonEssencial').innerText = fmt(guestsE > 0 ? (baseTotalE + totalHorasExtrasE) / guestsE : 0);
             document.getElementById('oldPriceEssencial').innerText = fmt(valorCheioE);
             document.getElementById('priceEssencial').innerText = fmt(subtotalE);
             document.getElementById('staffEssencial').innerText = dataE.staff;
@@ -1272,7 +1375,7 @@
             const subtotalP = baseTotalP + totalHorasExtrasP + window.orderState.displacementFee;
             const valorCheioP = subtotalP / 0.75;
 
-            document.getElementById('perPersonPremium').innerText = fmt((baseTotalP + totalHorasExtrasP) / guestsP);
+            document.getElementById('perPersonPremium').innerText = fmt(guestsP > 0 ? (baseTotalP + totalHorasExtrasP) / guestsP : 0);
             document.getElementById('oldPricePremium').innerText = fmt(valorCheioP);
             document.getElementById('pricePremium').innerText = fmt(subtotalP);
             document.getElementById('staffPremium').innerText = dataP.staff;
@@ -1307,6 +1410,7 @@
             let val = (parseInt(input.value) || 0) + amount;
             if (val < 20) val = 20;
             input.value = val;
+            window.trackGuestsChange(plan);
             window.updateDisplay();
         };
 
@@ -1351,6 +1455,7 @@
                 </div>
             `}).join('');
             document.getElementById('modal-menu-visual').style.display = 'block';
+            window.track('abriu_cardapio');
         };
 
         let menuPreviewTimer = null;
@@ -1367,6 +1472,13 @@
                 if (!box || !poster) return;
                 box.innerHTML = `<video class="w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline><source src="${videoUrl}" type="video/mp4"></video>`;
                 poster.style.opacity = '0';
+
+                // Registra cada vídeo só uma vez por visita, para não encher a jornada
+                if (!videosVistosNaSessao.has(String(id))) {
+                    videosVistosNaSessao.add(String(id));
+                    const drink = DRINKS_DB.find(d => String(d.id) === String(id));
+                    window.track('viu_video', drink ? drink.name : '');
+                }
             }, 400);
         };
 
@@ -1426,7 +1538,8 @@
             
             const buttons = document.querySelectorAll('.btn-pay-action');
             buttons.forEach(btn => btn.innerText = "Quero essa (Escolher Drinks)");
-            
+
+            window.track('simulou_pagamento', `${plan} · ${window.orderState.guests} convidados · ${window.orderState.durationStr} · ${fmt(window.orderState.totalValue)}`);
             window.goToPayment();
         };
 
@@ -1459,6 +1572,7 @@
             document.getElementById('btn-close-sim').style.display = 'none';
             document.getElementById('simulation-notice').classList.add('hidden');
             document.getElementById('step-drinks').style.display = 'block';
+            window.track('escolheu_plano', `${plan} · ${window.orderState.guests} convidados · ${window.orderState.durationStr} · ${fmt(window.orderState.totalValue)}`);
             window.renderDrinkSelectionGrid();
         };
 
@@ -1492,8 +1606,13 @@
 
         window.toggleDrink = function(name) {
             const idx = window.orderState.drinks.indexOf(name);
-            if(idx > -1) window.orderState.drinks.splice(idx, 1);
-            else if(window.orderState.drinks.length < window.orderState.maxDrinks) window.orderState.drinks.push(name);
+            if(idx > -1) {
+                window.orderState.drinks.splice(idx, 1);
+                window.track('removeu_drink', name);
+            } else if(window.orderState.drinks.length < window.orderState.maxDrinks) {
+                window.orderState.drinks.push(name);
+                window.track('selecionou_drink', name);
+            }
             window.renderDrinkSelectionGrid();
         };
 
@@ -1511,6 +1630,8 @@
             window.orderState.totalValue = subtotal;
             window.orderState.valorCheio = subtotal / 0.75;
             window.orderState.priceStr = fmt(window.orderState.totalValue);
+            window.orderState.durationStr = `${5 + extraHours} Horas`;
+            window.track('upgrade_premium', `${window.orderState.guests} convidados · ${fmt(subtotal)}`);
             window.renderDrinkSelectionGrid();
         };
 
@@ -1539,7 +1660,11 @@
         window.goToPayment = function() {
             document.querySelectorAll('.step-overlay').forEach(el => el.style.display = 'none');
             document.getElementById('step-pay').style.display = 'block';
-            
+
+            if (!window.orderState.isQuickSimulation && window.orderState.drinks.length > 0) {
+                window.track('confirmou_drinks', `${window.orderState.drinks.length} drinks: ${window.orderState.drinks.join(', ')}`);
+            }
+
             const cupomInputEl = document.getElementById('coupon-input');
             if(cupomInputEl && cupomInputEl.value && window.orderState.discountPercent === 0) {
                 window.applyCoupon();
@@ -1550,26 +1675,38 @@
             window.scrollTo(0,0);
         };
 
-        window.applyCoupon = function() {
+        window.applyCoupon = async function() {
             const input = document.getElementById('coupon-input').value.trim().toUpperCase();
             const msgEl = document.getElementById('coupon-msg');
-            
+
             if(!input) return;
 
-            if(COUPONS_DB[input]) {
+            msgEl.textContent = "Verificando cupom...";
+            msgEl.className = "text-[11px] mt-3 text-gray-400 font-bold uppercase tracking-widest block text-center";
+
+            let percent = null;
+            try {
+                if (typeof window.lookupCoupon === 'function') percent = await window.lookupCoupon(input);
+            } catch (e) {
+                console.error("Erro ao verificar cupom:", e);
+            }
+
+            if(percent) {
                 window.orderState.couponCode = input;
-                window.orderState.discountPercent = COUPONS_DB[input];
-                
-                msgEl.innerHTML = `✓ Cupom de ${COUPONS_DB[input] * 100}% aplicado com sucesso!`;
+                window.orderState.discountPercent = percent;
+
+                msgEl.textContent = `✓ Cupom de ${parseFloat((percent * 100).toFixed(3))}% aplicado com sucesso!`;
                 msgEl.className = "text-[11px] mt-3 text-green-400 font-bold uppercase tracking-widest block text-center";
+                window.track('aplicou_cupom', `${input} (${parseFloat((percent * 100).toFixed(3))}%)`);
             } else {
                 window.orderState.couponCode = '';
                 window.orderState.discountPercent = 0;
-                
-                msgEl.innerHTML = "✕ Cupom inválido ou expirado.";
+
+                msgEl.textContent = "✕ Cupom inválido ou expirado.";
                 msgEl.className = "text-[11px] mt-3 text-red-500 font-bold uppercase tracking-widest block text-center";
+                window.track('cupom_invalido', input);
             }
-            
+
             window.renderPaymentExamples();
         };
 
@@ -1644,7 +1781,7 @@
             msg += `*DESCONTO 25% OFF:* -${fmt(window.orderState.valorCheio - window.orderState.totalValue)}\n`;
             
             if(window.orderState.discountPercent > 0) {
-                msg += `*CUPOM APLICADO:* ${window.orderState.couponCode} (-${window.orderState.discountPercent * 100}% extra)\n`;
+                msg += `*CUPOM APLICADO:* ${window.orderState.couponCode} (-${parseFloat((window.orderState.discountPercent * 100).toFixed(3))}% extra)\n`;
                 msg += `*DESCONTO DO CUPOM:* -${fmt(window.orderState.totalValue * window.orderState.discountPercent)}\n`;
             }
             msg += `*VALOR FINAL:* ${fmt(window.orderState.finalTotal)}\n\n`;
@@ -1654,6 +1791,7 @@
             msg += `\nOlá! Gostaria de validar minha data com as condições simuladas no app.`;
             
             if(window.finishOrderToFirebase) window.finishOrderToFirebase(method);
+            window.track('clicou_whatsapp', `${window.orderState.plan} · ${method} · ${fmt(window.orderState.finalTotal)}`);
             
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
@@ -1683,44 +1821,23 @@
         };
 
         let adminClicks = 0;
-        
-        window.processAdminLogin = function() {
-            const user = document.getElementById('admin-user').value;
-            const pass = document.getElementById('admin-pass').value;
-            
-            // USUÁRIO E SENHA DEFINIDOS
-            if(user === 'ADMINGM' && pass === 'RETEIME123') {
-                document.getElementById('admin-login-modal').style.display = 'none';
-                localStorage.setItem('gmd_admin_session', 'true');
-                document.getElementById('admin-panel').style.display = 'flex';
-                document.getElementById('admin-error-msg').classList.add('hidden');
-                
-                document.getElementById('admin-user').value = '';
-                document.getElementById('admin-pass').value = '';
-                
-                if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
-            } else {
-                document.getElementById('admin-error-msg').classList.remove('hidden');
-            }
-        };
+        let adminClicksTimer = null;
 
+        // Login, logout e abertura do painel ficam no módulo do Firebase (Firebase Auth),
+        // assim nenhuma senha fica escrita no código do site.
         window.triggerAdmin = function() {
             adminClicks++;
+            clearTimeout(adminClicksTimer);
+            adminClicksTimer = setTimeout(() => { adminClicks = 0; }, 2000);
             if(adminClicks >= 7) {
-                if(localStorage.getItem('gmd_admin_session') === 'true') {
-                    document.getElementById('admin-panel').style.display = 'flex';
-                    if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
+                adminClicks = 0;
+                if(window.isAdminUser && typeof window.openAdminPanel === 'function') {
+                    window.openAdminPanel();
                 } else {
+                    document.getElementById('admin-error-msg').classList.add('hidden');
                     document.getElementById('admin-login-modal').style.display = 'flex';
                 }
-                adminClicks = 0;
             }
-            setTimeout(() => { adminClicks = 0; }, 2000); 
-        };
-        
-        window.closeAdmin = function() {
-            localStorage.setItem('gmd_admin_session', 'false'); 
-            document.getElementById('admin-panel').style.display = 'none';
         };
 
         window.setAdminTab = function(tabName) {
@@ -1779,12 +1896,13 @@
             document.getElementById('eventDate').value = eventDate;
 
             if(window.saveLeadToFirebase) {
-                window.saveLeadToFirebase({ 
-                    name, 
-                    whatsapp, 
-                    eventDate, 
+                window.saveLeadToFirebase({
+                    name,
+                    whatsapp,
+                    eventDate,
                     guests,
-                    regionName: window.orderState.regionName
+                    regionName: window.orderState.regionName,
+                    displacementFee: window.orderState.displacementFee
                 });
             }
 
@@ -1801,6 +1919,39 @@
                 window.updateDisplay();
                 window.calcTimeline(); 
             }, 1000);
+        };
+
+        // Cliente que já preencheu antes: o formulário volta preenchido e o lead continua o mesmo
+        window.prefillBarrier = function(lead) {
+            if (!lead) return;
+            const setIfEmpty = (id, value) => {
+                const el = document.getElementById(id);
+                if (el && !el.value && value !== undefined && value !== null && value !== '') el.value = value;
+            };
+            setIfEmpty('lead-name-barrier', lead.name);
+            setIfEmpty('lead-whatsapp-barrier', lead.whatsapp);
+            setIfEmpty('lead-guests-barrier', lead.guests);
+
+            // Só reaproveita a data se ela ainda estiver no futuro
+            const dateEl = document.getElementById('lead-date-barrier');
+            if (dateEl && !dateEl.value && lead.eventDate && /^\d{4}-\d{2}-\d{2}$/.test(lead.eventDate)) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                if (lead.eventDate >= tomorrow.toISOString().split("T")[0]) dateEl.value = lead.eventDate;
+            }
+
+            const regionSelect = document.getElementById('lead-region-barrier');
+            if (regionSelect && !regionSelect.value && lead.region) {
+                const opt = Array.from(regionSelect.options).find(o => o.text === lead.region);
+                if (opt) regionSelect.selectedIndex = opt.index;
+            }
+
+            const welcome = document.getElementById('welcome-back-msg');
+            if (welcome) {
+                const firstName = String(lead.name || '').trim().split(' ')[0];
+                welcome.textContent = `Que bom te ver de novo${firstName ? ', ' + firstName : ''}! Confira seus dados e continue.`;
+                welcome.classList.remove('hidden');
+            }
         };
 
         window.recoverLead = function(name, phone, eventDate, guests) {
@@ -1826,8 +1977,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, push, set, get, onValue, update, onDisconnect, serverTimestamp, increment, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCzPZhMjCv-CrYavikjwF2Vq5kDKr5uXyg",
@@ -1843,29 +1994,406 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
+        // ==========================================
+        // UTILITÁRIOS
+        // ==========================================
+        const LEAD_STORAGE_KEY = 'gmd_lead_id';
+        const ALERTS_STORAGE_KEY = 'gmd_admin_alerts';
+
+        const storage = {
+            get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+            set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+            remove(k) { try { localStorage.removeItem(k); } catch (e) {} }
+        };
+        storage.remove('gmd_admin_session'); // limpeza do login antigo
+
+        // Protege o painel contra códigos maliciosos digitados nos campos do formulário
+        const esc = (v) => String(v ?? '').replace(/[&<>"'`]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
+        const onlyDigits = (v) => String(v || '').replace(/\D/g, '');
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const fmtBRL = (v) => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        // Relógio do servidor (corrige diferença de horário do aparelho do admin)
+        let serverTimeOffset = 0;
+        onValue(ref(db, '.info/serverTimeOffset'), (snap) => { serverTimeOffset = Number(snap.val()) || 0; });
+        const serverNow = () => Date.now() + serverTimeOffset;
+
+        function timeAgo(ts) {
+            if (typeof ts !== 'number') return '-';
+            const diff = Math.max(0, serverNow() - ts);
+            const min = Math.floor(diff / 60000);
+            if (min < 1) return 'agora mesmo';
+            if (min < 60) return `há ${min} min`;
+            const h = Math.floor(min / 60);
+            if (h < 24) return `há ${h} h`;
+            const d = Math.floor(h / 24);
+            if (d < 30) return `há ${d} ${d === 1 ? 'dia' : 'dias'}`;
+            return `em ${new Date(ts).toLocaleDateString('pt-BR')}`;
+        }
+
+        function fmtDuration(totalSecs) {
+            const s = Math.max(0, Math.floor(Number(totalSecs) || 0));
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            if (h > 0) return `${h}h ${String(m).padStart(2, '0')}min`;
+            if (m > 0) return `${m}min ${String(sec).padStart(2, '0')}s`;
+            return `${sec}s`;
+        }
+
+        function fmtDateTime(ts) {
+            if (typeof ts !== 'number') return '--';
+            const d = new Date(ts);
+            return `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+        // ==========================================
+        // AUTENTICAÇÃO (visitante anônimo x admin com e-mail/senha)
+        // ==========================================
         let currentUser = null;
         let currentLeadId = null;
-        let isAdminActive = localStorage.getItem('gmd_admin_session') === 'true';
-        
-        let globalLeads = [];
-        window.adminListenerAttached = false;
+        let restoredLead = null;
+        let isAdmin = false;
+        window.isAdminUser = false;
 
-        const initAuth = async () => {
+        let resolveAuthReady;
+        const authReady = new Promise(r => { resolveAuthReady = r; });
+        const waitForAuth = (ms = 8000) => Promise.race([authReady, sleep(ms)]);
+
+        async function checkIsAdmin(uid) {
             try {
-                await signInAnonymously(auth);
-            } catch(e) { 
-                console.warn("Autenticação anônima pendente.", e.code); 
+                const snap = await get(ref(db, 'admins/' + uid));
+                return snap.val() === true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function setAdminState(value) {
+            isAdmin = !!value;
+            window.isAdminUser = isAdmin;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                currentUser = null;
+                setAdminState(false);
+                try {
+                    await signInAnonymously(auth);
+                } catch (e) {
+                    console.warn("Login anônimo indisponível. Ative 'Anônimo' em Authentication no Firebase.", e.code);
+                    resolveAuthReady();
+                }
+                return;
+            }
+
+            currentUser = user;
+            if (!user.isAnonymous) {
+                const ok = await checkIsAdmin(user.uid);
+                setAdminState(ok);
+                if (ok) window.openAdminPanel();
+            } else {
+                setAdminState(false);
+            }
+            resolveAuthReady();
+            tryRestoreLead();
+        });
+
+        // ==========================================
+        // LEAD ÚNICO: o mesmo cliente volta sempre para o mesmo card
+        // ==========================================
+        let restorePromise = null;
+
+        function tryRestoreLead() {
+            if (!restorePromise) restorePromise = restoreLead();
+            return restorePromise;
+        }
+
+        async function restoreLead() {
+            const id = storage.get(LEAD_STORAGE_KEY);
+            if (!id || !currentUser) return;
+            try {
+                const snap = await get(ref(db, 'leads/' + id));
+                const lead = snap.val();
+                if (snap.exists() && lead && lead.userId === currentUser.uid) {
+                    currentLeadId = id;
+                    restoredLead = lead;
+                    if (typeof window.prefillBarrier === 'function') window.prefillBarrier(lead);
+                } else {
+                    storage.remove(LEAD_STORAGE_KEY);
+                }
+            } catch (e) {
+                storage.remove(LEAD_STORAGE_KEY);
+            }
+        }
+
+        window.saveLeadToFirebase = async function(data) {
+            if (!data || !data.name) return;
+            await waitForAuth();
+            if (!currentUser) {
+                console.warn("Sem autenticação no Firebase: o lead não foi salvo.");
+                return;
+            }
+            await Promise.race([tryRestoreLead(), sleep(5000)]);
+
+            const info = {
+                name: String(data.name).trim().slice(0, 120),
+                whatsapp: String(data.whatsapp).trim().slice(0, 40),
+                eventDate: data.eventDate || "Não informada",
+                guests: parseInt(data.guests) || 0,
+                region: data.regionName || "Não informada",
+                displacementFee: Number(data.displacementFee) || 0,
+                lastVisitAt: serverTimestamp()
+            };
+
+            // Outra pessoa usando o mesmo aparelho (WhatsApp diferente) vira um lead novo
+            if (currentLeadId && restoredLead && onlyDigits(restoredLead.whatsapp) !== onlyDigits(info.whatsapp)) {
+                currentLeadId = null;
+                restoredLead = null;
+                storage.remove(LEAD_STORAGE_KEY);
+            }
+
+            if (currentLeadId) {
+                try {
+                    await update(ref(db, 'leads/' + currentLeadId), info);
+                    startTracking(currentLeadId);
+                    return;
+                } catch (e) {
+                    console.warn("Lead anterior indisponível, criando um novo.", e);
+                    currentLeadId = null;
+                    storage.remove(LEAD_STORAGE_KEY);
+                }
+            }
+
+            try {
+                const newLeadRef = push(ref(db, 'leads'));
+                await set(newLeadRef, {
+                    ...info,
+                    timestamp: new Date().toISOString(),
+                    userId: currentUser.uid,
+                    status: 'Captado (Iniciou Orçamento)',
+                    isReserved: false,
+                    timeOnSite: 0,
+                    visits: 0
+                });
+                currentLeadId = newLeadRef.key;
+                storage.set(LEAD_STORAGE_KEY, currentLeadId);
+                startTracking(currentLeadId);
+            } catch (e) {
+                console.error("Erro ao guardar dados do cliente:", e);
             }
         };
-        
-        initAuth();
-        onAuthStateChanged(auth, (user) => { 
-            currentUser = user; 
-            if(user && isAdminActive) {
-                document.getElementById('admin-panel').style.display = 'flex';
-                if(typeof window.fetchAdminLeads === 'function') window.fetchAdminLeads();
+
+        // ==========================================
+        // RASTREAMENTO: presença online + tempo de tela + jornada
+        // ==========================================
+        const HEARTBEAT_MS = 15000;          // envia o tempo acumulado a cada 15s
+        const IDLE_MS = 2 * 60 * 1000;       // 2 min sem mexer = para de contar
+        const MAX_FLUSH_SECONDS = 60;        // trava de segurança por envio
+
+        let trackingLeadId = null;
+        let visibleSince = null;
+        let pendingMs = 0;
+        let lastInteraction = Date.now();
+
+        function accumulateTime() {
+            const now = Date.now();
+            if (visibleSince !== null) {
+                const activeUntil = Math.min(now, lastInteraction + IDLE_MS);
+                if (activeUntil > visibleSince) pendingMs += activeUntil - visibleSince;
             }
-        });
+            visibleSince = document.visibilityState === 'visible' ? now : null;
+        }
+
+        function flushTime() {
+            if (!trackingLeadId) return;
+            accumulateTime();
+            let secs = Math.floor(pendingMs / 1000);
+            if (secs <= 0) return;
+            pendingMs -= secs * 1000;
+            secs = Math.min(secs, MAX_FLUSH_SECONDS);
+            update(ref(db, 'leads/' + trackingLeadId), {
+                timeOnSite: increment(secs),
+                lastSeen: serverTimestamp()
+            }).catch(() => {});
+        }
+
+        function markInteraction() {
+            const now = Date.now();
+            if (now - lastInteraction > IDLE_MS) {
+                // voltou de uma pausa: fecha a conta da pausa (sem contar) e recomeça daqui
+                accumulateTime();
+                lastInteraction = now;
+                if (document.visibilityState === 'visible') visibleSince = now;
+                if (trackingLeadId) update(ref(db, 'leads/' + trackingLeadId), { lastSeen: serverTimestamp() }).catch(() => {});
+                return;
+            }
+            lastInteraction = now;
+        }
+
+        function startTracking(leadId) {
+            if (!leadId || trackingLeadId === leadId) return;
+            trackingLeadId = leadId;
+            const leadPath = 'leads/' + leadId;
+
+            update(ref(db, leadPath), { visits: increment(1), lastSeen: serverTimestamp() }).catch(() => {});
+            window.trackEvent('sessao_iniciada', isMobile ? 'Celular' : 'Computador');
+
+            // Presença: cada aba aberta é uma "conexão". Quando a aba fecha, a internet cai
+            // ou o celular bloqueia, o próprio servidor do Firebase remove a conexão.
+            onValue(ref(db, '.info/connected'), (snap) => {
+                if (snap.val() !== true) return;
+                const conRef = push(ref(db, leadPath + '/connections'));
+                onDisconnect(conRef).remove()
+                    .then(() => set(conRef, true))
+                    .catch((e) => console.warn("Presença indisponível:", e));
+                onDisconnect(ref(db, leadPath + '/lastSeen')).set(serverTimestamp()).catch(() => {});
+            });
+
+            // Tempo de tela: só conta com a aba visível e a pessoa ativa
+            lastInteraction = Date.now();
+            visibleSince = document.visibilityState === 'visible' ? Date.now() : null;
+            ['pointerdown', 'pointermove', 'keydown', 'scroll', 'touchstart', 'wheel'].forEach(ev => {
+                window.addEventListener(ev, markInteraction, { passive: true, capture: true });
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    lastInteraction = Date.now();
+                    visibleSince = Date.now();
+                    update(ref(db, leadPath), { lastSeen: serverTimestamp() }).catch(() => {});
+                } else {
+                    flushTime();
+                    visibleSince = null;
+                }
+            });
+            window.addEventListener('pagehide', flushTime);
+            setInterval(flushTime, HEARTBEAT_MS);
+        }
+
+        // Registra uma ação do cliente na jornada (detalhes em leadEvents, contador no lead)
+        window.trackEvent = function(type, detail = '') {
+            const leadId = currentLeadId;
+            if (!leadId || !currentUser || !type) return;
+            try {
+                const eventKey = push(ref(db, 'leadEvents/' + leadId)).key;
+                const updates = {};
+                updates[`leadEvents/${leadId}/${eventKey}`] = {
+                    type: String(type).slice(0, 40),
+                    detail: String(detail || '').slice(0, 300),
+                    at: serverTimestamp()
+                };
+                updates[`leads/${leadId}/eventCounts/${type}`] = increment(1);
+                updates[`leads/${leadId}/lastSeen`] = serverTimestamp();
+                update(ref(db), updates).catch((e) => console.warn("Evento não registrado:", e));
+            } catch (e) {
+                console.warn("Evento não registrado:", e);
+            }
+        };
+
+        window.finishOrderToFirebase = async function(method) {
+            if (!currentLeadId) return;
+            try {
+                await update(ref(db, 'leads/' + currentLeadId), {
+                    plan: window.orderState.plan || "Nenhum",
+                    duration: window.orderState.durationStr || "Padrão",
+                    drinks: window.orderState.drinks || [],
+                    totalValue: window.orderState.priceStr || "R$ 0,00",
+                    coupon: window.orderState.couponCode || "Nenhum",
+                    discountValue: window.orderState.discountValue || 0,
+                    finalValue: window.orderState.finalTotal || window.orderState.totalValue,
+                    paymentMethod: method,
+                    status: 'Orçamento Finalizado'
+                });
+            } catch (e) {
+                console.error("Erro ao atualizar progresso:", e);
+            }
+        };
+
+        // ==========================================
+        // CUPONS (guardados no Firebase)
+        // O visitante só consegue consultar um código específico; a lista completa é só do admin.
+        // ==========================================
+        window.lookupCoupon = async function(code) {
+            const c = String(code || '').trim().toUpperCase();
+            if (!c || /[.#$\[\]\/]/.test(c)) return null;
+            await waitForAuth(4000);
+            const snap = await get(ref(db, 'coupons/' + c));
+            const v = snap.val();
+            return (typeof v === 'number' && v > 0 && v < 1) ? v : null;
+        };
+
+        let couponsUnsub = null;
+
+        function listenCoupons() {
+            if (couponsUnsub) return;
+            couponsUnsub = onValue(ref(db, 'coupons'), (snap) => {
+                renderCoupons(snap.val() || {});
+            }, (error) => {
+                couponsUnsub = null;
+                const list = document.getElementById('admin-coupons-list');
+                if (list) list.innerHTML = `<p class="text-[10px] text-red-400 uppercase tracking-widest">Sem permissão para ler os cupons. Confira as regras do Firebase.</p>`;
+                console.error("Erro ao ler cupons:", error);
+            });
+        }
+
+        function renderCoupons(data) {
+            const list = document.getElementById('admin-coupons-list');
+            if (!list) return;
+            const entries = Object.entries(data).sort((a, b) => a[0].localeCompare(b[0]));
+            if (entries.length === 0) {
+                list.innerHTML = `<p class="text-[10px] text-gray-500 uppercase tracking-widest">Nenhum cupom cadastrado ainda.</p>`;
+                return;
+            }
+            list.innerHTML = entries.map(([code, value]) => `
+                <span class="inline-flex items-center gap-2 bg-[#d4af37]/10 border border-[#d4af37]/30 rounded-lg pl-3 pr-1 py-1">
+                    <span class="text-[10px] font-black text-white tracking-widest">${esc(code)}</span>
+                    <span class="text-[10px] gold-text font-bold">${esc(parseFloat((Number(value) * 100).toFixed(3)))}%</span>
+                    <button type="button" data-code="${esc(code)}" onclick="window.removeCoupon(this.dataset.code)" class="w-6 h-6 rounded-md text-red-400 hover:bg-red-500/20 transition-all" title="Excluir cupom">×</button>
+                </span>
+            `).join('');
+        }
+
+        function couponMsg(text, ok) {
+            const el = document.getElementById('coupon-admin-msg');
+            if (!el) return;
+            el.textContent = text;
+            el.className = `text-[10px] uppercase tracking-widest font-bold mb-3 ${ok ? 'text-green-400' : 'text-red-400'}`;
+            clearTimeout(couponMsg.timer);
+            couponMsg.timer = setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+
+        window.addCoupon = async function() {
+            if (!isAdmin) return;
+            const codeEl = document.getElementById('coupon-new-code');
+            const pctEl = document.getElementById('coupon-new-percent');
+            const code = String(codeEl.value || '').trim().toUpperCase();
+            const pct = parseFloat(String(pctEl.value || '').replace(',', '.'));
+
+            if (!/^[A-Z0-9_-]{2,40}$/.test(code)) return couponMsg('Use só letras, números, - ou _ (2 a 40 caracteres).', false);
+            if (!(pct > 0 && pct < 100)) return couponMsg('O desconto precisa ser maior que 0% e menor que 100%.', false);
+
+            try {
+                await set(ref(db, 'coupons/' + code), pct / 100);
+                codeEl.value = '';
+                pctEl.value = '';
+                couponMsg(`Cupom ${code} (${pct}%) salvo!`, true);
+            } catch (e) {
+                console.error(e);
+                couponMsg('Não foi possível salvar. Confira as regras do Firebase.', false);
+            }
+        };
+
+        window.removeCoupon = async function(code) {
+            if (!isAdmin || !code) return;
+            if (!confirm(`Excluir o cupom ${code}? Ele deixa de funcionar na hora.`)) return;
+            try {
+                await set(ref(db, 'coupons/' + code), null);
+                couponMsg(`Cupom ${code} excluído.`, true);
+            } catch (e) {
+                couponMsg('Não foi possível excluir.', false);
+            }
+        };
 
         // ==========================================
         // CRONÔMETRO DA PROMOÇÃO (sincronizado via Firebase)
@@ -2000,71 +2528,171 @@
             }
         };
 
-        window.saveLeadToFirebase = async function(data) {
-            if (db && data.name) {
-                try {
-                    const leadsRef = ref(db, 'leads');
-                    const newLeadRef = push(leadsRef); 
-                    
-                    await set(newLeadRef, {
-                        name: data.name,
-                        whatsapp: data.whatsapp,
-                        eventDate: data.eventDate || "Não informada",
-                        guests: data.guests || 0,
-                        region: data.regionName || "Não informada",
-                        timestamp: new Date().toISOString(),
-                        userId: currentUser ? currentUser.uid : 'visitante-' + Math.random().toString(36).substr(2, 9),
-                        status: 'Captado (Iniciou Orçamento)',
-                        isReserved: false
-                    });
-                    
-                    currentLeadId = newLeadRef.key; 
-                } catch(e) { 
-                    console.error("Erro ao guardar dados do cliente:", e); 
+        // ==========================================
+        // LOGIN DO ADMIN (Firebase Auth — e-mail e senha)
+        // ==========================================
+        window.processAdminLogin = async function() {
+            const emailEl = document.getElementById('admin-user');
+            const passEl = document.getElementById('admin-pass');
+            const errEl = document.getElementById('admin-error-msg');
+            const btn = document.getElementById('admin-login-btn');
+            const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
+
+            const email = String(emailEl.value || '').trim();
+            const pass = String(passEl.value || '');
+            if (!email || !pass) return showErr('Preencha e-mail e senha');
+
+            errEl.classList.add('hidden');
+            const originalText = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                const ok = await checkIsAdmin(cred.user.uid);
+                if (!ok) {
+                    await signOut(auth);
+                    showErr('Este usuário não tem permissão de admin');
+                    return;
                 }
+                setAdminState(true);
+                document.getElementById('admin-login-modal').style.display = 'none';
+                emailEl.value = '';
+                passEl.value = '';
+                window.openAdminPanel();
+            } catch (e) {
+                const code = e && e.code ? e.code : '';
+                if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-email'].includes(code)) showErr('E-mail ou senha incorretos');
+                else if (code === 'auth/too-many-requests') showErr('Muitas tentativas. Aguarde alguns minutos');
+                else if (code === 'auth/operation-not-allowed') showErr('Ative o login por E-mail/Senha no Firebase');
+                else if (code === 'auth/network-request-failed') showErr('Sem conexão com a internet');
+                else showErr('Erro ao entrar: ' + (code || 'tente novamente'));
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = originalText; }
             }
         };
 
-        window.finishOrderToFirebase = async function(method) {
-            if (db && currentLeadId) {
-                try {
-                    const leadRef = ref(db, 'leads/' + currentLeadId);
-                    await update(leadRef, {
-                        plan: window.orderState.plan || "Nenhum",
-                        duration: window.orderState.durationStr || "Padrão",
-                        drinks: window.orderState.drinks || [],
-                        totalValue: window.orderState.priceStr || "R$ 0,00",
-                        coupon: window.orderState.couponCode || "Nenhum",
-                        discountValue: window.orderState.discountValue || 0,
-                        finalValue: window.orderState.finalTotal || window.orderState.totalValue,
-                        paymentMethod: method,
-                        status: 'Orçamento Finalizado'
-                    });
-                } catch(e) { 
-                    console.error("Erro ao atualizar progresso:", e); 
-                }
-            }
+        window.openAdminPanel = function() {
+            if (!isAdmin) return;
+            document.getElementById('admin-login-modal').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'flex';
+            listenCoupons();
+            window.fetchAdminLeads();
+            updateAlertsButton();
+            startPanelClock();
         };
 
-        window.toggleReservation = async function(leadId, currentStatus) {
-            if (db && leadId) {
-                try {
-                    const leadRef = ref(db, 'leads/' + leadId);
-                    await update(leadRef, {
-                        isReserved: !currentStatus
-                    });
-                } catch(e) { 
-                    console.error("Erro ao atualizar reserva:", e); 
-                }
-            }
+        window.closeAdmin = async function() {
+            document.getElementById('admin-panel').style.display = 'none';
+            if (leadsUnsub) { leadsUnsub(); leadsUnsub = null; }
+            if (couponsUnsub) { couponsUnsub(); couponsUnsub = null; }
+            stopPanelClock();
+            globalLeads = [];
+            firstLeadsSnapshot = true;
+            prevConnected.clear();
+            knownLeadIds.clear();
+            journeyCache.clear();
+            openJourneys.clear();
+            setAdminState(false);
+            try { await signOut(auth); } catch (e) {}
         };
+
+        // ==========================================
+        // PAINEL DE CLIENTES
+        // ==========================================
+        let globalLeads = [];
+        let leadsUnsub = null;
+        let firstLeadsSnapshot = true;
+        const prevConnected = new Map();
+        const knownLeadIds = new Set();
+        const openJourneys = new Set();
+        const journeyCache = new Map();  // leadId -> { loading, events, count, error }
+        const drafts = {};               // textos digitados no painel e ainda não salvos
+        window.currentAdminSort = 'recentes';
+
+        const EVENT_LABELS = {
+            sessao_iniciada:    { icon: '🚪', label: 'Entrou na plataforma' },
+            abriu_cardapio:     { icon: '📖', label: 'Abriu o cardápio' },
+            viu_video:          { icon: '🎬', label: 'Assistiu ao vídeo' },
+            alterou_convidados: { icon: '👥', label: 'Alterou convidados' },
+            ajustou_horas:      { icon: '⏱', label: 'Ajustou horas extras' },
+            escolheu_plano:     { icon: '✅', label: 'Escolheu o plano' },
+            simulou_pagamento:  { icon: '💳', label: 'Simulou pagamento' },
+            selecionou_drink:   { icon: '🍸', label: 'Selecionou drink' },
+            removeu_drink:      { icon: '➖', label: 'Removeu drink' },
+            upgrade_premium:    { icon: '🏆', label: 'Fez upgrade para o Premium' },
+            confirmou_drinks:   { icon: '📝', label: 'Confirmou os drinks' },
+            aplicou_cupom:      { icon: '🎟', label: 'Aplicou cupom' },
+            cupom_invalido:     { icon: '⚠️', label: 'Tentou cupom inválido' },
+            clicou_whatsapp:    { icon: '📲', label: 'Enviou orçamento no WhatsApp' }
+        };
+
+        // Pontos do termômetro: cada ação vale X pontos, até um limite
+        const SCORE_RULES = {
+            abriu_cardapio:     { pts: 5,  max: 5 },
+            viu_video:          { pts: 2,  max: 10 },
+            alterou_convidados: { pts: 1,  max: 4 },
+            ajustou_horas:      { pts: 3,  max: 6 },
+            escolheu_plano:     { pts: 10, max: 10 },
+            simulou_pagamento:  { pts: 8,  max: 16 },
+            selecionou_drink:   { pts: 1,  max: 10 },
+            upgrade_premium:    { pts: 10, max: 10 },
+            confirmou_drinks:   { pts: 10, max: 10 },
+            aplicou_cupom:      { pts: 8,  max: 8 },
+            cupom_invalido:     { pts: 3,  max: 3 },
+            clicou_whatsapp:    { pts: 25, max: 25 }
+        };
+        const HOT_SCORE = 45;
+        const WARM_SCORE = 20;
+
+        function computeScore(lead) {
+            const counts = lead.eventCounts || {};
+            let score = 0;
+            for (const [type, rule] of Object.entries(SCORE_RULES)) {
+                score += Math.min((Number(counts[type]) || 0) * rule.pts, rule.max);
+            }
+            if (!counts.clicou_whatsapp && lead.status === 'Orçamento Finalizado') score += 25; // leads antigos
+            score += Math.min(Math.floor((Number(lead.timeOnSite) || 0) / 60), 15);           // 1 ponto por minuto (até 15)
+            score += Math.min(Math.max((Number(lead.visits) || 0) - 1, 0) * 6, 18);          // 6 pontos por visita extra (até 18)
+            return score;
+        }
+
+        function getTier(lead) {
+            const score = computeScore(lead);
+            if (score >= HOT_SCORE) return { key: 'hot', label: 'Quente', icon: '🔥', cls: 'badge-hot', score };
+            if (score >= WARM_SCORE) return { key: 'warm', label: 'Morno', icon: '🌤', cls: 'badge-warm', score };
+            return { key: 'cold', label: 'Frio', icon: '❄️', cls: 'badge-cold', score };
+        }
+
+        const hasConnections = (lead) => !!(lead.connections && Object.keys(lead.connections).length > 0);
+
+        function getPresence(lead) {
+            const connected = hasConnections(lead);
+            const last = typeof lead.lastSeen === 'number' ? lead.lastSeen : null;
+            const since = last !== null ? serverNow() - last : Infinity;
+
+            if (connected && since < 60 * 1000) {
+                return { key: 'online', rank: 0, html: `<span class="lead-badge badge-online"><span class="online-dot"></span>Online agora</span>` };
+            }
+            if (connected && since < 30 * 60 * 1000) {
+                return { key: 'away', rank: 1, html: `<span class="lead-badge badge-away">🟡 Ausente · ativo ${esc(timeAgo(last))}</span>` };
+            }
+            if (last !== null) {
+                return { key: 'offline', rank: 2, html: `<span class="lead-badge badge-offline">⚫ Visto ${esc(timeAgo(last))}</span>` };
+            }
+            return { key: 'none', rank: 3, html: `<span class="lead-badge badge-offline">Sem rastreio</span>` };
+        }
+
+        const totalActions = (lead) => Object.entries(lead.eventCounts || {})
+            .filter(([type]) => type !== 'sessao_iniciada')
+            .reduce((sum, [, n]) => sum + (Number(n) || 0), 0);
+        const totalEvents = (lead) => Object.values(lead.eventCounts || {}).reduce((sum, n) => sum + (Number(n) || 0), 0);
 
         window.fetchAdminLeads = function() {
             const container = document.getElementById('admin-leads-container');
-            if(!db || !container) return;
+            if (!container || !isAdmin) return;
 
-            if(window.adminListenerAttached) {
-                window.renderAdminLeads();
+            if (leadsUnsub) {
+                safeRenderLeads(true);
                 return;
             }
 
@@ -2075,145 +2703,372 @@
                 </div>
             `;
 
-            const leadsRef = ref(db, 'leads');
-            
-            onValue(leadsRef, (snapshot) => {
-                window.adminListenerAttached = true;
-                if (!snapshot.exists()) {
-                    globalLeads = [];
-                    window.renderAdminLeads();
-                    return;
-                }
-
-                const data = snapshot.val();
-                globalLeads = [];
-                
-                for (let id in data) {
-                    globalLeads.push({ id: id, ...data[id] });
-                }
-                
-                globalLeads.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                window.renderAdminLeads();
+            leadsUnsub = onValue(ref(db, 'leads'), (snapshot) => {
+                const data = snapshot.val() || {};
+                globalLeads = Object.entries(data).map(([id, v]) => ({ id, ...(v || {}) }));
+                detectAlerts();
+                refreshOpenJourneys();
+                safeRenderLeads();
             }, (error) => {
+                leadsUnsub = null;
                 console.error("Erro ao escutar banco de dados:", error);
-                container.innerHTML = `<div class="text-center py-10"><p class="text-red-500 text-xs font-bold uppercase mb-2">Erro de Conexão</p><p class="text-[10px] text-gray-400">Ative o "Logon Anônimo" e coloque as regras no Firebase.</p></div>`;
+                container.innerHTML = `<div class="text-center py-10"><p class="text-red-500 text-xs font-bold uppercase mb-2">Sem acesso aos leads</p><p class="text-[10px] text-gray-400">Confira se as regras do Firebase foram publicadas e se o seu UID está cadastrado em "admins".</p></div>`;
             });
         };
 
-        window.saveLeadDetails = async function(leadId, btnElement) {
-            const addressInput = document.getElementById(`address-${leadId}`);
-            const payInfoInput = document.getElementById(`payinfo-${leadId}`);
-            
-            if (db && leadId && addressInput && payInfoInput) {
-                try {
-                    const originalText = btnElement.innerHTML;
-                    btnElement.innerHTML = "⏳ Salvando...";
-                    
-                    const leadRef = ref(db, 'leads/' + leadId);
-                    await update(leadRef, {
-                        eventAddress: addressInput.value,
-                        adminPaymentInfo: payInfoInput.value
-                    });
-                    
-                    btnElement.innerHTML = "✅ Salvo com sucesso!";
-                    btnElement.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/50');
-                    
-                    setTimeout(() => {
-                        btnElement.innerHTML = originalText;
-                        btnElement.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/50');
-                    }, 2000);
-                    
-                } catch(e) {
-                    console.error("Erro ao salvar detalhes:", e);
-                    btnElement.innerHTML = "❌ Erro ao salvar";
-                }
+        // Re-renderiza sem atrapalhar: não apaga o que você está digitando nem "come" cliques
+        let pendingRender = false;
+        let lastRenderAt = 0;
+        let renderTimer = null;
+        let pointerDownInPanel = false;
+
+        function safeRenderLeads(force) {
+            const container = document.getElementById('admin-leads-container');
+            if (!container || document.getElementById('admin-panel').style.display !== 'flex') return;
+
+            const active = document.activeElement;
+            const typing = active && container.contains(active) && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+            if (typing || pointerDownInPanel) {
+                pendingRender = true;
+                return;
             }
+
+            const elapsed = Date.now() - lastRenderAt;
+            if (!force && elapsed < 1500) {
+                clearTimeout(renderTimer);
+                renderTimer = setTimeout(() => safeRenderLeads(true), 1500 - elapsed);
+                return;
+            }
+
+            pendingRender = false;
+            lastRenderAt = Date.now();
+            const scrollTop = container.scrollTop;
+            window.renderAdminLeads();
+            container.scrollTop = scrollTop;
+        }
+
+        (function attachPanelGuards() {
+            const container = document.getElementById('admin-leads-container');
+            if (!container) return;
+            container.addEventListener('pointerdown', () => { pointerDownInPanel = true; });
+            window.addEventListener('pointerup', () => {
+                if (!pointerDownInPanel) return;
+                pointerDownInPanel = false;
+                setTimeout(() => { if (pendingRender) safeRenderLeads(true); }, 200);
+            });
+            window.addEventListener('pointercancel', () => { pointerDownInPanel = false; });
+            container.addEventListener('focusout', () => {
+                setTimeout(() => { if (pendingRender) safeRenderLeads(true); }, 600);
+            });
+            container.addEventListener('input', (e) => {
+                const id = e.target && e.target.id;
+                if (id && (id.startsWith('address-') || id.startsWith('payinfo-'))) drafts[id] = e.target.value;
+            });
+        })();
+
+        // Atualiza os "há X min" e o status online a cada 30s
+        let panelClock = null;
+        function startPanelClock() {
+            if (panelClock) return;
+            panelClock = setInterval(() => safeRenderLeads(), 30000);
+        }
+        function stopPanelClock() {
+            clearInterval(panelClock);
+            panelClock = null;
+        }
+
+        window.setAdminSort = function(value) {
+            window.currentAdminSort = value || 'recentes';
+            safeRenderLeads(true);
         };
+
+        // ---------- Jornada do cliente ----------
+        async function loadJourney(leadId) {
+            const lead = globalLeads.find(l => l.id === leadId);
+            journeyCache.set(leadId, { ...(journeyCache.get(leadId) || {}), loading: true, error: null });
+            safeRenderLeads(true);
+            try {
+                const snap = await get(query(ref(db, 'leadEvents/' + leadId), limitToLast(200)));
+                const events = [];
+                snap.forEach(child => { events.push({ id: child.key, ...child.val() }); });
+                events.sort((a, b) => (b.at || 0) - (a.at || 0)); // mais recentes primeiro
+                journeyCache.set(leadId, { loading: false, events, count: lead ? totalEvents(lead) : events.length, error: null });
+            } catch (e) {
+                console.error("Erro ao carregar jornada:", e);
+                journeyCache.set(leadId, { loading: false, events: [], count: 0, error: 'Não foi possível carregar a jornada.' });
+            }
+            safeRenderLeads(true);
+        }
+
+        function refreshOpenJourneys() {
+            openJourneys.forEach(leadId => {
+                const lead = globalLeads.find(l => l.id === leadId);
+                const cache = journeyCache.get(leadId);
+                if (lead && cache && !cache.loading && cache.count !== totalEvents(lead)) loadJourney(leadId);
+            });
+        }
+
+        window.toggleJourney = function(leadId) {
+            if (openJourneys.has(leadId)) {
+                openJourneys.delete(leadId);
+                safeRenderLeads(true);
+                return;
+            }
+            openJourneys.add(leadId);
+            loadJourney(leadId);
+        };
+
+        function renderJourney(leadId) {
+            const cache = journeyCache.get(leadId);
+            if (!cache || (cache.loading && !cache.events)) {
+                return `<div class="py-4 text-center"><div class="loading-spinner"></div></div>`;
+            }
+            if (cache.error) return `<p class="text-[10px] text-red-400 py-3">${esc(cache.error)}</p>`;
+            if (!cache.events || cache.events.length === 0) {
+                return `<p class="text-[10px] text-gray-500 py-3 italic">Nenhuma ação registrada ainda. A jornada aparece para clientes que entraram depois desta atualização.</p>`;
+            }
+            return `
+                <div class="journey-list max-h-72 overflow-y-auto mt-3 pr-2">
+                    ${cache.events.map(ev => {
+                        const info = EVENT_LABELS[ev.type] || { icon: '•', label: ev.type };
+                        return `
+                            <div class="journey-item ${ev.type === 'sessao_iniciada' ? 'session' : ''}">
+                                <span class="journey-time">${esc(fmtDateTime(ev.at))}</span>
+                                <span>${info.icon} <b class="text-white">${esc(info.label)}</b>${ev.detail ? ` <span class="text-gray-400">· ${esc(ev.detail)}</span>` : ''}</span>
+                            </div>`;
+                    }).join('')}
+                </div>
+                ${cache.events.length >= 200 ? '<p class="text-[9px] text-gray-600 mt-2 uppercase tracking-widest">Mostrando as 200 ações mais recentes</p>' : ''}
+            `;
+        }
+
+        // ---------- Alertas ----------
+        const alertsEnabled = () => storage.get(ALERTS_STORAGE_KEY) === '1';
+
+        function updateAlertsButton() {
+            const btn = document.getElementById('admin-alerts-btn');
+            if (!btn) return;
+            btn.textContent = alertsEnabled() ? '🔔 Alertas ligados' : '🔕 Alertas desligados';
+            btn.style.borderColor = alertsEnabled() ? '#d4af37' : '';
+        }
+
+        let audioCtx = null;
+        function playBeep() {
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return;
+                audioCtx = audioCtx || new Ctx();
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 880;
+                g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.02);
+                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+                o.connect(g).connect(audioCtx.destination);
+                o.start();
+                o.stop(audioCtx.currentTime + 0.4);
+            } catch (e) {}
+        }
+
+        function showToast(title, body) {
+            const box = document.getElementById('admin-toast-container');
+            if (!box) return;
+            const el = document.createElement('div');
+            el.className = 'admin-toast';
+            const t = document.createElement('p');
+            t.className = 'gold-text font-black uppercase tracking-widest text-[10px] mb-1';
+            t.textContent = title;
+            const b = document.createElement('p');
+            b.className = 'text-gray-300';
+            b.textContent = body;
+            el.appendChild(t);
+            el.appendChild(b);
+            box.appendChild(el);
+            setTimeout(() => { el.style.transition = 'opacity 0.4s'; el.style.opacity = '0'; }, 7000);
+            setTimeout(() => el.remove(), 7500);
+        }
+
+        function notifyAdmin(title, body) {
+            showToast(title, body);
+            if (!alertsEnabled()) return;
+            playBeep();
+            try {
+                if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body });
+            } catch (e) {}
+        }
+
+        window.toggleAdminAlerts = async function() {
+            if (alertsEnabled()) {
+                storage.set(ALERTS_STORAGE_KEY, '0');
+                updateAlertsButton();
+                return;
+            }
+            storage.set(ALERTS_STORAGE_KEY, '1');
+            playBeep(); // libera o som no navegador
+            if ('Notification' in window && Notification.permission === 'default') {
+                try { await Notification.requestPermission(); } catch (e) {}
+            }
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                showToast('Alertas ligados', 'Seu navegador não liberou notificações do sistema. Os avisos vão aparecer aqui no painel, com som.');
+            } else {
+                showToast('Alertas ligados', 'Você será avisado quando chegar lead novo ou quando um lead morno/quente voltar ao site.');
+            }
+            updateAlertsButton();
+        };
+
+        function detectAlerts() {
+            globalLeads.forEach(lead => {
+                const connected = hasConnections(lead);
+                if (!firstLeadsSnapshot) {
+                    if (!knownLeadIds.has(lead.id)) {
+                        notifyAdmin('🆕 Novo lead', `${lead.name || 'Sem nome'} · ${lead.guests || 0} convidados`);
+                    } else if (connected && !prevConnected.get(lead.id)) {
+                        const tier = getTier(lead);
+                        if (tier.key !== 'cold') notifyAdmin(`${tier.icon} Lead ${tier.label.toLowerCase()} online agora`, `${lead.name || 'Sem nome'} · ${lead.guests || 0} convidados`);
+                    }
+                }
+                prevConnected.set(lead.id, connected);
+                knownLeadIds.add(lead.id);
+            });
+            firstLeadsSnapshot = false;
+        }
+
+        // ---------- Renderização ----------
+        function sortLeads(list) {
+            const byRecent = (a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
+            const sort = window.currentAdminSort;
+            if (sort === 'quentes') return list.sort((a, b) => computeScore(b) - computeScore(a) || byRecent(a, b));
+            if (sort === 'tempo') return list.sort((a, b) => (Number(b.timeOnSite) || 0) - (Number(a.timeOnSite) || 0) || byRecent(a, b));
+            if (sort === 'online') return list.sort((a, b) => getPresence(a).rank - getPresence(b).rank || (Number(b.lastSeen) || 0) - (Number(a.lastSeen) || 0));
+            return list.sort(byRecent);
+        }
+
+        function renderStats() {
+            const bar = document.getElementById('admin-stats-bar');
+            if (!bar) return;
+            const online = globalLeads.filter(l => getPresence(l).key === 'online').length;
+            const hot = globalLeads.filter(l => getTier(l).key === 'hot').length;
+            const today = new Date().toDateString();
+            const newToday = globalLeads.filter(l => l.timestamp && new Date(l.timestamp).toDateString() === today).length;
+            bar.innerHTML = `
+                <span class="lead-badge badge-online">${online > 0 ? '<span class="online-dot"></span>' : ''}${online} online agora</span>
+                <span class="lead-badge badge-hot">🔥 ${hot} quentes</span>
+                <span class="lead-badge badge-neutral">🆕 ${newToday} hoje</span>
+                <span class="lead-badge badge-offline">${globalLeads.length} leads no total</span>
+            `;
+        }
 
         window.renderAdminLeads = function() {
             const container = document.getElementById('admin-leads-container');
-            if(!container) return;
+            if (!container) return;
+
+            renderStats();
 
             let leadsToRender = [...globalLeads];
-
-            if(window.currentAdminTab === 'reservados') {
+            if (window.currentAdminTab === 'reservados') {
                 leadsToRender = leadsToRender.filter(lead => lead.isReserved === true);
             }
+            sortLeads(leadsToRender);
 
-            if(leadsToRender.length === 0) {
+            if (leadsToRender.length === 0) {
                 container.innerHTML = `<p class="text-center text-gray-500 py-10 italic">${window.currentAdminTab === 'reservados' ? 'Sua agenda está vazia no momento.' : 'Nenhum cliente preencheu os dados.'}</p>`;
                 return;
             }
-            
+
             let html = '';
             leadsToRender.forEach(lead => {
-                const cleanWhatsApp = lead.whatsapp ? lead.whatsapp.replace(/\D/g,'') : '';
+                const id = esc(lead.id);
+                const cleanWhatsApp = onlyDigits(lead.whatsapp);
                 const waLink = `https://wa.me/55${cleanWhatsApp}`;
                 const isReserved = lead.isReserved === true;
-                const isAbandoned = lead.status && lead.status.includes('Captado');
+                const isAbandoned = !!(lead.status && String(lead.status).includes('Captado'));
                 const statusClass = !isAbandoned ? 'text-green-400' : 'text-yellow-500';
-                
+
                 const cardBorderClass = isReserved ? 'border border-[#d4af37] shadow-[0_0_20px_rgba(212,175,55,0.15)] bg-[#111]' : 'border border-transparent shadow-xl bg-[#151515]';
-                const reserveBtnClass = isReserved 
-                    ? 'bg-gray-800 text-gray-400 border border-gray-600 hover:bg-gray-700' 
+                const reserveBtnClass = isReserved
+                    ? 'bg-gray-800 text-gray-400 border border-gray-600 hover:bg-gray-700'
                     : 'bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/50 hover:bg-[#d4af37]/40';
 
-                let priceText = lead.totalValue;
-                if(lead.coupon && lead.coupon !== "Nenhum") {
-                    priceText = `${lead.totalValue} <span class="text-green-400 ml-1">-${Number(lead.discountValue).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${lead.coupon})</span>`;
+                let priceText = esc(lead.totalValue);
+                if (lead.coupon && lead.coupon !== "Nenhum") {
+                    priceText = `${esc(lead.totalValue)} <span class="text-green-400 ml-1">-${esc(fmtBRL(lead.discountValue))} (${esc(lead.coupon)})</span>`;
                 }
 
                 let displayDate = lead.eventDate || '-';
-                if (lead.eventDate && lead.eventDate !== "Não informada" && lead.eventDate.includes('-')) {
+                if (lead.eventDate && lead.eventDate !== "Não informada" && String(lead.eventDate).includes('-')) {
                     const d = new Date(lead.eventDate + 'T12:00:00');
                     if (!isNaN(d)) displayDate = d.toLocaleDateString('pt-BR');
                 }
+
+                const presence = getPresence(lead);
+                const tier = getTier(lead);
+                const actions = totalActions(lead);
+                const journeyOpen = openJourneys.has(lead.id);
+                const addressVal = drafts[`address-${lead.id}`] ?? lead.eventAddress ?? '';
+                const payInfoVal = drafts[`payinfo-${lead.id}`] ?? lead.adminPaymentInfo ?? lead.paymentMethod ?? '';
+                const drinksList = Array.isArray(lead.drinks) ? lead.drinks : (lead.drinks ? Object.values(lead.drinks) : []);
 
                 html += `
                 <div class="lead-card p-5 rounded-2xl mb-4 relative transition-all ${cardBorderClass}">
                     <div class="absolute top-4 right-4 flex gap-2 flex-wrap justify-end max-w-[60%]">
                         ${isAbandoned ? `
-                            <button onclick="window.recoverLead('${lead.name}', '${lead.whatsapp}', '${lead.eventDate}', '${lead.guests}')" class="bg-purple-600/20 text-purple-400 border border-purple-500/30 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black hover:bg-purple-600/40 transition-all flex items-center gap-1 shadow-lg">
+                            <button onclick="window.recoverLeadById('${id}')" class="bg-purple-600/20 text-purple-400 border border-purple-500/30 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black hover:bg-purple-600/40 transition-all flex items-center gap-1 shadow-lg">
                                 ♻️ Recuperar
                             </button>
                         ` : ''}
-                        <button onclick="window.toggleReservation('${lead.id}', ${isReserved})" class="${reserveBtnClass} px-3 py-1.5 rounded-lg text-[9px] uppercase font-black transition-all flex items-center gap-1 shadow-lg">
+                        <button onclick="window.toggleReservation('${id}', ${isReserved})" class="${reserveBtnClass} px-3 py-1.5 rounded-lg text-[9px] uppercase font-black transition-all flex items-center gap-1 shadow-lg">
                             ${isReserved ? '✕ Remover' : '🗓 Reservar'}
                         </button>
-                        <a href="${waLink}" target="_blank" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black hover:bg-green-600/40 transition-all flex items-center justify-center shadow-lg">WhatsApp</a>
-                        <button onclick="window.deleteLead('${lead.id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 w-8 h-8 rounded-lg flex items-center justify-center text-lg hover:bg-red-500/20 cursor-pointer shadow-lg">×</button>
+                        <a href="${waLink}" target="_blank" rel="noopener" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black hover:bg-green-600/40 transition-all flex items-center justify-center shadow-lg">WhatsApp</a>
+                        <button onclick="window.deleteLead('${id}')" class="bg-red-500/10 text-red-500 border border-red-500/20 w-8 h-8 rounded-lg flex items-center justify-center text-lg hover:bg-red-500/20 cursor-pointer shadow-lg">×</button>
                     </div>
 
                     <div class="border-b border-white/10 pb-3 mb-3 pr-24 sm:pr-60">
                         ${isReserved ? '<span class="inline-block bg-[#d4af37] text-black text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest mb-2 shadow-lg">🗓 Evento Reservado na Agenda</span>' : ''}
-                        <h4 class="${isReserved ? 'gold-text' : 'text-white'} font-black uppercase text-base leading-tight">${lead.name || 'Sem Nome'}</h4>
-                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">${lead.timestamp ? new Date(lead.timestamp).toLocaleString('pt-BR') : '-'}</span>
+                        <h4 class="${isReserved ? 'gold-text' : 'text-white'} font-black uppercase text-base leading-tight">${esc(lead.name || 'Sem Nome')}</h4>
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">${lead.timestamp ? esc(new Date(lead.timestamp).toLocaleString('pt-BR')) : '-'}</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        ${presence.html}
+                        <span class="lead-badge ${tier.cls}" title="Pontuação de interesse">${tier.icon} ${tier.label} · ${tier.score} pts</span>
+                        <span class="lead-badge badge-neutral" title="Tempo ativo na plataforma">⏱ ${esc(fmtDuration(lead.timeOnSite))}</span>
+                        <span class="lead-badge badge-neutral" title="Quantas vezes entrou">🔁 ${Number(lead.visits) || 0} ${Number(lead.visits) === 1 ? 'visita' : 'visitas'}</span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-y-3 text-[11px] text-gray-400">
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Contato</span>
-                            <span class="text-white font-medium">${lead.whatsapp || '-'}</span>
+                            <span class="text-white font-medium">${esc(lead.whatsapp || '-')}</span>
                         </div>
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Status</span>
-                            <span class="${statusClass} font-bold">${lead.status || 'Novo'}</span>
+                            <span class="${statusClass} font-bold">${esc(lead.status || 'Novo')}</span>
                         </div>
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Data / Local Original</span>
-                            <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${displayDate} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${lead.region || '-'}</span></span>
+                            <span class="${isReserved ? 'gold-text font-bold' : 'text-white'}">${esc(displayDate)} <br> <span class="text-[9px] text-gray-500 leading-tight block mt-0.5">${esc(lead.region || '-')}</span></span>
                         </div>
                         <div>
                             <span class="block text-[9px] uppercase font-bold text-gray-600 mb-1">Convidados / Duração</span>
-                            <span class="text-white">${lead.guests || '0'} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${lead.duration || '-'}</span></span>
+                            <span class="text-white">${esc(lead.guests || '0')} <br> <span class="text-[9px] text-[#d4af37] leading-tight block mt-0.5">${esc(lead.duration || '-')}</span></span>
                         </div>
                     </div>
 
                     ${lead.plan ? `
                     <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center bg-black/20 p-2 rounded-lg">
                         <span class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Plano Selecionado</span>
-                        <span class="gold-text font-black text-xs uppercase">${lead.plan} - ${priceText}</span>
+                        <span class="gold-text font-black text-xs uppercase">${esc(lead.plan)} - ${priceText}</span>
                     </div>` : ''}
+
+                    <div class="mt-4 pt-3 border-t border-white/5">
+                        <button type="button" onclick="window.toggleJourney('${id}')" class="w-full flex justify-between items-center text-[9px] uppercase font-black tracking-widest text-gray-400 hover:text-[#d4af37] transition-colors">
+                            <span>📍 Jornada do cliente (${actions} ${actions === 1 ? 'ação' : 'ações'})</span>
+                            <span>${journeyOpen ? '▲ Fechar' : '▼ Ver'}</span>
+                        </button>
+                        ${journeyOpen ? renderJourney(lead.id) : ''}
+                    </div>
 
                     ${isReserved ? `
                     <div class="mt-4 pt-4 border-t border-[#d4af37]/30 bg-gradient-to-br from-black/60 to-transparent p-4 rounded-xl shadow-inner">
@@ -2221,26 +3076,26 @@
                             <span class="text-xl">📋</span>
                             <h5 class="text-[10px] gold-text font-black uppercase tracking-widest">Detalhes da Agenda</h5>
                         </div>
-                        
+
                         <div class="space-y-4">
                             <div>
                                 <span class="block text-[8px] uppercase text-gray-500 font-bold mb-1">🍸 Drinks Selecionados:</span>
                                 <span class="text-[10px] text-gray-300 bg-white/5 p-2.5 rounded block border border-white/5 font-medium leading-relaxed">
-                                    ${lead.drinks && lead.drinks.length > 0 ? lead.drinks.join(', ') : 'Nenhum drink selecionado no simulador'}
+                                    ${drinksList.length > 0 ? esc(drinksList.join(', ')) : 'Nenhum drink selecionado no simulador'}
                                 </span>
                             </div>
 
                             <div>
                                 <span class="block text-[8px] uppercase text-gray-500 font-bold mb-1">📍 Endereço do Evento:</span>
-                                <input type="text" id="address-${lead.id}" value="${lead.eventAddress || ''}" placeholder="Ex: Sítio das Águas - Rua Principal, 123" class="w-full bg-black/80 border border-gray-700 rounded-lg p-2.5 text-[10px] text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
+                                <input type="text" id="address-${id}" value="${esc(addressVal)}" placeholder="Ex: Sítio das Águas - Rua Principal, 123" class="w-full bg-black/80 border border-gray-700 rounded-lg p-2.5 text-[10px] text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
                             </div>
 
                             <div>
                                 <span class="block text-[8px] uppercase text-gray-500 font-bold mb-1">💰 Pagamento / Observações:</span>
-                                <input type="text" id="payinfo-${lead.id}" value="${lead.adminPaymentInfo || lead.paymentMethod || ''}" placeholder="Ex: 50% Pix Pago, Restante no dia" class="w-full bg-black/80 border border-gray-700 rounded-lg p-2.5 text-[10px] text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
+                                <input type="text" id="payinfo-${id}" value="${esc(payInfoVal)}" placeholder="Ex: 50% Pix Pago, Restante no dia" class="w-full bg-black/80 border border-gray-700 rounded-lg p-2.5 text-[10px] text-white focus:border-[#d4af37] outline-none transition-colors shadow-inner">
                             </div>
 
-                            <button onclick="window.saveLeadDetails('${lead.id}', this)" class="w-full mt-2 gold-bg text-black py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                            <button onclick="window.saveLeadDetails('${id}', this)" class="w-full mt-2 gold-bg text-black py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                                 💾 Salvar Detalhes na Agenda
                             </button>
                         </div>
@@ -2252,14 +3107,61 @@
             container.innerHTML = html;
         };
 
+        // ---------- Ações do admin ----------
+        window.recoverLeadById = function(leadId) {
+            const lead = globalLeads.find(l => l.id === leadId);
+            if (!lead) return;
+            window.recoverLead(lead.name, lead.whatsapp, lead.eventDate, lead.guests);
+        };
+
+        window.toggleReservation = async function(leadId, currentStatus) {
+            if (!leadId) return;
+            try {
+                await update(ref(db, 'leads/' + leadId), { isReserved: !currentStatus });
+            } catch (e) {
+                console.error("Erro ao atualizar reserva:", e);
+            }
+        };
+
+        window.saveLeadDetails = async function(leadId, btnElement) {
+            const addressInput = document.getElementById(`address-${leadId}`);
+            const payInfoInput = document.getElementById(`payinfo-${leadId}`);
+            if (!leadId || !addressInput || !payInfoInput) return;
+
+            const originalText = btnElement.innerHTML;
+            try {
+                btnElement.innerHTML = "⏳ Salvando...";
+                await update(ref(db, 'leads/' + leadId), {
+                    eventAddress: addressInput.value,
+                    adminPaymentInfo: payInfoInput.value
+                });
+                delete drafts[`address-${leadId}`];
+                delete drafts[`payinfo-${leadId}`];
+
+                btnElement.innerHTML = "✅ Salvo com sucesso!";
+                btnElement.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/50');
+                setTimeout(() => {
+                    btnElement.innerHTML = originalText;
+                    btnElement.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/50');
+                }, 2000);
+            } catch (e) {
+                console.error("Erro ao salvar detalhes:", e);
+                btnElement.innerHTML = "❌ Erro ao salvar";
+                setTimeout(() => { btnElement.innerHTML = originalText; }, 2500);
+            }
+        };
+
         window.deleteLead = async function(leadId) {
-            if (confirm("Deseja remover este cliente permanentemente da sua lista de contatos?")) {
-                try {
-                    const leadRef = ref(db, 'leads/' + leadId);
-                    await remove(leadRef);
-                } catch (e) {
-                    console.error("Erro ao excluir registro:", e);
-                }
+            if (!confirm("Deseja remover este cliente permanentemente da sua lista de contatos?")) return;
+            try {
+                const updates = {};
+                updates['leads/' + leadId] = null;
+                updates['leadEvents/' + leadId] = null;
+                await update(ref(db), updates);
+                openJourneys.delete(leadId);
+                journeyCache.delete(leadId);
+            } catch (e) {
+                console.error("Erro ao excluir registro:", e);
             }
         };
     </script>
